@@ -1,0 +1,30 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+.envrc
+# Test binary, created with `go test -c`
+*.test
+
+# Output of the dep command, which is deprecated
+vendor/
+
+# Logs and debug files
+*.log
+*.out
+*.tmp
+
+# Build artifacts and local configuration
+build/
+bin/
+*.env
+
+# IDE files
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# Go module files
+go.sum
