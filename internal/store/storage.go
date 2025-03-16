@@ -23,11 +23,18 @@ type Storage struct {
 		Activate(context.Context, string) error
 		Delete(context.Context, int64) error
 	}
+	Rooms interface {
+		GetByID(context.Context, int64) (*Room, error)
+		Create(context.Context, *Room) error
+		Delete(context.Context, int64) error
+		Update(context.Context, *Room) error
+	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
 		Users: &UsersStore{db},
+		Rooms: &RoomsStore{db},
 	}
 }
 

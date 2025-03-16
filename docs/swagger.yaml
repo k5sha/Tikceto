@@ -1,4 +1,17 @@
 definitions:
+  main.CreateRoomPayload:
+    properties:
+      capacity:
+        minimum: 0
+        type: integer
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - capacity
+    - name
+    type: object
   main.CreateUserTokenPayload:
     properties:
       email:
@@ -28,6 +41,25 @@ definitions:
     - email
     - password
     - username
+    type: object
+  main.UpdateRoomPayload:
+    properties:
+      capacity:
+        minimum: 0
+        type: integer
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+    type: object
+  store.Room:
+    properties:
+      capacity:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   store.User:
     properties:
@@ -113,6 +145,134 @@ paths:
       summary: Registers a user
       tags:
       - authentication
+  /rooms:
+    post:
+      consumes:
+      - application/json
+      description: Creates a room
+      parameters:
+      - description: Room payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateRoomPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/store.Room'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a room
+      tags:
+      - rooms
+  /rooms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a room
+      tags:
+      - rooms
+    get:
+      consumes:
+      - application/json
+      description: Fetches a room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Room'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches a room
+      tags:
+      - rooms
+    patch:
+      consumes:
+      - application/json
+      description: Updates a room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Room payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.UpdateRoomPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Room'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a room
+      tags:
+      - rooms
 securityDefinitions:
   ApiKeyAuth:
     description: Use the Authorization header with a Bearer token to authenticate

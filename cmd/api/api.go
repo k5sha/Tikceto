@@ -97,6 +97,19 @@ func (app *application) mount() *chi.Mux {
 		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
 		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
+		r.Route("/rooms", func(r chi.Router) {
+			r.Post("/", app.createRoomHandler)
+
+			r.Route("/{roomID}", func(r chi.Router) {
+				r.Use(app.roomsContextMiddleware)
+
+				r.Get("/", app.getRoomHandler)
+				r.Delete("/", app.deleteRoomHandler)
+				r.Patch("/", app.updateRoomHandler)
+
+			})
+		})
+
 		r.Route("/users", func(r chi.Router) {
 			r.Put("/activate/{token}", app.activateUserHandler)
 		})
