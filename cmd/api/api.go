@@ -110,6 +110,19 @@ func (app *application) mount() *chi.Mux {
 			})
 		})
 
+		r.Route("/movies", func(r chi.Router) {
+			r.Post("/", app.createMovieHandler)
+
+			r.Route("/{movieID}", func(r chi.Router) {
+				r.Use(app.moviesContextMiddleware)
+
+				r.Get("/", app.getMovieHandler)
+				r.Delete("/", app.deleteMovieHandler)
+				r.Patch("/", app.updateMovieHandler)
+
+			})
+		})
+
 		r.Route("/users", func(r chi.Router) {
 			r.Put("/activate/{token}", app.activateUserHandler)
 		})

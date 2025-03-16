@@ -1,8 +1,30 @@
 definitions:
+  main.CreateMoviePayload:
+    description: string   "Description of the movie" validate:"required,min=50,max=500"
+    properties:
+      description:
+        maxLength: 500
+        minLength: 50
+        type: string
+      duration:
+        minimum: 1
+        type: integer
+      release_date:
+        type: string
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - description
+    - duration
+    - release_date
+    - title
+    type: object
   main.CreateRoomPayload:
     properties:
       capacity:
-        minimum: 0
+        minimum: 1
         type: integer
       name:
         maxLength: 100
@@ -42,14 +64,48 @@ definitions:
     - password
     - username
     type: object
+  main.UpdateMoviePayload:
+    description: string   "Description of the movie" validate:"omitempty,min=50,max=500"
+    properties:
+      description:
+        maxLength: 500
+        minLength: 50
+        type: string
+      duration:
+        minimum: 1
+        type: integer
+      release_date:
+        type: string
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+    type: object
   main.UpdateRoomPayload:
     properties:
       capacity:
-        minimum: 0
+        minimum: 1
         type: integer
       name:
         maxLength: 100
         minLength: 3
+        type: string
+    type: object
+  store.Movie:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: integer
+      poster_url:
+        type: string
+      release_date:
+        type: string
+      title:
         type: string
     type: object
   store.Room:
@@ -145,6 +201,134 @@ paths:
       summary: Registers a user
       tags:
       - authentication
+  /movies:
+    post:
+      consumes:
+      - application/json
+      description: Creates a movie
+      parameters:
+      - description: Movie payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateMoviePayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/store.Movie'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a movie
+      tags:
+      - movies
+  /movies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a movie by ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a movie
+      tags:
+      - movies
+    get:
+      consumes:
+      - application/json
+      description: Fetches a movie by ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Movie'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches a movie
+      tags:
+      - movies
+    patch:
+      consumes:
+      - application/json
+      description: Updates a movie by ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Movie payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.UpdateMoviePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Movie'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a movie
+      tags:
+      - movies
   /rooms:
     post:
       consumes:

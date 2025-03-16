@@ -17,10 +17,10 @@ const roomCtx roomKey = "room"
 // CreateRoomPayload represents the payload for creating a room.
 //
 //	@Name		string   "Name of the room"  validate:"required,min=3,max=100"
-//	@Capacity	int   "Capacity of the room" validate:"required,numeric,min=0"`
+//	@Capacity	int   "Capacity of the room" validate:"required,gte=1"`
 type CreateRoomPayload struct {
 	Name     string `json:"name" validate:"required,min=3,max=100"`
-	Capacity int64  `json:"capacity" validate:"required,numeric,min=0"`
+	Capacity int64  `json:"capacity" validate:"required,gte=1"`
 }
 
 // CreateRoom godoc
@@ -90,10 +90,10 @@ func (app *application) getRoomHandler(w http.ResponseWriter, r *http.Request) {
 // UpdateRoomPayload represents the payload for updating a room.
 //
 //	@Name		string   "Updated name of the room" validate:"omitempty,min=3,max=100"`
-//	@Capacity	int   "Updated capacity of the room" validate:"omitempty,numeric,min=0"`
+//	@Capacity	int   "Updated capacity of the room" validate:"omitempty,gte=1"`
 type UpdateRoomPayload struct {
 	Name     *string `json:"name" validate:"omitempty,min=3,max=100"`
-	Capacity *int64  `json:"capacity" validate:"omitempty,numeric,min=0"`
+	Capacity *int64  `json:"capacity" validate:"omitempty,gte=1"`
 }
 
 // UpdateRoom godoc
