@@ -11,6 +11,7 @@ import (
 	"github.com/k5sha/Tikceto/internal/auth"
 	"github.com/k5sha/Tikceto/internal/env"
 	"github.com/k5sha/Tikceto/internal/mailer"
+	"github.com/k5sha/Tikceto/internal/s3"
 	"github.com/k5sha/Tikceto/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"go.uber.org/zap"
@@ -27,6 +28,7 @@ type application struct {
 	authenticator auth.Authenticator
 	mailer        mailer.Client
 	logger        *zap.SugaredLogger
+	s3            s3.Client
 }
 
 type config struct {
@@ -37,6 +39,7 @@ type config struct {
 	frontendURL string
 	env         string
 	db          dbConfig
+	s3          s3Config
 }
 
 type dbConfig struct {
@@ -72,6 +75,18 @@ type mailTrapConfig struct {
 	apiKey string
 }
 
+type s3Config struct {
+	bucketName string
+	minio      minioConfig
+}
+
+type minioConfig struct {
+	user     string
+	password string
+	ssl      bool
+	endpoint string
+}
+
 func (app *application) mount() *chi.Mux {
 	r := chi.NewRouter()
 
@@ -96,6 +111,9 @@ func (app *application) mount() *chi.Mux {
 		// Swagger
 		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
 		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
+
+		// Static
+		r.Handle("/static/*", app.secureImageServer("./static"))
 
 		r.Route("/rooms", func(r chi.Router) {
 			r.Post("/", app.createRoomHandler)

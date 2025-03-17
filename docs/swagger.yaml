@@ -1,26 +1,4 @@
 definitions:
-  main.CreateMoviePayload:
-    description: string   "Description of the movie" validate:"required,min=50,max=500"
-    properties:
-      description:
-        maxLength: 500
-        minLength: 50
-        type: string
-      duration:
-        minimum: 1
-        type: integer
-      release_date:
-        type: string
-      title:
-        maxLength: 100
-        minLength: 3
-        type: string
-    required:
-    - description
-    - duration
-    - release_date
-    - title
-    type: object
   main.CreateRoomPayload:
     properties:
       capacity:
@@ -204,15 +182,34 @@ paths:
   /movies:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Creates a movie
       parameters:
-      - description: Movie payload
-        in: body
-        name: payload
+      - description: Movie poster file
+        in: formData
+        name: file
         required: true
-        schema:
-          $ref: '#/definitions/main.CreateMoviePayload'
+        type: file
+      - description: Movie title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Movie description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Movie duration in minutes
+        in: formData
+        name: duration
+        required: true
+        type: integer
+      - description: Movie release date (YYYY-MM-DD)
+        in: formData
+        name: release_date
+        required: true
+        type: string
       produces:
       - application/json
       responses:

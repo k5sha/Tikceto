@@ -121,7 +121,7 @@ const docTemplate = `{
                 ],
                 "description": "Creates a movie",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -132,13 +132,39 @@ const docTemplate = `{
                 "summary": "Creates a movie",
                 "parameters": [
                     {
-                        "description": "Movie payload",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.CreateMoviePayload"
-                        }
+                        "type": "file",
+                        "description": "Movie poster file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movie title",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movie description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Movie duration in minutes",
+                        "name": "duration",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movie release date (YYYY-MM-DD)",
+                        "name": "release_date",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -502,35 +528,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "main.CreateMoviePayload": {
-            "description": "string   \"Description of the movie\" validate:\"required,min=50,max=500\"",
-            "type": "object",
-            "required": [
-                "description",
-                "duration",
-                "release_date",
-                "title"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string",
-                    "maxLength": 500,
-                    "minLength": 50
-                },
-                "duration": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "release_date": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 3
-                }
-            }
-        },
         "main.CreateRoomPayload": {
             "type": "object",
             "required": [

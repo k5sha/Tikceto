@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/k5sha/Tikceto/internal/s3"
 	"github.com/k5sha/Tikceto/internal/store"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -34,21 +36,66 @@ type CreateMoviePayload struct {
 //	@Summary		Creates a movie
 //	@Description	Creates a movie
 //	@Tags			movies
-//	@Accept			json
+//	@Accept			multipart/form-data
 //	@Produce		json
-//	@Param			payload	body		CreateMoviePayload	true	"Movie payload"
-//	@Success		201		{object}	store.Movie
-//	@Failure		400		{object}	error
-//	@Failure		401		{object}	error
-//	@Failure		500		{object}	error
+//	@Param			file			formData	file	true	"Movie poster file"
+//	@Param			title			formData	string	true	"Movie title"
+//	@Param			description		formData	string	true	"Movie description"
+//	@Param			duration		formData	int		true	"Movie duration in minutes"
+//	@Param			release_date	formData	string	true	"Movie release date (YYYY-MM-DD)"
+//	@Success		201				{object}	store.Movie
+//	@Failure		400				{object}	error
+//	@Failure		401				{object}	error
+//	@Failure		500				{object}	error
 //	@Security		ApiKeyAuth
 //	@Router			/movies [post]
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request) {
-	var payload CreateMoviePayload
-	if err := readJSON(w, r, &payload); err != nil {
-		app.badRequestResponse(w, r, err)
+	err := r.ParseMultipartForm(10 << 20) // 10MB max upload size
+	if err != nil {
+		app.internalServerError(w, r, err)
 		return
 	}
+
+	// TODO: rename post url to object id or something like it
+	file, fileHeader, err := r.FormFile("file")
+	if err != nil {
+		app.badRequestResponse(w, r, fmt.Errorf("file is required"))
+		return
+	}
+	defer file.Close()
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	fileData := s3.FileDataType{
+		FileName: fileHeader.Filename,
+		Data:     fileBytes,
+	}
+	ctx := r.Context()
+
+	objectID, err := app.s3.CreateOne(ctx, fileData)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	payload := CreateMoviePayload{
+		Title:       r.FormValue("title"),
+		Description: r.FormValue("description"),
+		Duration:    0,
+		ReleaseDate: r.FormValue("release_date"),
+	}
+
+	durationStr := r.FormValue("duration")
+	duration, err := strconv.Atoi(durationStr)
+	if err != nil {
+		app.badRequestResponse(w, r, fmt.Errorf("invalid duration format"))
+		return
+	}
+	payload.Duration = int64(duration)
 
 	if err := Validate.Struct(payload); err != nil {
 		app.badRequestResponse(w, r, err)
@@ -60,8 +107,8 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 		Description: payload.Description,
 		Duration:    payload.Duration,
 		ReleaseDate: payload.ReleaseDate,
+		PosterUrl:   objectID,
 	}
-	ctx := r.Context()
 
 	if err := app.store.Movies.Create(ctx, movie); err != nil {
 		app.internalServerError(w, r, err)
@@ -88,6 +135,16 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 //	@Router			/movies/{id} [get]
 func (app *application) getMovieHandler(w http.ResponseWriter, r *http.Request) {
 	movie := getMovieFromCtx(r)
+
+	ctx := r.Context()
+
+	url, err := app.s3.GetOne(ctx, movie.PosterUrl)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	movie.PosterUrl = url
 
 	if err := app.jsonResponse(w, http.StatusOK, movie); err != nil {
 		app.internalServerError(w, r, err)
@@ -129,6 +186,7 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 
 	var payload UpdateMoviePayload
 
+	// TODO: add update of poster
 	if err := readJSON(w, r, &payload); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -194,6 +252,11 @@ func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Reques
 		default:
 			app.internalServerError(w, r, err)
 		}
+		return
+	}
+
+	if err := app.s3.DeleteOne(ctx, movie.PosterUrl); err != nil {
+		app.internalServerError(w, r, err)
 		return
 	}
 

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -87,4 +89,39 @@ func (app *application) AuthTokenMiddleware() func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
+}
+
+var allowedExtensions = map[string]bool{
+	".jpg":  true,
+	".jpeg": true,
+	".png":  true,
+	".gif":  true,
+	".webp": true,
+	".svg":  true,
+}
+
+func (app *application) secureImageServer(root string) http.Handler {
+	fs := http.Dir(root)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := filepath.Join(root, r.URL.Path[len("/v1/static/"):])
+
+		ext := strings.ToLower(filepath.Ext(path))
+
+		if strings.HasPrefix(filepath.Base(path), ".") {
+			app.forbiddenErrorResponse(w, r)
+			return
+		}
+
+		if !allowedExtensions[ext] {
+			app.forbiddenErrorResponse(w, r)
+			return
+		}
+
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			app.notFoundResponse(w, r, err)
+			return
+		}
+
+		http.StripPrefix("/v1/static/", http.FileServer(fs)).ServeHTTP(w, r)
+	})
 }

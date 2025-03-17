@@ -5,6 +5,7 @@ import (
 	"github.com/k5sha/Tikceto/internal/db"
 	"github.com/k5sha/Tikceto/internal/env"
 	"github.com/k5sha/Tikceto/internal/mailer"
+	"github.com/k5sha/Tikceto/internal/s3"
 	"github.com/k5sha/Tikceto/internal/store"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
@@ -60,6 +61,15 @@ func main() {
 				apiKey: env.GetString("MAILTRAP_API_KEY", ""),
 			},
 		},
+		s3: s3Config{
+			bucketName: env.GetString("S3_BUCKET_NAME", "tikceto"),
+			minio: minioConfig{
+				user:     env.GetString("MINIO_ROOT_USER", "admin"),
+				password: env.GetString("MINIO_ROOT_PASSWORD", "adminpassword"),
+				endpoint: env.GetString("MINIO_ENDPOINT", "localhost:9000"),
+				ssl:      env.GetBool("MINIO_SSL", false),
+			},
+		},
 	}
 
 	// Logger
@@ -85,6 +95,12 @@ func main() {
 	// Auth
 	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
 
+	// S3
+	s3, err := s3.NewMinioClient(cfg.s3.minio.endpoint, cfg.s3.minio.user, cfg.s3.minio.password, cfg.s3.bucketName, cfg.s3.minio.ssl)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	// Application
 	app := &application{
 		authenticator: jwtAuthenticator,
@@ -92,6 +108,7 @@ func main() {
 		store:         store,
 		logger:        logger,
 		mailer:        mailer,
+		s3:            s3,
 	}
 
 	// Routing
