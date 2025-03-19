@@ -71,10 +71,8 @@ func (s *MoviesStore) Create(ctx context.Context, movie *Movie) error {
 		&movie.ID,
 		&movie.CreatedAt,
 	)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 func (s *MoviesStore) Delete(ctx context.Context, id int64) error {
 	query := `

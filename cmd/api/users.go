@@ -33,6 +33,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		app.internalServerError(w, r, err)
 		return
 	}
+
 }
 
 func getUserFromCtx(r *http.Request) *store.User {

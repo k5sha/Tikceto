@@ -141,6 +141,19 @@ func (app *application) mount() *chi.Mux {
 			})
 		})
 
+		r.Route("/sessions", func(r chi.Router) {
+			r.Post("/", app.createSessionHandler)
+
+			r.Route("/{sessionID}", func(r chi.Router) {
+				r.Use(app.sessionsContextMiddleware)
+
+				r.Get("/", app.getSessionHandler)
+				r.Delete("/", app.deleteSessionHandler)
+				r.Patch("/", app.updateSessionHandler)
+
+			})
+		})
+
 		r.Route("/users", func(r chi.Router) {
 			r.Put("/activate/{token}", app.activateUserHandler)
 		})

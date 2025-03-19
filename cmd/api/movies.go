@@ -16,8 +16,6 @@ type movieKey string
 
 const movieCtx movieKey = "movie"
 
-// TODO: poster upload
-
 // CreateMoviePayload represents the payload for creating a movie.
 //
 //	@Title			string   "Title of the movie"  validate:"required,min=3,max=100"

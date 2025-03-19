@@ -30,8 +30,8 @@ type CreateRoomPayload struct {
 //	@Tags			rooms
 //	@Accept			json
 //	@Produce		json
-//	@Param			payload	body		CreateRoomPayload	true	"Room payload"
-//	@Success		201		{object}	store.Room
+//	@Param			payload	body		CreateRoomPayload	true	"Session payload"
+//	@Success		201		{object}	store.Session
 //	@Failure		400		{object}	error
 //	@Failure		401		{object}	error
 //	@Failure		500		{object}	error
@@ -73,8 +73,8 @@ func (app *application) createRoomHandler(w http.ResponseWriter, r *http.Request
 //	@Tags			rooms
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"Room ID"
-//	@Success		200	{object}	store.Room
+//	@Param			id	path		int	true	"Session ID"
+//	@Success		200	{object}	store.Session
 //	@Failure		404	{object}	error
 //	@Failure		500	{object}	error
 //	@Router			/rooms/{id} [get]
@@ -103,9 +103,9 @@ type UpdateRoomPayload struct {
 //	@Tags			rooms
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int					true	"Room ID"
-//	@Param			payload	body		UpdateRoomPayload	true	"Room payload"
-//	@Success		200		{object}	store.Room
+//	@Param			id		path		int					true	"Session ID"
+//	@Param			payload	body		UpdateRoomPayload	true	"Session payload"
+//	@Success		200		{object}	store.Session
 //	@Failure		400		{object}	error
 //	@Failure		401		{object}	error
 //	@Failure		404		{object}	error
@@ -159,7 +159,7 @@ func (app *application) updateRoomHandler(w http.ResponseWriter, r *http.Request
 //	@Tags			rooms
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"Room ID"
+//	@Param			id	path		int	true	"Session ID"
 //	@Success		204	{object} string
 //	@Failure		404	{object}	error
 //	@Failure		500	{object}	error

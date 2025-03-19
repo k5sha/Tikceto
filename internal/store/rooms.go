@@ -61,10 +61,8 @@ func (s *RoomsStore) Create(ctx context.Context, room *Room) error {
 	).Scan(
 		&room.ID,
 	)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 func (s *RoomsStore) Delete(ctx context.Context, id int64) error {
 	query := `

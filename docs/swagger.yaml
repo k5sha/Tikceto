@@ -12,6 +12,25 @@ definitions:
     - capacity
     - name
     type: object
+  main.CreateSessionPayload:
+    properties:
+      movie_id:
+        minimum: 1
+        type: integer
+      price:
+        minimum: 0
+        type: number
+      room_id:
+        minimum: 1
+        type: integer
+      start_time:
+        type: string
+    required:
+    - movie_id
+    - price
+    - room_id
+    - start_time
+    type: object
   main.CreateUserTokenPayload:
     properties:
       email:
@@ -69,6 +88,20 @@ definitions:
         minLength: 3
         type: string
     type: object
+  main.UpdateSessionPayload:
+    properties:
+      movie_id:
+        minimum: 1
+        type: integer
+      price:
+        minimum: 0
+        type: number
+      room_id:
+        minimum: 1
+        type: integer
+      start_time:
+        type: string
+    type: object
   store.Movie:
     properties:
       created_at:
@@ -93,6 +126,23 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+    type: object
+  store.Session:
+    properties:
+      id:
+        type: integer
+      movie:
+        $ref: '#/definitions/store.Movie'
+      movie_id:
+        type: integer
+      price:
+        type: number
+      room:
+        $ref: '#/definitions/store.Room'
+      room_id:
+        type: integer
+      start_time:
         type: string
     type: object
   store.User:
@@ -332,7 +382,7 @@ paths:
       - application/json
       description: Creates a room
       parameters:
-      - description: Room payload
+      - description: Session payload
         in: body
         name: payload
         required: true
@@ -344,7 +394,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/store.Room'
+            $ref: '#/definitions/store.Session'
         "400":
           description: Bad Request
           schema: {}
@@ -365,7 +415,7 @@ paths:
       - application/json
       description: Delete a room by ID
       parameters:
-      - description: Room ID
+      - description: Session ID
         in: path
         name: id
         required: true
@@ -393,7 +443,7 @@ paths:
       - application/json
       description: Fetches a room by ID
       parameters:
-      - description: Room ID
+      - description: Session ID
         in: path
         name: id
         required: true
@@ -404,7 +454,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/store.Room'
+            $ref: '#/definitions/store.Session'
         "404":
           description: Not Found
           schema: {}
@@ -419,12 +469,12 @@ paths:
       - application/json
       description: Updates a room by ID
       parameters:
-      - description: Room ID
+      - description: Session ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Room payload
+      - description: Session payload
         in: body
         name: payload
         required: true
@@ -436,7 +486,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/store.Room'
+            $ref: '#/definitions/store.Session'
         "400":
           description: Bad Request
           schema: {}
@@ -454,6 +504,134 @@ paths:
       summary: Updates a room
       tags:
       - rooms
+  /sessions:
+    post:
+      consumes:
+      - application/json
+      description: Creates a session
+      parameters:
+      - description: Session payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateSessionPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/store.Session'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a session
+      tags:
+      - sessions
+  /sessions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a session by ID
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a session
+      tags:
+      - sessions
+    get:
+      consumes:
+      - application/json
+      description: Fetches a session by ID
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Session'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches a session
+      tags:
+      - sessions
+    patch:
+      consumes:
+      - application/json
+      description: Updates a session by ID
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Session payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.UpdateSessionPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Session'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a session
+      tags:
+      - sessions
 securityDefinitions:
   ApiKeyAuth:
     description: Use the Authorization header with a Bearer token to authenticate
