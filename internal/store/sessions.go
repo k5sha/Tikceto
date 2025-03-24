@@ -52,6 +52,7 @@ func (s *SessionStore) GetByID(ctx context.Context, id int64) (*Session, error) 
 
 	return session, nil
 }
+
 func (s *SessionStore) Create(ctx context.Context, session *Session) error {
 	query := `
 		INSERT INTO sessions (movie_id, room_id, start_time, price) 

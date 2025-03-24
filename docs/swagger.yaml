@@ -181,8 +181,6 @@ definitions:
         type: integer
       name:
         type: string
-      seats_count:
-        type: integer
     type: object
   store.Seat:
     properties:

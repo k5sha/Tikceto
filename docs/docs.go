@@ -1364,9 +1364,6 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
-                },
-                "seats_count": {
-                    "type": "integer"
                 }
             }
         },

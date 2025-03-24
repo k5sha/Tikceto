@@ -53,7 +53,7 @@ func (app *application) createSeatHandler(w http.ResponseWriter, r *http.Request
 
 	ctx := r.Context()
 
-	room, err := app.store.Rooms.GetByID(ctx, payload.RoomID)
+	data, err := app.store.Rooms.GetWithSeatsCountByID(ctx, payload.RoomID)
 	if err != nil {
 		if errors.Is(err, store.ErrNotFound) {
 			app.notFoundResponse(w, r, err)
@@ -63,13 +63,13 @@ func (app *application) createSeatHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if room.SeatsCount >= room.Capacity {
+	if data.SeatsCount >= data.Room.Capacity {
 		app.badRequestResponse(w, r, fmt.Errorf("room capacity exceeded"))
 		return
 	}
 
 	seat := &store.Seat{
-		RoomID: room.ID,
+		RoomID: data.Room.ID,
 		Row:    payload.Row,
 		Number: payload.Number,
 	}

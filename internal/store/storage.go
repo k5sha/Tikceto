@@ -25,6 +25,7 @@ type Storage struct {
 	}
 	Rooms interface {
 		GetByID(context.Context, int64) (*Room, error)
+		GetWithSeatsCountByID(context.Context, int64) (*RoomWithMetadata, error)
 		Create(context.Context, *Room) error
 		Delete(context.Context, int64) error
 		Update(context.Context, *Room) error

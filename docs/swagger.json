@@ -1355,9 +1355,6 @@
                 },
                 "name": {
                     "type": "string"
-                },
-                "seats_count": {
-                    "type": "integer"
                 }
             }
         },
