@@ -167,6 +167,19 @@ func (app *application) mount() *chi.Mux {
 			})
 		})
 
+		r.Route("/tickets", func(r chi.Router) {
+			r.Post("/", app.createTicketHandler)
+
+			r.Route("/{ticketID}", func(r chi.Router) {
+				r.Use(app.ticketContextMiddleware)
+
+				r.Get("/", app.getTicketHandler)
+				r.Delete("/", app.deleteTicketHandler)
+				r.Patch("/", app.updateTicketHandler)
+
+			})
+		})
+
 		r.Route("/users", func(r chi.Router) {
 			r.Put("/activate/{token}", app.activateUserHandler)
 		})

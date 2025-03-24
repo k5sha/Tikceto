@@ -47,6 +47,26 @@ definitions:
     - room_id
     - start_time
     type: object
+  main.CreateTicketPayload:
+    properties:
+      price:
+        minimum: 0
+        type: number
+      seat_id:
+        minimum: 1
+        type: integer
+      session_id:
+        minimum: 1
+        type: integer
+      user_id:
+        minimum: 1
+        type: integer
+    required:
+    - price
+    - seat_id
+    - session_id
+    - user_id
+    type: object
   main.CreateUserTokenPayload:
     properties:
       email:
@@ -127,6 +147,15 @@ definitions:
       start_time:
         type: string
     type: object
+  main.UpdateTicketPayload:
+    properties:
+      price:
+        minimum: 0
+        type: number
+      user_id:
+        minimum: 1
+        type: integer
+    type: object
   store.Movie:
     properties:
       created_at:
@@ -182,6 +211,25 @@ definitions:
         type: integer
       start_time:
         type: string
+    type: object
+  store.Ticket:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      price:
+        type: number
+      seat:
+        $ref: '#/definitions/store.Seat'
+      seat_id:
+        type: integer
+      session:
+        $ref: '#/definitions/store.Session'
+      session_id:
+        type: integer
+      user_id:
+        type: integer
     type: object
   store.User:
     properties:
@@ -798,6 +846,134 @@ paths:
       summary: Updates a session
       tags:
       - sessions
+  /tickets:
+    post:
+      consumes:
+      - application/json
+      description: Creates a ticket
+      parameters:
+      - description: Ticket payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateTicketPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/store.Ticket'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a ticket
+      tags:
+      - tickets
+  /tickets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ticket by ID
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a ticket
+      tags:
+      - tickets
+    get:
+      consumes:
+      - application/json
+      description: Fetches a ticket by ID
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Ticket'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches a ticket
+      tags:
+      - tickets
+    patch:
+      consumes:
+      - application/json
+      description: Updates a ticket by ID
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Ticket payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.UpdateTicketPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Ticket'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a ticket
+      tags:
+      - tickets
 securityDefinitions:
   ApiKeyAuth:
     description: Use the Authorization header with a Bearer token to authenticate
