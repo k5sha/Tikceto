@@ -9,9 +9,10 @@ import (
 // TODO: add createdAt
 
 type Room struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Capacity int64  `json:"capacity"`
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	Capacity   int64  `json:"capacity"`
+	SeatsCount int64  `json:"seats_count"`
 }
 
 type RoomsStore struct {
@@ -20,9 +21,11 @@ type RoomsStore struct {
 
 func (s *RoomsStore) GetByID(ctx context.Context, id int64) (*Room, error) {
 	query := `
-		SELECT id, name, capacity
-		FROM rooms 
-        WHERE id = $1`
+		SELECT r.id, r.name, r.capacity,  COUNT(s.id) 
+		FROM rooms r 
+		LEFT JOIN seats s ON r.id = s.room_id 
+		WHERE r.id = $1 
+		GROUP BY r.id, r.name, r.capacity`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
@@ -32,6 +35,7 @@ func (s *RoomsStore) GetByID(ctx context.Context, id int64) (*Room, error) {
 		&room.ID,
 		&room.Name,
 		&room.Capacity,
+		&room.SeatsCount,
 	)
 	if err != nil {
 		switch {

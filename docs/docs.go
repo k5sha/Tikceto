@@ -352,7 +352,7 @@ const docTemplate = `{
                 "summary": "Creates a room",
                 "parameters": [
                     {
-                        "description": "Session payload",
+                        "description": "Room payload",
                         "name": "payload",
                         "in": "body",
                         "required": true,
@@ -365,7 +365,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/store.Session"
+                            "$ref": "#/definitions/store.Room"
                         }
                     },
                     "400": {
@@ -399,7 +399,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Session ID",
+                        "description": "Room ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -409,7 +409,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/store.Session"
+                            "$ref": "#/definitions/store.Room"
                         }
                     },
                     "404": {
@@ -442,7 +442,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Session ID",
+                        "description": "Room ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -485,13 +485,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Session ID",
+                        "description": "Room ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Session payload",
+                        "description": "Room payload",
                         "name": "payload",
                         "in": "body",
                         "required": true,
@@ -504,7 +504,201 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/store.Session"
+                            "$ref": "#/definitions/store.Room"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/seats": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a seat in a specified room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seats"
+                ],
+                "summary": "Creates a seat",
+                "parameters": [
+                    {
+                        "description": "Seat payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CreateSeatPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/store.Seat"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/seats/{id}": {
+            "get": {
+                "description": "Fetches a seat by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seats"
+                ],
+                "summary": "Fetches a seat",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Seat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.Seat"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes a seat by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seats"
+                ],
+                "summary": "Deletes a seat",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Seat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a seat by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seats"
+                ],
+                "summary": "Updates a seat",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Seat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Seat payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.UpdateSeatPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.Seat"
                         }
                     },
                     "400": {
@@ -740,6 +934,28 @@ const docTemplate = `{
                 }
             }
         },
+        "main.CreateSeatPayload": {
+            "type": "object",
+            "required": [
+                "number",
+                "room_id",
+                "row"
+            ],
+            "properties": {
+                "number": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "room_id": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "row": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
         "main.CreateSessionPayload": {
             "type": "object",
             "required": [
@@ -844,6 +1060,19 @@ const docTemplate = `{
                 }
             }
         },
+        "main.UpdateSeatPayload": {
+            "type": "object",
+            "properties": {
+                "row": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "seat_number": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
         "main.UpdateSessionPayload": {
             "type": "object",
             "properties": {
@@ -901,6 +1130,26 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "seats_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "store.Seat": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "room_id": {
+                    "type": "integer"
+                },
+                "row": {
+                    "type": "integer"
+                },
+                "seat_number": {
+                    "type": "integer"
                 }
             }
         },

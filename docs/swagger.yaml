@@ -12,6 +12,22 @@ definitions:
     - capacity
     - name
     type: object
+  main.CreateSeatPayload:
+    properties:
+      number:
+        minimum: 1
+        type: integer
+      room_id:
+        minimum: 1
+        type: integer
+      row:
+        minimum: 1
+        type: integer
+    required:
+    - number
+    - room_id
+    - row
+    type: object
   main.CreateSessionPayload:
     properties:
       movie_id:
@@ -88,6 +104,15 @@ definitions:
         minLength: 3
         type: string
     type: object
+  main.UpdateSeatPayload:
+    properties:
+      row:
+        minimum: 1
+        type: integer
+      seat_number:
+        minimum: 1
+        type: integer
+    type: object
   main.UpdateSessionPayload:
     properties:
       movie_id:
@@ -127,6 +152,19 @@ definitions:
         type: integer
       name:
         type: string
+      seats_count:
+        type: integer
+    type: object
+  store.Seat:
+    properties:
+      id:
+        type: integer
+      room_id:
+        type: integer
+      row:
+        type: integer
+      seat_number:
+        type: integer
     type: object
   store.Session:
     properties:
@@ -382,7 +420,7 @@ paths:
       - application/json
       description: Creates a room
       parameters:
-      - description: Session payload
+      - description: Room payload
         in: body
         name: payload
         required: true
@@ -394,7 +432,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/store.Session'
+            $ref: '#/definitions/store.Room'
         "400":
           description: Bad Request
           schema: {}
@@ -415,7 +453,7 @@ paths:
       - application/json
       description: Delete a room by ID
       parameters:
-      - description: Session ID
+      - description: Room ID
         in: path
         name: id
         required: true
@@ -443,7 +481,7 @@ paths:
       - application/json
       description: Fetches a room by ID
       parameters:
-      - description: Session ID
+      - description: Room ID
         in: path
         name: id
         required: true
@@ -454,7 +492,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/store.Session'
+            $ref: '#/definitions/store.Room'
         "404":
           description: Not Found
           schema: {}
@@ -469,12 +507,12 @@ paths:
       - application/json
       description: Updates a room by ID
       parameters:
-      - description: Session ID
+      - description: Room ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Session payload
+      - description: Room payload
         in: body
         name: payload
         required: true
@@ -486,7 +524,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/store.Session'
+            $ref: '#/definitions/store.Room'
         "400":
           description: Bad Request
           schema: {}
@@ -504,6 +542,134 @@ paths:
       summary: Updates a room
       tags:
       - rooms
+  /seats:
+    post:
+      consumes:
+      - application/json
+      description: Creates a seat in a specified room
+      parameters:
+      - description: Seat payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateSeatPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/store.Seat'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a seat
+      tags:
+      - seats
+  /seats/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a seat by ID
+      parameters:
+      - description: Seat ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a seat
+      tags:
+      - seats
+    get:
+      consumes:
+      - application/json
+      description: Fetches a seat by ID
+      parameters:
+      - description: Seat ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Seat'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches a seat
+      tags:
+      - seats
+    patch:
+      consumes:
+      - application/json
+      description: Updates a seat by ID
+      parameters:
+      - description: Seat ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Seat payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.UpdateSeatPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Seat'
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a seat
+      tags:
+      - seats
   /sessions:
     post:
       consumes:

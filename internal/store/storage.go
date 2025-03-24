@@ -41,6 +41,12 @@ type Storage struct {
 		Delete(context.Context, int64) error
 		Update(context.Context, *Session) error
 	}
+	Seats interface {
+		GetByID(context.Context, int64) (*Seat, error)
+		Create(context.Context, *Seat) error
+		Delete(context.Context, int64) error
+		Update(context.Context, *Seat) error
+	}
 }
 
 func NewStorage(db *sql.DB) Storage {
@@ -49,6 +55,7 @@ func NewStorage(db *sql.DB) Storage {
 		Rooms:    &RoomsStore{db},
 		Movies:   &MoviesStore{db},
 		Sessions: &SessionStore{db},
+		Seats:    &SeatStore{db},
 	}
 }
 
