@@ -210,6 +210,21 @@ definitions:
       start_time:
         type: string
     type: object
+  store.SessionWithoutMovie:
+    properties:
+      id:
+        type: integer
+      movie_id:
+        type: integer
+      price:
+        type: number
+      room:
+        $ref: '#/definitions/store.Room'
+      room_id:
+        type: integer
+      start_time:
+        type: string
+    type: object
   store.Ticket:
     properties:
       created_at:
@@ -794,7 +809,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/store.Session'
+            $ref: '#/definitions/store.SessionWithoutMovie'
         "404":
           description: Not Found
           schema: {}
@@ -842,6 +857,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Updates a session
+      tags:
+      - sessions
+  /sessions/movie/{movieID}:
+    get:
+      consumes:
+      - application/json
+      description: Fetches all sessions by movie ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/store.Session'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches all sessions for a given movie
       tags:
       - sessions
   /tickets:

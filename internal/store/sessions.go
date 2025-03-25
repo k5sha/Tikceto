@@ -16,6 +16,15 @@ type Session struct {
 	Room      Room    `json:"room"`
 }
 
+type SessionWithoutMovie struct {
+	ID        int64   `json:"id"`
+	MovieID   int64   `json:"movie_id"`
+	RoomID    int64   `json:"room_id"`
+	StartTime string  `json:"start_time"`
+	Price     float64 `json:"price"`
+	Room      Room    `json:"room"`
+}
+
 type SessionStore struct {
 	db *sql.DB
 }
@@ -51,6 +60,49 @@ func (s *SessionStore) GetByID(ctx context.Context, id int64) (*Session, error) 
 	}
 
 	return session, nil
+}
+
+func (s *SessionStore) GetByMovieID(ctx context.Context, movieID int64) ([]SessionWithoutMovie, error) {
+	query := `
+		SELECT s.id, s.movie_id, s.room_id, s.start_time, s.price,
+		       r.id, r.name, r.capacity
+		FROM sessions s
+		LEFT JOIN rooms r ON s.room_id = r.id
+		WHERE s.movie_id = $1
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := s.db.QueryContext(ctx, query, movieID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sessions []SessionWithoutMovie
+
+	for rows.Next() {
+		var session SessionWithoutMovie
+		err := rows.Scan(
+			&session.ID, &session.MovieID, &session.RoomID, &session.StartTime, &session.Price,
+			&session.Room.ID, &session.Room.Name, &session.Room.Capacity,
+		)
+		if err != nil {
+			return nil, err
+		}
+		sessions = append(sessions, session)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(sessions) == 0 {
+		return nil, ErrNotFound
+	}
+
+	return sessions, nil
 }
 
 func (s *SessionStore) Create(ctx context.Context, session *Session) error {

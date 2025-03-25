@@ -144,6 +144,8 @@ func (app *application) mount() *chi.Mux {
 		r.Route("/sessions", func(r chi.Router) {
 			r.Post("/", app.createSessionHandler)
 
+			r.Get("/movie/{movieID}", app.getSessionsByMovieHandler)
+
 			r.Route("/{sessionID}", func(r chi.Router) {
 				r.Use(app.sessionsContextMiddleware)
 

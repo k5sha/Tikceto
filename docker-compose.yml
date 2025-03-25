@@ -16,7 +16,6 @@ services:
     image: 'bitnami/minio:latest'
     volumes:
       - 'minio_data:/data'
-      - './minio-init.sh:/docker-entrypoint-init.d/minio-init.sh'  # Mount init script
     ports:
       - "9000:9000"
       - "9001:9001"

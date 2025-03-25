@@ -38,6 +38,7 @@ type Storage struct {
 	}
 	Sessions interface {
 		GetByID(context.Context, int64) (*Session, error)
+		GetByMovieID(context.Context, int64) ([]SessionWithoutMovie, error)
 		Create(context.Context, *Session) error
 		Delete(context.Context, int64) error
 		Update(context.Context, *Session) error

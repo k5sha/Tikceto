@@ -105,7 +105,7 @@ func (app *application) createSessionHandler(w http.ResponseWriter, r *http.Requ
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"Session ID"
-//	@Success		200	{object}	store.Session
+//	@Success		200	{object}	store.SessionWithoutMovie
 //	@Failure		404	{object}	error
 //	@Failure		500	{object}	error
 //	@Router			/sessions/{id} [get]
@@ -113,6 +113,45 @@ func (app *application) getSessionHandler(w http.ResponseWriter, r *http.Request
 	session := getSessionFromCtx(r)
 
 	if err := app.jsonResponse(w, http.StatusOK, session); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
+// GetSessionsByMovieID godoc
+//
+//	@Summary		Fetches all sessions for a given movie
+//	@Description	Fetches all sessions by movie ID
+//	@Tags			sessions
+//	@Accept			json
+//	@Produce		json
+//	@Param			movieID	path		int	true	"Movie ID"
+//	@Success		200		{array}		store.Session
+//	@Failure		400		{object}	error
+//	@Failure		404		{object}	error
+//	@Failure		500		{object}	error
+//	@Router			/sessions/movie/{movieID} [get]
+func (app *application) getSessionsByMovieHandler(w http.ResponseWriter, r *http.Request) {
+	movieIDParam := chi.URLParam(r, "movieID")
+	movieID, err := strconv.ParseInt(movieIDParam, 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, fmt.Errorf("invalid movie ID"))
+		return
+	}
+
+	ctx := r.Context()
+
+	sessions, err := app.store.Sessions.GetByMovieID(ctx, movieID)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			app.notFoundResponse(w, r, err)
+			return
+		}
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, sessions); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}

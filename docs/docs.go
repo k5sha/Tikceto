@@ -771,6 +771,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/sessions/movie/{movieID}": {
+            "get": {
+                "description": "Fetches all sessions by movie ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sessions"
+                ],
+                "summary": "Fetches all sessions for a given movie",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Movie ID",
+                        "name": "movieID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/store.Session"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/sessions/{id}": {
             "get": {
                 "description": "Fetches a session by ID",
@@ -797,7 +844,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/store.Session"
+                            "$ref": "#/definitions/store.SessionWithoutMovie"
                         }
                     },
                     "404": {
@@ -1392,6 +1439,29 @@ const docTemplate = `{
                 },
                 "movie": {
                     "$ref": "#/definitions/store.Movie"
+                },
+                "movie_id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "room": {
+                    "$ref": "#/definitions/store.Room"
+                },
+                "room_id": {
+                    "type": "integer"
+                },
+                "start_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "store.SessionWithoutMovie": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 },
                 "movie_id": {
                     "type": "integer"
