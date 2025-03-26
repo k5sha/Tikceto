@@ -98,11 +98,11 @@ definitions:
     - username
     type: object
   main.UpdateMoviePayload:
-    description: string   "Description of the movie" validate:"omitempty,min=50,max=500"
+    description: string   "Description of the movie" validate:"omitempty,min=5,max=500"
     properties:
       description:
         maxLength: 500
-        minLength: 50
+        minLength: 5
         type: string
       duration:
         minimum: 1
@@ -329,6 +329,53 @@ paths:
       tags:
       - authentication
   /movies:
+    get:
+      consumes:
+      - application/json
+      description: Fetches the movies list with optional filters
+      parameters:
+      - description: Since date (YYYY-MM-DD)
+        in: query
+        name: since
+        type: string
+      - description: Until date (YYYY-MM-DD)
+        in: query
+        name: until
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort order (asc|desc)
+        in: query
+        name: sort
+        type: string
+      - description: Search by title or description
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/store.Movie'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches movies list
+      tags:
+      - movies
     post:
       consumes:
       - multipart/form-data

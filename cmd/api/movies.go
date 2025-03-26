@@ -19,12 +19,12 @@ const movieCtx movieKey = "movie"
 // CreateMoviePayload represents the payload for creating a movie.
 //
 //	@Title			string   "Title of the movie"  validate:"required,min=3,max=100"
-//	@Description	string   "Description of the movie" validate:"required,min=50,max=500"
+//	@Description	string   "Description of the movie" validate:"required,min=5,max=500"
 //	@Duration		int64   "Duration of the movie"  validate:"required,gte=1"
 //	@ReleaseDate	string   "Release date of the movie" validate:"required,datetime=2006-01-02"`
 type CreateMoviePayload struct {
 	Title       string `json:"title" validate:"required,min=3,max=100"`
-	Description string `json:"description" validate:"required,min=50,max=500"`
+	Description string `json:"description" validate:"required,min=5,max=500"`
 	Duration    int64  `json:"duration" validate:"required,gte=1"`
 	ReleaseDate string `json:"release_date"  validate:"required,datetime=2006-01-02"`
 }
@@ -150,15 +150,75 @@ func (app *application) getMovieHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// getMoviesHandler godoc
+//
+//	@Summary		Fetches movies list
+//	@Description	Fetches the movies list with optional filters
+//	@Tags			movies
+//	@Accept			json
+//	@Produce		json
+//	@Param			since	query		string	false	"Since date (YYYY-MM-DD)"
+//	@Param			until	query		string	false	"Until date (YYYY-MM-DD)"
+//	@Param			limit	query		int		false	"Limit"
+//	@Param			offset	query		int		false	"Offset"
+//	@Param			sort	query		string	false	"Sort order (asc|desc)"
+//	@Param			search	query		string	false	"Search by title or description"
+//	@Success		200		{object}	[]store.Movie
+//	@Failure		400		{object}	error
+//	@Failure		500		{object}	error
+//	@Router			/movies [get]
+func (app *application) getMoviesHandler(w http.ResponseWriter, r *http.Request) {
+	pq := store.PaginatedMoviesQuery{
+		Limit:  10,
+		Offset: 0,
+		Sort:   "desc",
+	}
+
+	pq, err := pq.Parse(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	if err := Validate.Struct(pq); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	ctx := r.Context()
+
+	movies, err := app.store.Movies.GetMoviesList(ctx, pq)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	// TODO: get many make
+	for i := range movies {
+		url, err := app.s3.GetOne(ctx, movies[i].PosterUrl)
+		if err != nil {
+			app.internalServerError(w, r, err)
+			return
+		}
+
+		movies[i].PosterUrl = url
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, movies); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
 // UpdateMoviePayload represents the payload for updating a movie.
 //
 //	@Title			string   "Title of the movie"  validate:"omitempty,min=3,max=100"
-//	@Description	string   "Description of the movie" validate:"omitempty,min=50,max=500"
+//	@Description	string   "Description of the movie" validate:"omitempty,min=5,max=500"
 //	@Duration		int64   "Duration of the movie"  validate:"omitempty,gte=1"
 //	@ReleaseDate	string   "Release date of the movie" validate:"omitempty,datetime=2006-01-02"`
 type UpdateMoviePayload struct {
 	Title       *string `json:"title" validate:"omitempty,min=3,max=100"`
-	Description *string `json:"description" validate:"omitempty,min=50,max=500"`
+	Description *string `json:"description" validate:"omitempty,min=5,max=500"`
 	Duration    *int64  `json:"duration" validate:"omitempty,gte=1"`
 	ReleaseDate *string `json:"release_date"  validate:"omitempty,datetime=2006-01-02"`
 }

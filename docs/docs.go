@@ -113,6 +113,76 @@ const docTemplate = `{
             }
         },
         "/movies": {
+            "get": {
+                "description": "Fetches the movies list with optional filters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movies"
+                ],
+                "summary": "Fetches movies list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Since date (YYYY-MM-DD)",
+                        "name": "since",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Until date (YYYY-MM-DD)",
+                        "name": "until",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order (asc|desc)",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by title or description",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/store.Movie"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -1292,13 +1362,13 @@ const docTemplate = `{
             }
         },
         "main.UpdateMoviePayload": {
-            "description": "string   \"Description of the movie\" validate:\"omitempty,min=50,max=500\"",
+            "description": "string   \"Description of the movie\" validate:\"omitempty,min=5,max=500\"",
             "type": "object",
             "properties": {
                 "description": {
                     "type": "string",
                     "maxLength": 500,
-                    "minLength": 50
+                    "minLength": 5
                 },
                 "duration": {
                     "type": "integer",

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 )
 
 type Movie struct {
@@ -50,6 +51,50 @@ func (s *MoviesStore) GetByID(ctx context.Context, id int64) (*Movie, error) {
 
 	return movie, nil
 }
+
+func (s *MoviesStore) GetMoviesList(ctx context.Context, fq PaginatedMoviesQuery) ([]Movie, error) {
+	query := `
+		SELECT id, title, description, duration, poster_url, release_date, created_at
+		FROM movies
+		WHERE 
+			(title ILIKE '%' || $1 || '%' OR description ILIKE '%' || $1 || '%') AND
+			($2::date IS NULL OR release_date >= $2) AND
+			($3::date IS NULL OR release_date <= $3)
+		ORDER BY release_date ` + fq.Sort + `
+		LIMIT $4 OFFSET $5
+	`
+
+	log.Println(fq)
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := s.db.QueryContext(ctx, query, fq.Search, fq.Since, fq.Until, fq.Limit, fq.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []Movie
+	for rows.Next() {
+		var movie Movie
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.Description,
+			&movie.Duration,
+			&movie.PosterUrl,
+			&movie.ReleaseDate,
+			&movie.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		movies = append(movies, movie)
+	}
+
+	return movies, nil
+}
+
 func (s *MoviesStore) Create(ctx context.Context, movie *Movie) error {
 	query := `
 	INSERT INTO movies (title, description, duration, poster_url, release_date) 
