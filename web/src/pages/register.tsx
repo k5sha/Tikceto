@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { User, Mail, Lock, CheckCircle, AlertCircle } from "lucide-react";
 
 import AuthLayout from "@/layouts/auth.tsx";
 
@@ -13,19 +14,16 @@ const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Викликаємо API для створення нового користувача
       await axios.post("http://localhost:8080/v1/authentication/user", {
         email,
         password,
         username,
       });
-
-      // Виводимо повідомлення про успішну реєстрацію
+      setError(null);
       setSuccessMessage(
         "Реєстрацію успішно завершено! Будь ласка, перевірте свою електронну пошту, щоб підтвердити обліковий запис.",
       );
     } catch (err) {
-      // Обробка помилок
       setError("Сталася помилка під час реєстрації.");
     }
   };
@@ -35,12 +33,14 @@ const Register = () => {
       <h2 className="text-2xl font-semibold text-center mb-6">Реєстрація</h2>
       <form onSubmit={handleRegister}>
         {error && (
-          <span className="mb-4 text-red-500 text-center">{error}</span>
+          <span className="mb-4 text-red-500 text-center">
+            <AlertCircle className="inline mr-2" /> {error}
+          </span>
         )}
 
         {successMessage && (
           <span className="mb-4 text-green-500 text-center">
-            {successMessage}
+            <CheckCircle className="inline mr-2" /> {successMessage}
           </span>
         )}
 
@@ -48,48 +48,57 @@ const Register = () => {
           <label className="block text-gray-700 font-medium" htmlFor="username">
             Нікнейм
           </label>
-          <input
-            required
-            className="w-full p-3 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            id="username"
-            name="username"
-            placeholder="Введіть ваш нікнейм"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 transform -translate-y-1.5 h-5 w-5 text-gray-500" />
+            <input
+              required
+              className="w-full p-3 pl-10 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              id="username"
+              name="username"
+              placeholder="Введіть ваш нікнейм"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="mb-4">
           <label className="block text-gray-700 font-medium" htmlFor="email">
             Емейл
           </label>
-          <input
-            required
-            className="w-full p-3 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            id="email"
-            name="email"
-            placeholder="Введіть ваш емейл"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1.5 h-5 w-5 text-gray-500" />
+            <input
+              required
+              className="w-full p-3 pl-10 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              id="email"
+              name="email"
+              placeholder="Введіть ваш емейл"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="mb-6">
           <label className="block text-gray-700 font-medium" htmlFor="password">
             Пароль
           </label>
-          <input
-            required
-            className="w-full p-3 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            id="password"
-            name="password"
-            placeholder="Введіть ваш пароль"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1.5 h-5 w-5 text-gray-500" />
+            <input
+              required
+              className="w-full p-3 pl-10 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              id="password"
+              name="password"
+              placeholder="Введіть ваш пароль"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
         </div>
 
         <button
