@@ -5,6 +5,7 @@ import (
 	"github.com/k5sha/Tikceto/internal/db"
 	"github.com/k5sha/Tikceto/internal/env"
 	"github.com/k5sha/Tikceto/internal/mailer"
+	"github.com/k5sha/Tikceto/internal/payment"
 	"github.com/k5sha/Tikceto/internal/s3"
 	"github.com/k5sha/Tikceto/internal/store"
 	_ "github.com/lib/pq"
@@ -66,9 +67,14 @@ func main() {
 			minio: minioConfig{
 				user:     env.GetString("MINIO_ROOT_USER", "admin"),
 				password: env.GetString("MINIO_ROOT_PASSWORD", "adminpassword"),
-				endpoint: env.GetString("MINIO_ENDPOINT", "localhost:9000"),
+				endpoint: env.GetString("MINIO_ENDPOINT", "192.168.0.171:9000"),
 				ssl:      env.GetBool("MINIO_SSL", false),
 			},
+		},
+		payment: payConfig{
+			pubKey:      env.GetString("PAYMENT_PUBLIC_KEY", ""),
+			privateKey:  env.GetString("PAYMENT_PRIVATE_KEY", ""),
+			frontendURL: env.GetString("PAYMENT_FRONTEND_URL", "http://localhost:5173/payment/complete/"),
 		},
 	}
 
@@ -101,6 +107,12 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	// Payment
+	payment, err := payment.NewLiqPayPaymentService(cfg.payment.pubKey, cfg.payment.privateKey, cfg.payment.frontendURL)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	// Application
 	app := &application{
 		authenticator: jwtAuthenticator,
@@ -109,6 +121,7 @@ func main() {
 		logger:        logger,
 		mailer:        mailer,
 		s3:            s3,
+		payment:       payment,
 	}
 
 	// Routing

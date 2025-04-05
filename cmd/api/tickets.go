@@ -18,12 +18,12 @@ const ticketCtx ticketKey = "ticket"
 //
 //	@SessionID	int64	"Session ID for the ticket" validate:"required,gte=1"`
 //	@SeatID		int64	"Seat ID for the ticket" validate:"required,gte=1"`
-//	@UserID		int64	"User ID for the ticket" validate:"required,gte=1"`
+//	@UserID		int64	"User ID for the ticket" validate:"omitempty,gte=1"`
 //	@Price		float64	"Price of the ticket" validate:"required,gte=0"`
 type CreateTicketPayload struct {
 	SessionID int64   `json:"session_id" validate:"required,gte=1"`
 	SeatID    int64   `json:"seat_id" validate:"required,gte=1"`
-	UserID    int64   `json:"user_id" validate:"required,gte=1"`
+	UserID    *int64  `json:"user_id" validate:"omitempty,gte=1"`
 	Price     float64 `json:"price" validate:"required,gte=0"`
 }
 
@@ -104,6 +104,51 @@ func (app *application) createTicketHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+// getMyTicketsHandler godoc
+//
+//	@Summary		Fetches a ticket
+//	@Description	Fetches a ticket by ID
+//	@Tags			tickets
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	store.Ticket
+//	@Failure		404	{object}	error
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/tickets/my [get]
+func (app *application) getMyTicketsHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	user := getUserFromCtx(r)
+
+	tickets, err := app.store.Tickets.GetByUserID(ctx, user.ID)
+	if err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	// TODO: get many make
+	for i := range tickets {
+		url, err := app.s3.GetOne(ctx, tickets[i].Session.Movie.PosterUrl)
+		if err != nil {
+			app.internalServerError(w, r, err)
+			return
+		}
+
+		tickets[i].Session.Movie.PosterUrl = url
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, tickets); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
 // GetTicket godoc
 //
 //	@Summary		Fetches a ticket
@@ -177,7 +222,7 @@ func (app *application) updateTicketHandler(w http.ResponseWriter, r *http.Reque
 			app.internalServerError(w, r, err)
 			return
 		}
-		ticket.UserID = user.ID
+		ticket.UserID = &user.ID
 	}
 	if payload.Price != nil {
 		ticket.Price = *payload.Price

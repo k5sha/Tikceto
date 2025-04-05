@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import {siteConfig} from "@/config/site.ts";
 
 const ActivationPage = () => {
   const { token } = useParams();
@@ -13,7 +14,7 @@ const ActivationPage = () => {
 
     setLoading(true);
     try {
-      await axios.put(`http://localhost:8080/v1/users/activate/${token}`);
+      await axios.put(`${siteConfig.server_api}/users/activate/${token}`);
       navigate("/login");
     } catch (err) {
       setError("Активація не вдалася. Спробуйте ще раз.");

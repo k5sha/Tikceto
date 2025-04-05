@@ -22,6 +22,35 @@ type RoomsStore struct {
 	db *sql.DB
 }
 
+func (s *RoomsStore) GetAll(ctx context.Context) ([]*Room, error) {
+	query := `
+		SELECT id, name, capacity FROM rooms`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := s.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var rooms []*Room
+	for rows.Next() {
+		room := &Room{}
+		if err := rows.Scan(&room.ID, &room.Name, &room.Capacity); err != nil {
+			return nil, err
+		}
+		rooms = append(rooms, room)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
+}
+
 func (s *RoomsStore) GetByID(ctx context.Context, id int64) (*Room, error) {
 	query := `
 		SELECT id, name, capacity FROM rooms WHERE id = $1`

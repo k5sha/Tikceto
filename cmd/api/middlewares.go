@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/k5sha/Tikceto/internal/store"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -124,4 +125,33 @@ func (app *application) secureImageServer(root string) http.Handler {
 
 		http.StripPrefix("/v1/static/", http.FileServer(fs)).ServeHTTP(w, r)
 	})
+}
+
+func (app *application) checkPermissions(role string, next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := getUserFromCtx(r)
+
+		allowed, err := app.checkRolePrecedence(r.Context(), user, role)
+		if err != nil {
+			app.internalServerError(w, r, err)
+			return
+		}
+
+		if !allowed {
+			app.forbiddenErrorResponse(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) checkRolePrecedence(ctx context.Context, user *store.User, roleName string) (bool, error) {
+	role, err := app.store.Roles.GetByName(ctx, roleName)
+	if err != nil {
+		app.logger.Errorw("Role not found", "roleName", roleName)
+		return false, err
+	}
+
+	return user.Role.Level >= role.Level, nil
 }

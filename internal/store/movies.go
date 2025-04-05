@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 )
 
 type Movie struct {
@@ -64,7 +63,6 @@ func (s *MoviesStore) GetMoviesList(ctx context.Context, fq PaginatedMoviesQuery
 		LIMIT $4 OFFSET $5
 	`
 
-	log.Println(fq)
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 

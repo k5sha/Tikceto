@@ -4,6 +4,8 @@ import { HeroUIProvider } from "@heroui/system";
 import { useHref, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { AuthProvider } from "@/context/authContext.tsx";
+
 declare module "@react-types/shared" {
   interface RouterConfig {
     routerOptions: NavigateOptions;
@@ -18,7 +20,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <HeroUIProvider navigate={navigate} useHref={useHref}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </HeroUIProvider>
     </QueryClientProvider>
   );

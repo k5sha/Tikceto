@@ -11,6 +11,7 @@ import (
 	"github.com/k5sha/Tikceto/internal/auth"
 	"github.com/k5sha/Tikceto/internal/env"
 	"github.com/k5sha/Tikceto/internal/mailer"
+	"github.com/k5sha/Tikceto/internal/payment"
 	"github.com/k5sha/Tikceto/internal/s3"
 	"github.com/k5sha/Tikceto/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -27,6 +28,7 @@ type application struct {
 	store         store.Storage
 	authenticator auth.Authenticator
 	mailer        mailer.Client
+	payment       payment.Client
 	logger        *zap.SugaredLogger
 	s3            s3.Client
 }
@@ -36,6 +38,7 @@ type config struct {
 	apiURL      string
 	auth        authConfig
 	mail        mailConfig
+	payment     payConfig
 	frontendURL string
 	env         string
 	db          dbConfig
@@ -71,6 +74,11 @@ type mailConfig struct {
 	mailTrap  mailTrapConfig
 }
 
+type payConfig struct {
+	pubKey      string
+	privateKey  string
+	frontendURL string
+}
 type mailTrapConfig struct {
 	apiKey string
 }
@@ -91,8 +99,8 @@ func (app *application) mount() *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{env.GetString("CORS_ALLOWED_ORIGIN", "http://localhost:5173")},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedOrigins:   []string{env.GetString("CORS_ALLOWED_ORIGIN", "*")},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
@@ -116,33 +124,43 @@ func (app *application) mount() *chi.Mux {
 		r.Handle("/static/*", app.secureImageServer("./static"))
 
 		r.Route("/rooms", func(r chi.Router) {
-			r.Post("/", app.createRoomHandler)
-
+			r.With(app.AuthTokenMiddleware()).Post("/", app.checkPermissions("admin", app.createRoomHandler))
+			r.Get("/", app.getRoomsHandler)
 			r.Route("/{roomID}", func(r chi.Router) {
 				r.Use(app.roomsContextMiddleware)
 
 				r.Get("/", app.getRoomHandler)
-				r.Delete("/", app.deleteRoomHandler)
-				r.Patch("/", app.updateRoomHandler)
+
+				r.Group(func(r chi.Router) {
+					r.Use(app.AuthTokenMiddleware())
+
+					r.Delete("/", app.checkPermissions("admin", app.deleteRoomHandler))
+					r.Patch("/", app.checkPermissions("admin", app.updateRoomHandler))
+				})
 
 			})
 		})
 
 		r.Route("/movies", func(r chi.Router) {
-			r.Post("/", app.createMovieHandler)
+			r.With(app.AuthTokenMiddleware()).Post("/", app.checkPermissions("admin", app.createMovieHandler))
+
 			r.Get("/", app.getMoviesHandler)
 			r.Route("/{movieID}", func(r chi.Router) {
 				r.Use(app.moviesContextMiddleware)
 
 				r.Get("/", app.getMovieHandler)
-				r.Delete("/", app.deleteMovieHandler)
-				r.Patch("/", app.updateMovieHandler)
+
+				r.Group(func(r chi.Router) {
+					r.Use(app.AuthTokenMiddleware())
+					r.Delete("/", app.checkPermissions("admin", app.deleteMovieHandler))
+					r.Patch("/", app.checkPermissions("admin", app.updateMovieHandler))
+				})
 
 			})
 		})
 
 		r.Route("/sessions", func(r chi.Router) {
-			r.Post("/", app.createSessionHandler)
+			r.With(app.AuthTokenMiddleware()).Post("/", app.checkPermissions("admin", app.createSessionHandler))
 
 			r.Get("/movie/{movieID}", app.getSessionsByMovieHandler)
 
@@ -150,39 +168,59 @@ func (app *application) mount() *chi.Mux {
 				r.Use(app.sessionsContextMiddleware)
 
 				r.Get("/", app.getSessionHandler)
-				r.Delete("/", app.deleteSessionHandler)
-				r.Patch("/", app.updateSessionHandler)
+
+				r.Group(func(r chi.Router) {
+					r.Use(app.AuthTokenMiddleware())
+					r.Delete("/", app.checkPermissions("admin", app.deleteSessionHandler))
+					r.Patch("/", app.checkPermissions("admin", app.updateSessionHandler))
+				})
 
 			})
 		})
 
 		r.Route("/seats", func(r chi.Router) {
-			r.Post("/", app.createSeatHandler)
+			r.With(app.AuthTokenMiddleware()).Post("/", app.checkPermissions("admin", app.createSeatHandler))
+			r.Get("/session/{sessionID}", app.getSeatsBySessionHandler)
 
 			r.Route("/{seatID}", func(r chi.Router) {
 				r.Use(app.seatsContextMiddleware)
 
 				r.Get("/", app.getSeatHandler)
-				r.Delete("/", app.deleteSeatHandler)
-				r.Patch("/", app.updateSeatHandler)
+				r.Group(func(r chi.Router) {
+					r.Use(app.AuthTokenMiddleware())
+					r.Delete("/", app.checkPermissions("admin", app.deleteSeatHandler))
+					r.Patch("/", app.checkPermissions("admin", app.updateSeatHandler))
+				})
 
 			})
 		})
 
 		r.Route("/tickets", func(r chi.Router) {
-			r.Post("/", app.createTicketHandler)
-
+			r.Group(func(r chi.Router) {
+				r.Use(app.AuthTokenMiddleware())
+				r.Post("/", app.checkPermissions("admin", app.createTicketHandler))
+				r.Get("/my", app.getMyTicketsHandler)
+			})
 			r.Route("/{ticketID}", func(r chi.Router) {
 				r.Use(app.ticketContextMiddleware)
 
 				r.Get("/", app.getTicketHandler)
-				r.Delete("/", app.deleteTicketHandler)
-				r.Patch("/", app.updateTicketHandler)
+				r.Group(func(r chi.Router) {
+					r.Use(app.AuthTokenMiddleware())
+					r.Delete("/", app.checkPermissions("admin", app.deleteTicketHandler))
+					r.Patch("/", app.checkPermissions("admin", app.updateTicketHandler))
+				})
 
 			})
 		})
 
+		r.Route("/payments", func(r chi.Router) {
+			r.With(app.AuthTokenMiddleware()).Post("/create", app.createPaymentHandler)
+			r.Put("/status/{orderID}", app.validatePaymentHandler)
+		})
+
 		r.Route("/users", func(r chi.Router) {
+			r.With(app.AuthTokenMiddleware()).Get("/me", app.getCurrentUserHandler)
 			r.Put("/activate/{token}", app.activateUserHandler)
 		})
 

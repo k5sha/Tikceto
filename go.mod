@@ -31,6 +31,7 @@ require (
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/liqpay/go-sdk v0.0.0-20200913160121-a6f81f822598 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/minio/crc64nvme v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect

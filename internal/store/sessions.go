@@ -69,6 +69,7 @@ func (s *SessionStore) GetByMovieID(ctx context.Context, movieID int64) ([]Sessi
 		FROM sessions s
 		LEFT JOIN rooms r ON s.room_id = r.id
 		WHERE s.movie_id = $1
+		ORDER BY s.start_time;
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)

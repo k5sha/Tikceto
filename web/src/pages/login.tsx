@@ -4,39 +4,49 @@ import axios from "axios";
 import { Mail, Lock } from "lucide-react";
 
 import AuthLayout from "@/layouts/auth.tsx";
+import { useAuth } from "@/context/authContext";
+import {siteConfig} from "@/config/site.ts";
 
 const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     try {
       const response = await axios.post(
-        "http://localhost:8080/v1/authentication/token",
-        {
-          email,
-          password,
-        },
+          `${siteConfig.server_api}/authentication/token`,
+        { email, password },
       );
-      const token = response.data;
 
-      localStorage.setItem("token", token);
-      navigate("/movies");
-    } catch (err) {
-      setError("Invalid email or password.");
+      const token = response.data.data;
+
+      login(token);
+      navigate("/");
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          "Невірний емейл або пароль. Спробуйте ще раз.",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <AuthLayout>
       <h2 className="text-2xl font-semibold text-center mb-6">Вхід</h2>
-      <form onSubmit={handleLogin}>
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+      <form className="space-y-4" onSubmit={handleLogin}>
+        {error && <p className="text-red-500 text-center">{error}</p>}
 
-        <div className="mb-4">
+        <div>
           <label className="block text-gray-700 font-medium" htmlFor="email">
             Емейл
           </label>
@@ -45,7 +55,6 @@ const Login = () => {
               required
               className="w-full p-3 pl-10 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               id="email"
-              name="email"
               placeholder="Введіть ваш емейл"
               type="email"
               value={email}
@@ -55,7 +64,7 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="mb-6">
+        <div>
           <label className="block text-gray-700 font-medium" htmlFor="password">
             Пароль
           </label>
@@ -64,7 +73,6 @@ const Login = () => {
               required
               className="w-full p-3 pl-10 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               id="password"
-              name="password"
               placeholder="Введіть ваш пароль"
               type="password"
               value={password}
@@ -75,10 +83,13 @@ const Login = () => {
         </div>
 
         <button
-          className="w-full bg-blue-500 text-white font-semibold p-3 rounded-lg hover:bg-blue-600 transition duration-200"
+          className={`w-full bg-blue-500 text-white font-semibold p-3 rounded-lg transition duration-200 ${
+            loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
+          }`}
+          disabled={loading}
           type="submit"
         >
-          Увійти
+          {loading ? "Завантаження..." : "Увійти"}
         </button>
       </form>
 

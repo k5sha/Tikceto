@@ -3,14 +3,28 @@ package main
 import (
 	"encoding/json"
 	"github.com/go-playground/validator/v10"
+	"log"
 	"net/http"
+	"time"
 )
 
 var Validate *validator.Validate
 
 func init() {
 	Validate = validator.New(validator.WithRequiredStructEnabled())
+
+	err := Validate.RegisterValidation("iso8601", iso8601Datetime)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
+
+func iso8601Datetime(fl validator.FieldLevel) bool {
+	value := fl.Field().String()
+	_, err := time.Parse(time.RFC3339Nano, value)
+	return err == nil
+}
+
 func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)

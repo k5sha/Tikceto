@@ -349,7 +349,7 @@ const docTemplate = `{
                 ],
                 "description": "Updates a movie by ID",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -367,13 +367,34 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Movie payload",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.UpdateMoviePayload"
-                        }
+                        "type": "string",
+                        "description": "Movie title",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movie description",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Movie duration",
+                        "name": "duration",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movie release date (YYYY-MM-DD)",
+                        "name": "release_date",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "New poster file",
+                        "name": "file",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -393,6 +414,96 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/payments/create": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a payment link for a ticket through LiqPay",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Create a payment link",
+                "parameters": [
+                    {
+                        "description": "Payment request payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CreatePaymentPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/payment.PaymentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/payments/status/{orderID}": {
+            "put": {
+                "description": "Validates the payment status by order ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Validate payment status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "orderID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {}
                     },
                     "500": {
@@ -444,6 +555,40 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/rooms/": {
+            "get": {
+                "description": "Fetches all rooms",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rooms"
+                ],
+                "summary": "Fetches all rooms",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/store.Room"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {}
                     },
                     "500": {
@@ -647,6 +792,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/seats/session/{sessionID}": {
+            "get": {
+                "description": "Fetches all seats for a specific session by session ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seats"
+                ],
+                "summary": "Fetch seats by session",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Session ID",
+                        "name": "sessionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of seats",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/store.SeatWithMetadata"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid session ID",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "No seats found for this session",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/seats/{id}": {
             "get": {
                 "description": "Fetches a seat by ID",
@@ -781,57 +973,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {}
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/sessions": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Creates a session",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "sessions"
-                ],
-                "summary": "Creates a session",
-                "parameters": [
-                    {
-                        "description": "Session payload",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.CreateSessionPayload"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/store.Session"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {}
-                    },
-                    "401": {
-                        "description": "Unauthorized",
                         "schema": {}
                     },
                     "500": {
@@ -1082,6 +1223,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/tickets/my": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetches a ticket by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tickets"
+                ],
+                "summary": "Fetches a ticket",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.Ticket"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/tickets/{id}": {
             "get": {
                 "description": "Fetches a ticket by ID",
@@ -1224,9 +1401,97 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/activate/{token}": {
+            "put": {
+                "description": "Activates/Register a user by invitation token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Activates/Register a user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Invitation token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User activated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns details of the currently authenticated user based on the provided JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Fetch current authenticated user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "main.CreatePaymentPayload": {
+            "type": "object",
+            "required": [
+                "seat_id",
+                "session_id"
+            ],
+            "properties": {
+                "seat_id": {
+                    "type": "integer"
+                },
+                "session_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "main.CreateRoomPayload": {
             "type": "object",
             "required": [
@@ -1267,39 +1532,12 @@ const docTemplate = `{
                 }
             }
         },
-        "main.CreateSessionPayload": {
-            "type": "object",
-            "required": [
-                "movie_id",
-                "price",
-                "room_id",
-                "start_time"
-            ],
-            "properties": {
-                "movie_id": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "price": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "room_id": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "start_time": {
-                    "type": "string"
-                }
-            }
-        },
         "main.CreateTicketPayload": {
             "type": "object",
             "required": [
                 "price",
                 "seat_id",
-                "session_id",
-                "user_id"
+                "session_id"
             ],
             "properties": {
                 "price": {
@@ -1358,29 +1596,6 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "maxLength": 100
-                }
-            }
-        },
-        "main.UpdateMoviePayload": {
-            "description": "string   \"Description of the movie\" validate:\"omitempty,min=5,max=500\"",
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string",
-                    "maxLength": 500,
-                    "minLength": 5
-                },
-                "duration": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "release_date": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 3
                 }
             }
         },
@@ -1444,6 +1659,20 @@ const docTemplate = `{
                 }
             }
         },
+        "payment.PaymentResponse": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "store.Movie": {
             "type": "object",
             "properties": {
@@ -1466,6 +1695,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "store.Role": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "level": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -1498,6 +1744,29 @@ const docTemplate = `{
                 },
                 "seat_number": {
                     "type": "integer"
+                }
+            }
+        },
+        "store.SeatWithMetadata": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "room_id": {
+                    "type": "integer"
+                },
+                "row": {
+                    "type": "integer"
+                },
+                "seat_number": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -1593,6 +1862,12 @@ const docTemplate = `{
                 },
                 "is_active": {
                     "type": "boolean"
+                },
+                "role": {
+                    "$ref": "#/definitions/store.Role"
+                },
+                "role_id": {
+                    "type": "integer"
                 },
                 "username": {
                     "type": "string"

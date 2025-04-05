@@ -228,54 +228,93 @@ type UpdateMoviePayload struct {
 //	@Summary		Updates a movie
 //	@Description	Updates a movie by ID
 //	@Tags			movies
-//	@Accept			json
+//	@Accept			multipart/form-data
 //	@Produce		json
-//	@Param			id		path		int					true	"Movie ID"
-//	@Param			payload	body		UpdateMoviePayload	true	"Movie payload"
-//	@Success		200		{object}	store.Movie
-//	@Failure		400		{object}	error
-//	@Failure		401		{object}	error
-//	@Failure		404		{object}	error
-//	@Failure		500		{object}	error
+//	@Param			id				path		int		true	"Movie ID"
+//	@Param			title			formData	string	false	"Movie title"
+//	@Param			description		formData	string	false	"Movie description"
+//	@Param			duration		formData	int		false	"Movie duration"
+//	@Param			release_date	formData	string	false	"Movie release date (YYYY-MM-DD)"
+//	@Param			file			formData	file	false	"New poster file"
+//	@Success		200				{object}	store.Movie
+//	@Failure		400				{object}	error
+//	@Failure		401				{object}	error
+//	@Failure		404				{object}	error
+//	@Failure		500				{object}	error
 //	@Security		ApiKeyAuth
 //	@Router			/movies/{id} [patch]
 func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Request) {
 	movie := getMovieFromCtx(r)
 
-	var payload UpdateMoviePayload
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		app.badRequestResponse(w, r, fmt.Errorf("не вдалося розпарсити форму: %w", err))
+		return
+	}
 
-	// TODO: add update of poster
-	if err := readJSON(w, r, &payload); err != nil {
+	title := r.FormValue("title")
+	description := r.FormValue("description")
+	durationStr := r.FormValue("duration")
+	releaseDate := r.FormValue("release_date")
+
+	if title != "" {
+		movie.Title = title
+	}
+	if description != "" {
+		movie.Description = description
+	}
+	if releaseDate != "" {
+		movie.ReleaseDate = releaseDate
+	}
+	if durationStr != "" {
+		duration, err := strconv.Atoi(durationStr)
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+		movie.Duration = int64(duration)
+	}
+
+	file, fileHeader, err := r.FormFile("file")
+	if err == nil {
+		defer file.Close()
+
+		fileBytes, err := io.ReadAll(file)
+		if err != nil {
+			app.internalServerError(w, r, err)
+			return
+		}
+
+		fileData := s3.FileDataType{
+			FileName: fileHeader.Filename,
+			Data:     fileBytes,
+		}
+
+		objectID, err := app.s3.CreateOne(r.Context(), fileData)
+		if err != nil {
+			app.internalServerError(w, r, err)
+			return
+		}
+
+		movie.PosterUrl = objectID
+	} else if !errors.Is(err, http.ErrMissingFile) {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
-	if err := Validate.Struct(payload); err != nil {
+	if err := Validate.Struct(movie); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
-	if payload.Title != nil {
-		movie.Title = *payload.Title
-	}
-	if payload.Description != nil {
-		movie.Description = *payload.Description
-	}
-	if payload.Duration != nil {
-		movie.Duration = *payload.Duration
-	}
-	if payload.ReleaseDate != nil {
-		movie.ReleaseDate = *payload.ReleaseDate
-	}
-
-	if err := app.store.Movies.Update(r.Context(), movie); err != nil {
+	ctx := r.Context()
+	if err := app.store.Movies.Update(ctx, movie); err != nil {
 		switch {
 		case errors.Is(err, store.ErrNotFound):
 			app.notFoundResponse(w, r, err)
 		default:
 			app.internalServerError(w, r, err)
 		}
-		app.internalServerError(w, r, err)
 		return
 	}
 
@@ -283,7 +322,6 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		app.internalServerError(w, r, err)
 		return
 	}
-
 }
 
 // DeleteMovie godoc

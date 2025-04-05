@@ -1,4 +1,14 @@
 definitions:
+  main.CreatePaymentPayload:
+    properties:
+      seat_id:
+        type: integer
+      session_id:
+        type: integer
+    required:
+    - seat_id
+    - session_id
+    type: object
   main.CreateRoomPayload:
     properties:
       capacity:
@@ -28,25 +38,6 @@ definitions:
     - room_id
     - row
     type: object
-  main.CreateSessionPayload:
-    properties:
-      movie_id:
-        minimum: 1
-        type: integer
-      price:
-        minimum: 0
-        type: number
-      room_id:
-        minimum: 1
-        type: integer
-      start_time:
-        type: string
-    required:
-    - movie_id
-    - price
-    - room_id
-    - start_time
-    type: object
   main.CreateTicketPayload:
     properties:
       price:
@@ -65,7 +56,6 @@ definitions:
     - price
     - seat_id
     - session_id
-    - user_id
     type: object
   main.CreateUserTokenPayload:
     properties:
@@ -96,23 +86,6 @@ definitions:
     - email
     - password
     - username
-    type: object
-  main.UpdateMoviePayload:
-    description: string   "Description of the movie" validate:"omitempty,min=5,max=500"
-    properties:
-      description:
-        maxLength: 500
-        minLength: 5
-        type: string
-      duration:
-        minimum: 1
-        type: integer
-      release_date:
-        type: string
-      title:
-        maxLength: 100
-        minLength: 3
-        type: string
     type: object
   main.UpdateRoomPayload:
     properties:
@@ -156,6 +129,15 @@ definitions:
         minimum: 1
         type: integer
     type: object
+  payment.PaymentResponse:
+    properties:
+      order_id:
+        type: integer
+      status:
+        type: string
+      url:
+        type: string
+    type: object
   store.Movie:
     properties:
       created_at:
@@ -171,6 +153,17 @@ definitions:
       release_date:
         type: string
       title:
+        type: string
+    type: object
+  store.Role:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      level:
+        type: integer
+      name:
         type: string
     type: object
   store.Room:
@@ -192,6 +185,21 @@ definitions:
         type: integer
       seat_number:
         type: integer
+    type: object
+  store.SeatWithMetadata:
+    properties:
+      id:
+        type: integer
+      price:
+        type: number
+      room_id:
+        type: integer
+      row:
+        type: integer
+      seat_number:
+        type: integer
+      status:
+        type: string
     type: object
   store.Session:
     properties:
@@ -254,6 +262,10 @@ definitions:
         type: integer
       is_active:
         type: boolean
+      role:
+        $ref: '#/definitions/store.Role'
+      role_id:
+        type: integer
       username:
         type: string
     type: object
@@ -484,7 +496,7 @@ paths:
       - movies
     patch:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Updates a movie by ID
       parameters:
       - description: Movie ID
@@ -492,12 +504,26 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Movie payload
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/main.UpdateMoviePayload'
+      - description: Movie title
+        in: formData
+        name: title
+        type: string
+      - description: Movie description
+        in: formData
+        name: description
+        type: string
+      - description: Movie duration
+        in: formData
+        name: duration
+        type: integer
+      - description: Movie release date (YYYY-MM-DD)
+        in: formData
+        name: release_date
+        type: string
+      - description: New poster file
+        in: formData
+        name: file
+        type: file
       produces:
       - application/json
       responses:
@@ -522,6 +548,65 @@ paths:
       summary: Updates a movie
       tags:
       - movies
+  /payments/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a payment link for a ticket through LiqPay
+      parameters:
+      - description: Payment request payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreatePaymentPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payment.PaymentResponse'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create a payment link
+      tags:
+      - payments
+  /payments/status/{orderID}:
+    put:
+      consumes:
+      - application/json
+      description: Validates the payment status by order ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Validate payment status
+      tags:
+      - payments
   /rooms:
     post:
       consumes:
@@ -553,6 +638,29 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Creates a room
+      tags:
+      - rooms
+  /rooms/:
+    get:
+      consumes:
+      - application/json
+      description: Fetches all rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/store.Room'
+            type: array
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Fetches all rooms
       tags:
       - rooms
   /rooms/{id}:
@@ -778,39 +886,38 @@ paths:
       summary: Updates a seat
       tags:
       - seats
-  /sessions:
-    post:
+  /seats/session/{sessionID}:
+    get:
       consumes:
       - application/json
-      description: Creates a session
+      description: Fetches all seats for a specific session by session ID
       parameters:
-      - description: Session payload
-        in: body
-        name: payload
+      - description: Session ID
+        in: path
+        name: sessionID
         required: true
-        schema:
-          $ref: '#/definitions/main.CreateSessionPayload'
+        type: integer
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: List of seats
           schema:
-            $ref: '#/definitions/store.Session'
+            items:
+              $ref: '#/definitions/store.SeatWithMetadata'
+            type: array
         "400":
-          description: Bad Request
+          description: Invalid session ID
           schema: {}
-        "401":
-          description: Unauthorized
+        "404":
+          description: No seats found for this session
           schema: {}
         "500":
           description: Internal Server Error
           schema: {}
-      security:
-      - ApiKeyAuth: []
-      summary: Creates a session
+      summary: Fetch seats by session
       tags:
-      - sessions
+      - seats
   /sessions/{id}:
     delete:
       consumes:
@@ -1066,6 +1173,78 @@ paths:
       summary: Updates a ticket
       tags:
       - tickets
+  /tickets/my:
+    get:
+      consumes:
+      - application/json
+      description: Fetches a ticket by ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Ticket'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Fetches a ticket
+      tags:
+      - tickets
+  /users/activate/{token}:
+    put:
+      description: Activates/Register a user by invitation token
+      parameters:
+      - description: Invitation token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User activated
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Activates/Register a user
+      tags:
+      - users
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      description: Returns details of the currently authenticated user based on the
+        provided JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.User'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch current authenticated user
+      tags:
+      - users
 securityDefinitions:
   ApiKeyAuth:
     description: Use the Authorization header with a Bearer token to authenticate

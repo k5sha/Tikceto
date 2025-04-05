@@ -20,29 +20,15 @@ const sessionCtx sessionKey = "session"
 //
 //	@MovieID	int64   "Movie ID for the session" validate:"required,gte=1"`
 //	@RoomID		int64   "Room ID for the session" validate:"required,gte=1"`
-//	@StartTime	date-time   "Start time of the session (timestamp)" validate:"required,datetime=2006-01-02 15:04:05"`
+//	@StartTime	date-time   "Start time of the session (timestamp)" validate:"required,iso8601"`
 //	@Price		float64 "Price of the session ticket" validate:"required,gte=0"`
 type CreateSessionPayload struct {
 	MovieID   int64   `json:"movie_id" validate:"required,gte=1"`
 	RoomID    int64   `json:"room_id" validate:"required,gte=1"`
-	StartTime string  `json:"start_time" validate:"required,datetime=2006-01-02 15:04:05"`
+	StartTime string  `json:"start_time" validate:"required,iso8601"`
 	Price     float64 `json:"price" validate:"required,gte=0"`
 }
 
-// CreateSession godoc
-//
-//	@Summary		Creates a session
-//	@Description	Creates a session
-//	@Tags			sessions
-//	@Accept			json
-//	@Produce		json
-//	@Param			payload	body		CreateSessionPayload	true	"Session payload"
-//	@Success		201		{object}	store.Session
-//	@Failure		400		{object}	error
-//	@Failure		401		{object}	error
-//	@Failure		500		{object}	error
-//	@Security		ApiKeyAuth
-//	@Router			/sessions [post]
 func (app *application) createSessionHandler(w http.ResponseWriter, r *http.Request) {
 	var payload CreateSessionPayload
 	if err := readJSON(w, r, &payload); err != nil {

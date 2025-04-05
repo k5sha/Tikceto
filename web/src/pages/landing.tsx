@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import DefaultLayout from "@/layouts/default";
 
-export default function IndexPage() {
+export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
@@ -14,7 +14,7 @@ export default function IndexPage() {
         </p>
         <button
           className="bg-primary-500 text-white py-2 px-6 rounded-lg hover:bg-opacity-50"
-          onClick={() => navigate("/movies")}
+          onClick={() => navigate("/")}
         >
           Почати
         </button>

@@ -24,6 +24,7 @@ type Storage struct {
 		Delete(context.Context, int64) error
 	}
 	Rooms interface {
+		GetAll(context.Context) ([]*Room, error)
 		GetByID(context.Context, int64) (*Room, error)
 		GetWithSeatsCountByID(context.Context, int64) (*RoomWithMetadata, error)
 		Create(context.Context, *Room) error
@@ -46,15 +47,21 @@ type Storage struct {
 	}
 	Seats interface {
 		GetByID(context.Context, int64) (*Seat, error)
+		GetBySession(context.Context, int64) ([]SeatWithMetadata, error)
 		Create(context.Context, *Seat) error
 		Delete(context.Context, int64) error
 		Update(context.Context, *Seat) error
 	}
 	Tickets interface {
 		GetByID(context.Context, int64) (*Ticket, error)
+		GetBySessionAndSeat(context.Context, int64, int64) (*Ticket, error)
+		GetByUserID(context.Context, int64) ([]Ticket, error)
 		Create(context.Context, *Ticket) error
 		Delete(context.Context, int64) error
 		Update(context.Context, *Ticket) error
+	}
+	Roles interface {
+		GetByName(context.Context, string) (*Role, error)
 	}
 }
 
@@ -66,6 +73,7 @@ func NewStorage(db *sql.DB) Storage {
 		Sessions: &SessionStore{db},
 		Seats:    &SeatStore{db},
 		Tickets:  &TicketStore{db},
+		Roles:    &RolesStore{db},
 	}
 }
 

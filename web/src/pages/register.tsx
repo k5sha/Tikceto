@@ -3,6 +3,7 @@ import axios from "axios";
 import { User, Mail, Lock, CheckCircle, AlertCircle } from "lucide-react";
 
 import AuthLayout from "@/layouts/auth.tsx";
+import {siteConfig} from "@/config/site.ts";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/v1/authentication/user", {
+      await axios.post(`${siteConfig.server_api}/authentication/user`, {
         email,
         password,
         username,

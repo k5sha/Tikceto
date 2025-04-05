@@ -87,6 +87,32 @@ func (app *application) getRoomHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetRoom godoc
+//
+//	@Summary		Fetches all rooms
+//	@Description	Fetches all rooms
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	[]store.Room
+//	@Failure		404	{object}	error
+//	@Failure		500	{object}	error
+//	@Router			/rooms/ [get]
+func (app *application) getRoomsHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	rooms, err := app.store.Rooms.GetAll(ctx)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, rooms); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
 // UpdateRoomPayload represents the payload for updating a room.
 //
 //	@Name		string   "Updated name of the room" validate:"omitempty,min=3,max=100"`

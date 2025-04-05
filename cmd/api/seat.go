@@ -110,6 +110,44 @@ func (app *application) getSeatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetSeatsBySession godoc
+//
+//	@Summary		Fetch seats by session
+//	@Description	Fetches all seats for a specific session by session ID
+//	@Tags			seats
+//	@Accept			json
+//	@Produce		json
+//	@Param			sessionID	path		int						true	"Session ID"
+//	@Success		200			{array}		store.SeatWithMetadata	"List of seats"
+//	@Failure		400			{object}	error					"Invalid session ID"
+//	@Failure		404			{object}	error					"No seats found for this session"
+//	@Failure		500			{object}	error					"Internal Server Error"
+//	@Router			/seats/session/{sessionID} [get]
+func (app *application) getSeatsBySessionHandler(w http.ResponseWriter, r *http.Request) {
+	sessionIDParam := chi.URLParam(r, "sessionID")
+	sessionID, err := strconv.ParseInt(sessionIDParam, 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, fmt.Errorf("invalid session ID"))
+		return
+	}
+
+	ctx := r.Context()
+	seats, err := app.store.Seats.GetBySession(ctx, sessionID)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			app.notFoundResponse(w, r, err)
+			return
+		}
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, seats); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
 // UpdateSeatPayload represents the payload for updating a seat.
 //
 //	@Row	int "Updated row number" validate:"omitempty,gte=1"
