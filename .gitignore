@@ -25,6 +25,3 @@ bin/
 *.swp
 *.swo
 .vscode/
-
-# Go module files
-go.sum
