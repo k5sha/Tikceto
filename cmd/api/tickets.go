@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/k5sha/Tikceto/internal/store"
 	"net/http"
-	"strconv"
 )
 
 type ticketKey string
@@ -23,7 +22,7 @@ const ticketCtx ticketKey = "ticket"
 type CreateTicketPayload struct {
 	SessionID int64   `json:"session_id" validate:"required,gte=1"`
 	SeatID    int64   `json:"seat_id" validate:"required,gte=1"`
-	UserID    *int64  `json:"user_id" validate:"omitempty,gte=1"`
+	UserID    int64   `json:"user_id" validate:"required,gte=1"`
 	Price     float64 `json:"price" validate:"required,gte=0"`
 }
 
@@ -134,7 +133,7 @@ func (app *application) getMyTicketsHandler(w http.ResponseWriter, r *http.Reque
 
 	// TODO: get many make
 	for i := range tickets {
-		url, err := app.s3.GetOne(ctx, tickets[i].Session.Movie.PosterUrl)
+		url, err := app.s3.GetOne(tickets[i].Session.Movie.PosterUrl)
 		if err != nil {
 			app.internalServerError(w, r, err)
 			return
@@ -222,7 +221,7 @@ func (app *application) updateTicketHandler(w http.ResponseWriter, r *http.Reque
 			app.internalServerError(w, r, err)
 			return
 		}
-		ticket.UserID = &user.ID
+		ticket.UserID = user.ID
 	}
 	if payload.Price != nil {
 		ticket.Price = *payload.Price
@@ -280,14 +279,13 @@ func (app *application) deleteTicketHandler(w http.ResponseWriter, r *http.Reque
 func (app *application) ticketContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		idParam := chi.URLParam(r, "ticketID")
-		id, err := strconv.ParseInt(idParam, 10, 64)
-		if err != nil {
-			app.badRequestResponse(w, r, fmt.Errorf("must provide a correct id"))
+		if idParam == "" {
+			app.badRequestResponse(w, r, fmt.Errorf("must provide a id"))
 			return
 		}
 		ctx := r.Context()
 
-		ticket, err := app.store.Tickets.GetByID(ctx, id)
+		ticket, err := app.store.Tickets.GetByID(ctx, idParam)
 		if err != nil {
 			switch {
 			case errors.Is(err, store.ErrNotFound):

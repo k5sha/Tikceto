@@ -9,6 +9,6 @@ type FileDataType struct {
 
 type Client interface {
 	CreateOne(ctx context.Context, file FileDataType) (string, error)
-	GetOne(ctx context.Context, objectID string) (string, error)
+	GetOne(objectID string) (string, error)
 	DeleteOne(ctx context.Context, objectID string) error
 }

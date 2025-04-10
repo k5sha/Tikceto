@@ -18,12 +18,13 @@ import EditMovieModal from "@/components/modals/editMovieModal.tsx";
 import AddSessionModal from "@/components/modals/addSessionModal.tsx";
 import DeleteSessionModal from "@/components/modals/deleteSessionModal.tsx";
 
-const isAuthenticated = () => !!localStorage.getItem("token");
-
-const fetchMovieDetails = async (movieId: number) => {
+const fetchMovieDetails = async (movieSlug: string | undefined) => {
+  if(!movieSlug) {
+    return;
+  }
   try {
     const { data } = await axios.get(
-      `${siteConfig.server_api}/movies/${movieId}`,
+      `${siteConfig.server_api}/movies/${movieSlug}`,
     );
 
     return data.data;
@@ -35,10 +36,13 @@ const fetchMovieDetails = async (movieId: number) => {
   }
 };
 
-const fetchSessions = async (movieId: number) => {
+const fetchSessions = async (movieSlug: string | undefined) => {
+  if (!movieSlug) {
+    return;
+  }
   try {
     const { data } = await axios.get(
-      `${siteConfig.server_api}/sessions/movie/${movieId}`,
+      `${siteConfig.server_api}/sessions/movie/${movieSlug}`,
     );
 
     return data.data;
@@ -86,7 +90,7 @@ const createPayment = async (
 };
 
 export default function MovieDetailPage() {
-  const { movieID } = useParams<{ movieID: string }>();
+  const { movieSlug } = useParams<{ movieSlug: string }>();
   const navigate = useNavigate();
   const { user, fetchWithAuth, isAdmin } = useAuth();
 
@@ -108,8 +112,8 @@ export default function MovieDetailPage() {
     error: movieErrorDetail,
     refetch: movieRefetch,
   } = useQuery({
-    queryKey: ["movie", movieID],
-    queryFn: () => fetchMovieDetails(Number(movieID)),
+    queryKey: ["movie", movieSlug],
+    queryFn: () => fetchMovieDetails(movieSlug),
   });
 
   const {
@@ -118,18 +122,13 @@ export default function MovieDetailPage() {
     error: sessionsErrorDetail,
     refetch: sessionsRefetch,
   } = useQuery({
-    queryKey: ["sessions", movieID],
-    queryFn: () => fetchSessions(Number(movieID)),
-    enabled: !!movieID && !movieLoading,
+    queryKey: ["sessions", movieSlug],
+    queryFn: () => fetchSessions(movie.id),
+    enabled: !movieLoading && movie != null && movie.id != null,
   });
 
   const [selectedSession, setSelectedSession] = useState<number | null>(null);
   const [selectedSeat, setSelectedSeat] = useState<number | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
-
-  useEffect(() => {
-    setIsLoggedIn(isAuthenticated());
-  }, []);
 
   const {
     data: seats,
@@ -163,7 +162,7 @@ export default function MovieDetailPage() {
   };
 
   const handlePurchase = async () => {
-    if (!isLoggedIn) {
+    if (!user) {
       alert("Ви повинні бути зареєстровані для покупки квитка.");
 
       return;
@@ -219,7 +218,7 @@ export default function MovieDetailPage() {
           <Button
             className="mt-4"
             color="primary"
-            onPress={() => navigate(`/movie/${movieID}`)}
+            onPress={() => navigate(`/movie/${movieSlug}`)}
           >
             Спробувати ще раз
           </Button>
@@ -357,9 +356,16 @@ export default function MovieDetailPage() {
                         <div className="text-tiny ">
                           {seat.row} ряд, {seat.seat_number} місце
                         </div>
-                        <div className="text-small font-bold text-center">
+                        { seat.status != "reserved" ?
+                            (<div className="text-small font-bold text-center">
                           {seat.price} ₴
-                        </div>
+                        </div>)
+                            : (
+                                <div className="text-small font-bold text-center">
+                                  Зарезервовано
+                                </div>
+                            )
+                        }
                       </div>
                     }
                   >
@@ -414,6 +420,7 @@ export default function MovieDetailPage() {
         isOpen={isEditModalOpen}
         movie={movie}
         refetch={movieRefetch}
+        navigate={navigate}
         onOpenChange={onOpenEditModal}
       />
       <AddSessionModal

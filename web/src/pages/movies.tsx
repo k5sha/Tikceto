@@ -2,7 +2,7 @@ import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { Divider } from "@heroui/divider";
 import { useDisclosure } from "@heroui/modal";
-import { Calendar, Clock, Film, Ticket } from "lucide-react";
+import {Calendar, Clock, Film, MapPlus, Ticket} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Skeleton from "react-loading-skeleton";
@@ -12,6 +12,7 @@ import DefaultLayout from "@/layouts/default";
 import { siteConfig } from "@/config/site.ts";
 import { useAuth } from "@/context/authContext.tsx";
 import AddMovieModal from "@/components/modals/addMovieModal.tsx";
+import AddRoomModal from "@/components/modals/addRoomModal.tsx";
 
 const fetchMovies = async () => {
   const { data } = await axios.get(`${siteConfig.server_api}/movies`);
@@ -36,8 +37,8 @@ export default function MoviesPage() {
   });
 
   const { isAdmin } = useAuth();
-  const { isOpen, onOpenChange } = useDisclosure();
-
+  const { isOpen: isAddMovieOpen, onOpenChange: onOpenAddMovie } = useDisclosure();
+  const { isOpen: isAddRoomOpen, onOpenChange: onOpenAddRoom } = useDisclosure();
   if (isLoading) {
     return (
       <DefaultLayout>
@@ -99,10 +100,14 @@ export default function MoviesPage() {
           <>
             <h1 className="text-lg font-medium text-gray-900">Адмін панель</h1>
             <Divider className="my-4" />
-            <div className="mb-4">
-              <Button color="primary" onPress={() => onOpenChange()}>
+            <div className="flex flex-row gap-8">
+              <Button color="primary" onPress={() => onOpenAddMovie()}>
                 <Film />
                 Додати фільм
+              </Button>
+              <Button color="primary" onPress={() => onOpenAddRoom()}>
+                <MapPlus />
+                Додати зал
               </Button>
             </div>
           </>
@@ -112,61 +117,76 @@ export default function MoviesPage() {
           🎬 Зараз у прокаті
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 items-baseline">
-          {movies.data.map((movie: any) => {
-            const releaseDate = new Date(movie.release_date).toLocaleDateString(
-              "uk-UA",
-              {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              },
-            );
+        <div>
+          {movies.data && movies.data.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 items-baseline">
+              {movies!.data.map((movie: any) => {
+                const releaseDate = new Date(
+                  movie.release_date,
+                ).toLocaleDateString("uk-UA", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                });
 
-            return (
-              <Link key={movie.id} href={`/movie/${movie.id}`}>
-                <div className="bg-white border rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer">
-                  <img
-                    alt={movie.title}
-                    className="w-full h-72 md:h-full lg:h-96 object-cover"
-                    src={movie.poster_url || "/path/to/fallback-image.jpg"}
-                  />
+                return (
+                  <Link key={movie.id} href={`/movie/${movie.slug}`}>
+                    <div className="bg-white border rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer">
+                      <img
+                        alt={movie.title}
+                        className="w-full h-72 md:h-full lg:h-96 object-cover"
+                        src={movie.poster_url || "/path/to/fallback-image.jpg"}
+                      />
 
-                  <div className="p-5">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                      {movie.title}
-                    </h2>
-                    <p className="text-gray-600 mb-4">
-                      {movie.description.length > 150
-                        ? movie.description.substring(0, 150) + "..."
-                        : movie.description}
-                    </p>
+                      <div className="p-5">
+                        <h2 className="text-2xl font-semibold text-gray-900 mb-3">
+                          {movie.title}
+                        </h2>
+                        <p className="text-gray-600 mb-4">
+                          {movie.description.length > 150
+                            ? movie.description.substring(0, 150) + "..."
+                            : movie.description}
+                        </p>
 
-                    <div className="flex items-center gap-3 text-gray-700 mb-4">
-                      <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                        <Clock size={16} /> {movie.duration} хвилин
-                      </span>
-                      <span className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                        <Calendar size={16} /> {releaseDate}
-                      </span>
+                        <div className="flex items-center gap-3 text-gray-700 mb-4">
+                          <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                            <Clock size={16} /> {movie.duration} хвилин
+                          </span>
+                          <span className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                            <Calendar size={16} /> {releaseDate}
+                          </span>
+                        </div>
+
+                        <Button
+                          className="w-1/2 flex items-center justify-center gap-2"
+                          color="primary"
+                          variant="solid"
+                        >
+                          <Ticket size={18} />
+                          Купити квиток
+                        </Button>
+                      </div>
                     </div>
-
-                    <Button
-                      className="w-1/2 flex items-center justify-center gap-2"
-                      color="primary"
-                      variant="solid"
-                    >
-                      <Ticket size={18} />
-                      Купити квиток
-                    </Button>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <h1 className="text-xl font-semibold text-primary-400 text-center">
+              Схоже немає жодного фільму
+            </h1>
+          )}
         </div>
       </div>
-      <AddMovieModal isOpen={isOpen} onOpenChange={onOpenChange} refetch={refetch} />
+      <AddMovieModal
+        isOpen={isAddMovieOpen}
+        refetch={refetch}
+        onOpenChange={onOpenAddMovie}
+      />
+      <AddRoomModal
+          isOpen={isAddRoomOpen}
+          onOpenChange={onOpenAddRoom}
+      />
     </DefaultLayout>
   );
 }

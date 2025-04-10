@@ -2,5 +2,5 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "Ticketo",
-  server_api: "http://192.168.0.171:8080/v1",
+  server_api: "http://185.126.115.87/v1",
 };

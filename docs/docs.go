@@ -210,6 +210,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Movie slug",
+                        "name": "slug",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Movie title",
                         "name": "title",
                         "in": "formData",
@@ -261,7 +268,7 @@ const docTemplate = `{
         },
         "/movies/{id}": {
             "get": {
-                "description": "Fetches a movie by ID",
+                "description": "Fetches a movie by ID or Slug",
                 "consumes": [
                     "application/json"
                 ],
@@ -274,8 +281,8 @@ const docTemplate = `{
                 "summary": "Fetches a movie",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Movie ID",
+                        "type": "string",
+                        "description": "Movie ID or Slug",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -365,6 +372,12 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movie slug",
+                        "name": "slug",
+                        "in": "formData"
                     },
                     {
                         "type": "string",
@@ -470,8 +483,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/payments/status/{orderID}": {
-            "put": {
+        "/payments/validate": {
+            "post": {
                 "description": "Validates the payment status by order ID",
                 "consumes": [
                     "application/json"
@@ -483,15 +496,6 @@ const docTemplate = `{
                     "payments"
                 ],
                 "summary": "Validate payment status",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Order ID",
-                        "name": "orderID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1507,6 +1511,10 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 100,
                     "minLength": 3
+                },
+                "rows": {
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },
@@ -1537,7 +1545,8 @@ const docTemplate = `{
             "required": [
                 "price",
                 "seat_id",
-                "session_id"
+                "session_id",
+                "user_id"
             ],
             "properties": {
                 "price": {
@@ -1663,7 +1672,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "order_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "status": {
                     "type": "string"
@@ -1692,6 +1701,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "release_date": {
+                    "type": "string"
+                },
+                "slug": {
                     "type": "string"
                 },
                 "title": {
@@ -1826,7 +1838,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "price": {
                     "type": "number"
@@ -1842,6 +1854,9 @@ const docTemplate = `{
                 },
                 "session_id": {
                     "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "integer"

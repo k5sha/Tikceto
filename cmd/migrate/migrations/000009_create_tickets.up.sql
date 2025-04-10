@@ -1,5 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 CREATE TABLE tickets (
-    id bigserial PRIMARY KEY,
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     session_id bigserial NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
     seat_id bigserial NOT NULL REFERENCES seats(id) ON DELETE CASCADE,
     user_id bigserial REFERENCES users(id) ON DELETE SET NULL,

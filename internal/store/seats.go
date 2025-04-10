@@ -13,15 +13,15 @@ var (
 type Seat struct {
 	ID     int64 `json:"id"`
 	RoomID int64 `json:"room_id"`
-	Row    int   `json:"row"`
-	Number int   `json:"seat_number"`
+	Row    int64 `json:"row"`
+	Number int64 `json:"seat_number"`
 }
 
 type SeatWithMetadata struct {
 	ID     int64    `json:"id"`
 	RoomID int64    `json:"room_id"`
-	Row    int      `json:"row"`
-	Number int      `json:"seat_number"`
+	Row    int64    `json:"row"`
+	Number int64    `json:"seat_number"`
 	Price  *float64 `json:"price,omitempty"`
 	Status string   `json:"status"`
 }
@@ -59,7 +59,7 @@ func (s *SeatStore) GetByID(ctx context.Context, id int64) (*Seat, error) {
 
 func (s *SeatStore) GetBySession(ctx context.Context, sessionID int64) ([]SeatWithMetadata, error) {
 	query := `
-		SELECT s.id, s.room_id, s.row, s.seat_number, t.user_id, t.price
+		SELECT s.id, s.room_id, s.row, s.seat_number, t.user_id, ses.price
 		FROM seats s
 		JOIN sessions ses ON s.room_id = ses.room_id
 		LEFT JOIN tickets t ON s.id = t.seat_id AND ses.id = t.session_id
@@ -83,9 +83,9 @@ func (s *SeatStore) GetBySession(ctx context.Context, sessionID int64) ([]SeatWi
 			return nil, err
 		}
 
-		seatStatus := "reserved"
-		if userID == nil && seat.Price != nil {
-			seatStatus = "available"
+		seatStatus := "available"
+		if userID != nil {
+			seatStatus = "reserved"
 		}
 
 		seat.Status = seatStatus

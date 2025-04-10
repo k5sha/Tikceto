@@ -6,7 +6,9 @@ import (
 	"errors"
 )
 
-// TODO: add createdAt
+var (
+	ErrDuplicateRoom = errors.New("a room with that name already exists")
+)
 
 type Room struct {
 	ID       int64  `json:"id"`
@@ -123,7 +125,15 @@ func (s *RoomsStore) Create(ctx context.Context, room *Room) error {
 		&room.ID,
 	)
 
-	return err
+	if err != nil {
+		switch {
+		case err.Error() == `pq: duplicate key value violates unique constraint "unique_room_name"`:
+			return ErrDuplicateRoom
+		default:
+			return err
+		}
+	}
+	return nil
 }
 func (s *RoomsStore) Delete(ctx context.Context, id int64) error {
 	query := `
@@ -168,6 +178,8 @@ func (s *RoomsStore) Update(ctx context.Context, room *Room) error {
 	)
 	if err != nil {
 		switch {
+		case err.Error() == `pq: duplicate key value violates unique constraint "unique_room_name"`:
+			return ErrDuplicateRoom
 		case errors.Is(err, sql.ErrNoRows):
 			return ErrNotFound
 		default:

@@ -128,13 +128,13 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
 
             <ModalFooter className="flex justify-end gap-2">
               <Button
-                color="primary"
-                variant="flat"
+                color="danger"
+                variant="light"
                 onPress={() => onOpenChange(false)}
               >
                 Скасувати
               </Button>
-              <Button color="danger" type="submit" variant="bordered">
+              <Button color="primary" type="submit">
                 Створити
               </Button>
             </ModalFooter>

@@ -1,0 +1,2 @@
+ALTER TABLE tickets
+    ADD COLUMN status VARCHAR(50) DEFAULT 'pending' NOT NULL;

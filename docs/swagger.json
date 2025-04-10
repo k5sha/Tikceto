@@ -201,6 +201,13 @@
                     },
                     {
                         "type": "string",
+                        "description": "Movie slug",
+                        "name": "slug",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Movie title",
                         "name": "title",
                         "in": "formData",
@@ -252,7 +259,7 @@
         },
         "/movies/{id}": {
             "get": {
-                "description": "Fetches a movie by ID",
+                "description": "Fetches a movie by ID or Slug",
                 "consumes": [
                     "application/json"
                 ],
@@ -265,8 +272,8 @@
                 "summary": "Fetches a movie",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Movie ID",
+                        "type": "string",
+                        "description": "Movie ID or Slug",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -356,6 +363,12 @@
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movie slug",
+                        "name": "slug",
+                        "in": "formData"
                     },
                     {
                         "type": "string",
@@ -461,8 +474,8 @@
                 }
             }
         },
-        "/payments/status/{orderID}": {
-            "put": {
+        "/payments/validate": {
+            "post": {
                 "description": "Validates the payment status by order ID",
                 "consumes": [
                     "application/json"
@@ -474,15 +487,6 @@
                     "payments"
                 ],
                 "summary": "Validate payment status",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Order ID",
-                        "name": "orderID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1498,6 +1502,10 @@
                     "type": "string",
                     "maxLength": 100,
                     "minLength": 3
+                },
+                "rows": {
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },
@@ -1528,7 +1536,8 @@
             "required": [
                 "price",
                 "seat_id",
-                "session_id"
+                "session_id",
+                "user_id"
             ],
             "properties": {
                 "price": {
@@ -1654,7 +1663,7 @@
             "type": "object",
             "properties": {
                 "order_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "status": {
                     "type": "string"
@@ -1683,6 +1692,9 @@
                     "type": "string"
                 },
                 "release_date": {
+                    "type": "string"
+                },
+                "slug": {
                     "type": "string"
                 },
                 "title": {
@@ -1817,7 +1829,7 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "price": {
                     "type": "number"
@@ -1833,6 +1845,9 @@
                 },
                 "session_id": {
                     "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "integer"

@@ -35,11 +35,11 @@ func main() {
 	// Config
 	cfg := config{
 		addr:        env.GetString("ADDR", ":8080"),
-		apiURL:      env.GetString("EXTERNAL_URL", "localhost:8080"),
-		frontendURL: env.GetString("FRONTEND_URL", "http://localhost:5173"),
+		apiURL:      env.GetString("EXTERNAL_URL", "192.168.0.171:8080"),
+		frontendURL: env.GetString("FRONTEND_URL", "http://192.168.0.171:5173"),
 		env:         env.GetString("ENV", "development"),
 		db: dbConfig{
-			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost:5432/tikceto?sslmode=disable"),
+			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@db:5432/tikceto?sslmode=disable"),
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
 			maxIdleTime:  env.GetDuration("DB_MAX_IDLE_TIME", 5*time.Minute),
@@ -67,14 +67,15 @@ func main() {
 			minio: minioConfig{
 				user:     env.GetString("MINIO_ROOT_USER", "admin"),
 				password: env.GetString("MINIO_ROOT_PASSWORD", "adminpassword"),
-				endpoint: env.GetString("MINIO_ENDPOINT", "192.168.0.171:9000"),
+				endpoint: env.GetString("MINIO_ENDPOINT", "minio:9000"),
 				ssl:      env.GetBool("MINIO_SSL", false),
 			},
 		},
 		payment: payConfig{
-			pubKey:      env.GetString("PAYMENT_PUBLIC_KEY", ""),
-			privateKey:  env.GetString("PAYMENT_PRIVATE_KEY", ""),
-			frontendURL: env.GetString("PAYMENT_FRONTEND_URL", "http://localhost:5173/payment/complete/"),
+			pubKey:      env.GetString("PAYMENT_PUBLIC_KEY", "&"),
+			privateKey:  env.GetString("PAYMENT_PRIVATE_KEY", "&"),
+			frontendURL: env.GetString("PAYMENT_FRONTEND_URL", "http://192.168.0.171:5173/payment/complete/"),
+			serverURL:   env.GetString("PAYMENT_SERVER_URL", "http://192.168.0.171/v1/payments/validate"),
 		},
 	}
 
@@ -102,13 +103,13 @@ func main() {
 	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
 
 	// S3
-	s3, err := s3.NewMinioClient(cfg.s3.minio.endpoint, cfg.s3.minio.user, cfg.s3.minio.password, cfg.s3.bucketName, cfg.s3.minio.ssl)
+	s3, err := s3.NewMinioClient(cfg.s3.minio.endpoint, "localhost/minio", cfg.s3.minio.user, cfg.s3.minio.password, cfg.s3.bucketName, cfg.s3.minio.ssl)
 	if err != nil {
 		logger.Fatal(err)
 	}
 
 	// Payment
-	payment, err := payment.NewLiqPayPaymentService(cfg.payment.pubKey, cfg.payment.privateKey, cfg.payment.frontendURL)
+	payment, err := payment.NewLiqPayPaymentService(cfg.payment.pubKey, cfg.payment.privateKey, cfg.payment.frontendURL, cfg.payment.serverURL)
 	if err != nil {
 		logger.Fatal(err)
 	}

@@ -11,12 +11,13 @@ var (
 )
 
 type Ticket struct {
-	ID        int64   `json:"id"`
+	ID        string  `json:"id"`
 	SessionID int64   `json:"session_id"`
 	SeatID    int64   `json:"seat_id"`
-	UserID    *int64  `json:"user_id"`
+	UserID    int64   `json:"user_id"`
 	Price     float64 `json:"price"`
 	CreatedAt string  `json:"created_at"`
+	Status    string  `json:"status"`
 	Session   Session `json:"session"`
 	Seat      Seat    `json:"seat"`
 }
@@ -25,9 +26,9 @@ type TicketStore struct {
 	db *sql.DB
 }
 
-func (s *TicketStore) GetByID(ctx context.Context, id int64) (*Ticket, error) {
+func (s *TicketStore) GetByID(ctx context.Context, id string) (*Ticket, error) {
 	query := `
-		SELECT id, session_id, seat_id, user_id, price, created_at
+		SELECT id, session_id, seat_id, user_id, price, status, created_at
 		FROM tickets
 		WHERE id = $1
 	`
@@ -37,7 +38,7 @@ func (s *TicketStore) GetByID(ctx context.Context, id int64) (*Ticket, error) {
 
 	ticket := &Ticket{}
 	err := s.db.QueryRowContext(ctx, query, id).Scan(
-		&ticket.ID, &ticket.SessionID, &ticket.SeatID, &ticket.UserID, &ticket.Price, &ticket.CreatedAt,
+		&ticket.ID, &ticket.SessionID, &ticket.SeatID, &ticket.UserID, &ticket.Price, &ticket.Status, &ticket.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -52,7 +53,7 @@ func (s *TicketStore) GetByID(ctx context.Context, id int64) (*Ticket, error) {
 func (s *TicketStore) GetByUserID(ctx context.Context, id int64) ([]Ticket, error) {
 	query := `
 		SELECT 
-			t.id, t.session_id, t.seat_id, t.user_id, t.price, t.created_at,
+			t.id, t.session_id, t.seat_id, t.user_id, t.price, t.status, t.created_at,
 			s.id, s.movie_id, s.room_id, s.start_time, s.price,
 			m.id, m.title, m.description, m.duration, m.poster_url, m.release_date, m.created_at,
 			r.id, r.name, r.capacity,
@@ -83,7 +84,7 @@ func (s *TicketStore) GetByUserID(ctx context.Context, id int64) ([]Ticket, erro
 		var seat Seat
 
 		err := rows.Scan(
-			&ticket.ID, &ticket.SessionID, &ticket.SeatID, &ticket.UserID, &ticket.Price, &ticket.CreatedAt,
+			&ticket.ID, &ticket.SessionID, &ticket.SeatID, &ticket.UserID, &ticket.Price, &ticket.Status, &ticket.CreatedAt,
 			&session.ID, &session.MovieID, &session.RoomID, &session.StartTime, &session.Price,
 			&movie.ID, &movie.Title, &movie.Description, &movie.Duration, &movie.PosterUrl, &movie.ReleaseDate, &movie.CreatedAt,
 			&room.ID, &room.Name, &room.Capacity,
@@ -138,8 +139,8 @@ func (s *TicketStore) GetBySessionAndSeat(ctx context.Context, sessionID, seatID
 
 func (s *TicketStore) Create(ctx context.Context, ticket *Ticket) error {
 	query := `
-		INSERT INTO tickets (session_id, seat_id, price, user_id)
-		VALUES ($1, $2, $3, $4) RETURNING id, created_at
+		INSERT INTO tickets (session_id, seat_id, price, user_id, status)
+		VALUES ($1, $2, $3, $4, $5) RETURNING id, created_at
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -147,7 +148,7 @@ func (s *TicketStore) Create(ctx context.Context, ticket *Ticket) error {
 
 	err := s.db.QueryRowContext(
 		ctx, query,
-		ticket.SessionID, ticket.SeatID, ticket.Price, ticket.UserID,
+		ticket.SessionID, ticket.SeatID, ticket.Price, ticket.UserID, "pending",
 	).Scan(&ticket.ID, &ticket.CreatedAt)
 
 	if err != nil {
@@ -160,7 +161,7 @@ func (s *TicketStore) Create(ctx context.Context, ticket *Ticket) error {
 	return nil
 }
 
-func (s *TicketStore) Delete(ctx context.Context, id int64) error {
+func (s *TicketStore) Delete(ctx context.Context, id string) error {
 	query := `DELETE FROM tickets WHERE id = $1`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -185,7 +186,7 @@ func (s *TicketStore) Delete(ctx context.Context, id int64) error {
 
 func (s *TicketStore) Update(ctx context.Context, ticket *Ticket) error {
 	query := `
-		UPDATE tickets SET user_id = $1, price = $2 WHERE id = $3
+		UPDATE tickets SET user_id = $1, price = $2, status = $3 WHERE id = $4
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -193,7 +194,7 @@ func (s *TicketStore) Update(ctx context.Context, ticket *Ticket) error {
 
 	res, err := s.db.ExecContext(
 		ctx, query,
-		ticket.UserID, ticket.Price, ticket.ID,
+		ticket.UserID, ticket.Price, ticket.Status, ticket.ID,
 	)
 	if err != nil {
 		return err

@@ -18,11 +18,13 @@ const movieCtx movieKey = "movie"
 
 // CreateMoviePayload represents the payload for creating a movie.
 //
+//	@Slug			string   "Slug of the movie"  validate:"required,min=3,max=100"
 //	@Title			string   "Title of the movie"  validate:"required,min=3,max=100"
 //	@Description	string   "Description of the movie" validate:"required,min=5,max=500"
 //	@Duration		int64   "Duration of the movie"  validate:"required,gte=1"
 //	@ReleaseDate	string   "Release date of the movie" validate:"required,datetime=2006-01-02"`
 type CreateMoviePayload struct {
+	Slug        string `json:"slug" validate:"required,min=3,max=100"`
 	Title       string `json:"title" validate:"required,min=3,max=100"`
 	Description string `json:"description" validate:"required,min=5,max=500"`
 	Duration    int64  `json:"duration" validate:"required,gte=1"`
@@ -37,6 +39,7 @@ type CreateMoviePayload struct {
 //	@Accept			multipart/form-data
 //	@Produce		json
 //	@Param			file			formData	file	true	"Movie poster file"
+//	@Param			slug			formData	string	true	"Movie slug"
 //	@Param			title			formData	string	true	"Movie title"
 //	@Param			description		formData	string	true	"Movie description"
 //	@Param			duration		formData	int		true	"Movie duration in minutes"
@@ -81,6 +84,7 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	payload := CreateMoviePayload{
+		Slug:        r.FormValue("slug"),
 		Title:       r.FormValue("title"),
 		Description: r.FormValue("description"),
 		Duration:    0,
@@ -101,6 +105,7 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	movie := &store.Movie{
+		Slug:        payload.Slug,
 		Title:       payload.Title,
 		Description: payload.Description,
 		Duration:    payload.Duration,
@@ -122,11 +127,11 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 // GetMovie godoc
 //
 //	@Summary		Fetches a movie
-//	@Description	Fetches a movie by ID
+//	@Description	Fetches a movie by ID or Slug
 //	@Tags			movies
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"Movie ID"
+//	@Param			id	path		string	true	"Movie ID or Slug"
 //	@Success		200	{object}	store.Movie
 //	@Failure		404	{object}	error
 //	@Failure		500	{object}	error
@@ -134,9 +139,7 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 func (app *application) getMovieHandler(w http.ResponseWriter, r *http.Request) {
 	movie := getMovieFromCtx(r)
 
-	ctx := r.Context()
-
-	url, err := app.s3.GetOne(ctx, movie.PosterUrl)
+	url, err := app.s3.GetOne(movie.PosterUrl)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
@@ -195,7 +198,7 @@ func (app *application) getMoviesHandler(w http.ResponseWriter, r *http.Request)
 
 	// TODO: get many make
 	for i := range movies {
-		url, err := app.s3.GetOne(ctx, movies[i].PosterUrl)
+		url, err := app.s3.GetOne(movies[i].PosterUrl)
 		if err != nil {
 			app.internalServerError(w, r, err)
 			return
@@ -212,11 +215,13 @@ func (app *application) getMoviesHandler(w http.ResponseWriter, r *http.Request)
 
 // UpdateMoviePayload represents the payload for updating a movie.
 //
+//	@Slug			string   "Slug of the movie"  validate:"omitempty,min=3,max=100"
 //	@Title			string   "Title of the movie"  validate:"omitempty,min=3,max=100"
 //	@Description	string   "Description of the movie" validate:"omitempty,min=5,max=500"
 //	@Duration		int64   "Duration of the movie"  validate:"omitempty,gte=1"
 //	@ReleaseDate	string   "Release date of the movie" validate:"omitempty,datetime=2006-01-02"`
 type UpdateMoviePayload struct {
+	Slug        *string `json:"slug" validate:"omitempty,min=3,max=100"`
 	Title       *string `json:"title" validate:"omitempty,min=3,max=100"`
 	Description *string `json:"description" validate:"omitempty,min=5,max=500"`
 	Duration    *int64  `json:"duration" validate:"omitempty,gte=1"`
@@ -231,6 +236,7 @@ type UpdateMoviePayload struct {
 //	@Accept			multipart/form-data
 //	@Produce		json
 //	@Param			id				path		int		true	"Movie ID"
+//	@Param			slug			formData	string	false	"Movie slug"
 //	@Param			title			formData	string	false	"Movie title"
 //	@Param			description		formData	string	false	"Movie description"
 //	@Param			duration		formData	int		false	"Movie duration"
@@ -252,11 +258,15 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	slug := r.FormValue("slug")
 	title := r.FormValue("title")
 	description := r.FormValue("description")
 	durationStr := r.FormValue("duration")
 	releaseDate := r.FormValue("release_date")
 
+	if slug != "" {
+		movie.Slug = slug
+	}
 	if title != "" {
 		movie.Title = title
 	}
@@ -365,13 +375,26 @@ func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Reques
 
 func (app *application) moviesContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
 		idParam := chi.URLParam(r, "movieID")
 		id, err := strconv.ParseInt(idParam, 10, 64)
 		if err != nil {
-			app.badRequestResponse(w, r, fmt.Errorf("must provide a correct id"))
+			movie, err := app.store.Movies.GetBySlug(ctx, idParam)
+			if err != nil {
+				switch {
+				case errors.Is(err, store.ErrNotFound):
+					app.notFoundResponse(w, r, err)
+				default:
+					app.internalServerError(w, r, err)
+				}
+				return
+			}
+
+			ctx = context.WithValue(ctx, movieCtx, movie)
+			next.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
-		ctx := r.Context()
 
 		movie, err := app.store.Movies.GetByID(ctx, id)
 		if err != nil {

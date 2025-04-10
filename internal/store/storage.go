@@ -33,6 +33,7 @@ type Storage struct {
 	}
 	Movies interface {
 		GetByID(context.Context, int64) (*Movie, error)
+		GetBySlug(context.Context, string) (*Movie, error)
 		GetMoviesList(context.Context, PaginatedMoviesQuery) ([]Movie, error)
 		Create(context.Context, *Movie) error
 		Delete(context.Context, int64) error
@@ -53,11 +54,11 @@ type Storage struct {
 		Update(context.Context, *Seat) error
 	}
 	Tickets interface {
-		GetByID(context.Context, int64) (*Ticket, error)
+		GetByID(context.Context, string) (*Ticket, error)
 		GetBySessionAndSeat(context.Context, int64, int64) (*Ticket, error)
 		GetByUserID(context.Context, int64) ([]Ticket, error)
 		Create(context.Context, *Ticket) error
-		Delete(context.Context, int64) error
+		Delete(context.Context, string) error
 		Update(context.Context, *Ticket) error
 	}
 	Roles interface {

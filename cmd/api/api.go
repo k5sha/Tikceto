@@ -78,6 +78,7 @@ type payConfig struct {
 	pubKey      string
 	privateKey  string
 	frontendURL string
+	serverURL   string
 }
 type mailTrapConfig struct {
 	apiKey string
@@ -120,9 +121,6 @@ func (app *application) mount() *chi.Mux {
 		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
 		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
-		// Static
-		r.Handle("/static/*", app.secureImageServer("./static"))
-
 		r.Route("/rooms", func(r chi.Router) {
 			r.With(app.AuthTokenMiddleware()).Post("/", app.checkPermissions("admin", app.createRoomHandler))
 			r.Get("/", app.getRoomsHandler)
@@ -145,6 +143,7 @@ func (app *application) mount() *chi.Mux {
 			r.With(app.AuthTokenMiddleware()).Post("/", app.checkPermissions("admin", app.createMovieHandler))
 
 			r.Get("/", app.getMoviesHandler)
+
 			r.Route("/{movieID}", func(r chi.Router) {
 				r.Use(app.moviesContextMiddleware)
 
@@ -204,9 +203,9 @@ func (app *application) mount() *chi.Mux {
 			r.Route("/{ticketID}", func(r chi.Router) {
 				r.Use(app.ticketContextMiddleware)
 
-				r.Get("/", app.getTicketHandler)
 				r.Group(func(r chi.Router) {
 					r.Use(app.AuthTokenMiddleware())
+					r.Get("/", app.checkPermissions("admin", app.getTicketHandler))
 					r.Delete("/", app.checkPermissions("admin", app.deleteTicketHandler))
 					r.Patch("/", app.checkPermissions("admin", app.updateTicketHandler))
 				})
@@ -216,7 +215,7 @@ func (app *application) mount() *chi.Mux {
 
 		r.Route("/payments", func(r chi.Router) {
 			r.With(app.AuthTokenMiddleware()).Post("/create", app.createPaymentHandler)
-			r.Put("/status/{orderID}", app.validatePaymentHandler)
+			r.Post("/validate", app.validatePaymentHandler)
 		})
 
 		r.Route("/users", func(r chi.Router) {

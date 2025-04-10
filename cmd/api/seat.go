@@ -21,8 +21,8 @@ const seatCtx seatKey = "seat"
 //	@Number	int    "Seat number in the row" validate:"required,gte=1"
 type CreateSeatPayload struct {
 	RoomID int64 `json:"room_id" validate:"required,gte=1"`
-	Row    int   `json:"row" validate:"required,gte=1"`
-	Number int   `json:"number" validate:"required,gte=1"`
+	Row    int64 `json:"row" validate:"required,gte=1"`
+	Number int64 `json:"number" validate:"required,gte=1"`
 }
 
 // CreateSeat godoc
@@ -153,8 +153,8 @@ func (app *application) getSeatsBySessionHandler(w http.ResponseWriter, r *http.
 //	@Row	int "Updated row number" validate:"omitempty,gte=1"
 //	@Number	int "Updated seat number" validate:"omitempty,gte=1"
 type UpdateSeatPayload struct {
-	Row    *int `json:"row" validate:"omitempty,gte=1"`
-	Number *int `json:"seat_number" validate:"omitempty,gte=1"`
+	Row    *int64 `json:"row" validate:"omitempty,gte=1"`
+	Number *int64 `json:"seat_number" validate:"omitempty,gte=1"`
 }
 
 // UpdateSeat godoc

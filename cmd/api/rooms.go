@@ -18,9 +18,11 @@ const roomCtx roomKey = "room"
 //
 //	@Name		string   "Name of the room"  validate:"required,min=3,max=100"
 //	@Capacity	int   "Capacity of the room" validate:"required,gte=1"`
+//	@Rows		int   "Count of rows" validate:"omitempty,gte=1"`
 type CreateRoomPayload struct {
 	Name     string `json:"name" validate:"required,min=3,max=100"`
 	Capacity int64  `json:"capacity" validate:"required,gte=1"`
+	Rows     *int64 `json:"rows" validate:"omitempty,gte=0"`
 }
 
 // CreateRoom godoc
@@ -56,8 +58,20 @@ func (app *application) createRoomHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	if err := app.store.Rooms.Create(ctx, room); err != nil {
+		if errors.Is(err, store.ErrDuplicateRoom) {
+			app.badRequestResponse(w, r, err)
+			return
+		}
 		app.internalServerError(w, r, err)
 		return
+	}
+
+	if payload.Rows != nil {
+		if err := app.fillSeatsInRoom(ctx, room, *payload.Rows); err != nil {
+			app.internalServerError(w, r, err)
+			return
+		}
+
 	}
 
 	if err := app.jsonResponse(w, http.StatusCreated, room); err != nil {
@@ -162,12 +176,13 @@ func (app *application) updateRoomHandler(w http.ResponseWriter, r *http.Request
 
 	if err := app.store.Rooms.Update(r.Context(), room); err != nil {
 		switch {
+		case errors.Is(err, store.ErrDuplicateRoom):
+			app.badRequestResponse(w, r, err)
 		case errors.Is(err, store.ErrNotFound):
 			app.notFoundResponse(w, r, err)
 		default:
 			app.internalServerError(w, r, err)
 		}
-		app.internalServerError(w, r, err)
 		return
 	}
 
@@ -186,7 +201,7 @@ func (app *application) updateRoomHandler(w http.ResponseWriter, r *http.Request
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"Room ID"
-//	@Success		204	{object} string
+//	@Success		204	{object}	string
 //	@Failure		404	{object}	error
 //	@Failure		500	{object}	error
 //	@Security		ApiKeyAuth
@@ -210,6 +225,37 @@ func (app *application) deleteRoomHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+}
+
+func (app *application) fillSeatsInRoom(ctx context.Context, room *store.Room, rows int64) error {
+	baseSeats := room.Capacity / rows
+	extraSeats := room.Capacity % rows
+
+	seatsPerRow := make([]int64, rows)
+	for i := int64(0); i < rows; i++ {
+		seatsPerRow[i] = baseSeats
+	}
+
+	for i := rows - 1; i >= 0 && extraSeats > 0; i-- {
+		seatsPerRow[i]++
+		extraSeats--
+	}
+
+	for row := int64(1); row <= rows; row++ {
+		for seatNumber := int64(1); seatNumber <= seatsPerRow[row-1]; seatNumber++ {
+			seat := &store.Seat{
+				RoomID: room.ID,
+				Row:    row,
+				Number: seatNumber,
+			}
+
+			if err := app.store.Seats.Create(ctx, seat); err != nil {
+				return fmt.Errorf("error creating seat: %v", err)
+			}
+		}
+	}
+
+	return nil
 }
 
 func (app *application) roomsContextMiddleware(next http.Handler) http.Handler {

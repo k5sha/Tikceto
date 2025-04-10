@@ -1,19 +1,21 @@
 package payment
 
 import (
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	"github.com/liqpay/go-sdk"
 	"log"
-	"strconv"
 )
 
 type LiqPayPaymentService struct {
 	publicKey   string
 	privateKey  string
 	frontendURL string
+	serverURL   string
 }
 
-func NewLiqPayPaymentService(publicKey, privateKey, frontendURL string) (*LiqPayPaymentService, error) {
+func NewLiqPayPaymentService(publicKey, privateKey, frontendURL, serverURL string) (*LiqPayPaymentService, error) {
 	if publicKey == "" || privateKey == "" || frontendURL == "" {
 		return nil, fmt.Errorf("API keys required")
 	}
@@ -21,6 +23,7 @@ func NewLiqPayPaymentService(publicKey, privateKey, frontendURL string) (*LiqPay
 		publicKey:   publicKey,
 		privateKey:  privateKey,
 		frontendURL: frontendURL,
+		serverURL:   serverURL,
 	}, nil
 }
 
@@ -37,7 +40,8 @@ func (s *LiqPayPaymentService) CreatePayment(payment PaymentRequest) (*PaymentRe
 		"description":    payment.Description,
 		"order_id":       payment.OrderId,
 		"sandbox":        1,
-		"result_url":     s.frontendURL + strconv.FormatInt(payment.OrderId, 10),
+		"result_url":     s.frontendURL + payment.OrderId,
+		"server_url":     s.serverURL,
 	}
 
 	resp, err := c.Send("request", request)
@@ -48,8 +52,6 @@ func (s *LiqPayPaymentService) CreatePayment(payment PaymentRequest) (*PaymentRe
 	if resp["result"] != "ok" {
 		return nil, fmt.Errorf("Liqpay API error: %s", resp["err"])
 	}
-
-	log.Println(resp)
 
 	urlCheckout, _ := resp["url_checkout"].(string)
 
@@ -75,4 +77,15 @@ func (s *LiqPayPaymentService) ValidatePayment(orderID string) (*string, error) 
 
 	status, _ := resp["err_code"].(string)
 	return &status, nil
+}
+
+func (s *LiqPayPaymentService) GenerateSignature(data string) string {
+	signatureSource := s.privateKey + data + s.privateKey
+
+	hash := sha1.New()
+	hash.Write([]byte(signatureSource))
+	hashBytes := hash.Sum(nil)
+
+	signature := base64.StdEncoding.EncodeToString(hashBytes)
+	return signature
 }

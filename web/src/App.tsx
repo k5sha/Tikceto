@@ -16,7 +16,7 @@ function App() {
       <Route element={<PurchaseComplete />} path="payment/complete/:orderID" />
       <Route element={<MyTickets />} path="/my/tickets/" />
       <Route element={<MoviesPage />} path="/" />
-      <Route element={<MovieDetailPage />} path="/movie/:movieID" />
+      <Route element={<MovieDetailPage />} path="/movie/:movieSlug" />
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
       <Route element={<ActivationPage />} path="/confirm/:token" />

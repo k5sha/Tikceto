@@ -1,15 +1,14 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"github.com/k5sha/Tikceto/internal/payment"
 	"github.com/k5sha/Tikceto/internal/store"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 // CreatePaymentPayload represents the payload for creating a seat.
@@ -43,7 +42,38 @@ func (app *application) createPaymentHandler(w http.ResponseWriter, r *http.Requ
 
 	ctx := r.Context()
 
-	ticket, err := app.store.Tickets.GetBySessionAndSeat(ctx, payload.SessionID, payload.SeatID)
+	user := getUserFromCtx(r)
+
+	session, err := app.store.Sessions.GetByID(ctx, payload.SessionID)
+	if err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	seat, err := app.store.Seats.GetByID(ctx, payload.SeatID)
+	if err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	ticket := &store.Ticket{
+		UserID:    user.ID,
+		SessionID: session.ID,
+		SeatID:    seat.ID,
+		Price:     session.Price,
+	}
+
+	err = app.store.Tickets.Create(ctx, ticket)
 	if err != nil {
 		if errors.Is(err, store.ErrNotFound) {
 			app.notFoundResponse(w, r, err)
@@ -56,7 +86,7 @@ func (app *application) createPaymentHandler(w http.ResponseWriter, r *http.Requ
 	paymentPayload := payment.PaymentRequest{
 		Amount:      ticket.Price,
 		Currency:    "UAH",
-		Description: "Купівля квитка #" + strconv.FormatInt(ticket.ID, 10),
+		Description: "Купівля квитка #" + ticket.ID,
 		OrderId:     ticket.ID,
 	}
 
@@ -66,15 +96,6 @@ func (app *application) createPaymentHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	user := getUserFromCtx(r)
-
-	ticket.UserID = &user.ID
-
-	err = app.store.Tickets.Update(ctx, ticket)
-	if err != nil {
-		app.internalServerError(w, r, err)
-		return
-	}
 	if err := app.jsonResponse(w, http.StatusCreated, paymentResp); err != nil {
 		app.internalServerError(w, r, err)
 		return
@@ -88,61 +109,64 @@ func (app *application) createPaymentHandler(w http.ResponseWriter, r *http.Requ
 //	@Tags			payments
 //	@Accept			json
 //	@Produce		json
-//	@Param			orderID	path		string	true	"Order ID"
-//	@Success		200		{object}	map[string]string
-//	@Failure		400		{object}	error
-//	@Failure		500		{object}	error
-//	@Router			/payments/status/{orderID} [put]
+//	@Success		200	{object}	map[string]string
+//	@Failure		400	{object}	error
+//	@Failure		500	{object}	error
+//	@Router			/payments/validate [post]
 func (app *application) validatePaymentHandler(w http.ResponseWriter, r *http.Request) {
-	orderID := chi.URLParam(r, "orderID")
-	if orderID == "" {
-		app.badRequestResponse(w, r, errors.New("orderID parameter is required"))
+	data := r.FormValue("data")
+	signature := r.FormValue("signature")
+
+	expectedSignature := app.payment.GenerateSignature(data)
+
+	if signature != expectedSignature {
+		app.unauthorizedErrorResponse(w, r, fmt.Errorf("Invalid signature"))
 		return
 	}
 
-	errCode, err := app.payment.ValidatePayment(orderID)
+	decodedData, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 
-	log.Println(errCode)
+	var paymentData PaymentData
 
-	ticketID, err := strconv.ParseInt(orderID, 10, 64)
+	err = json.Unmarshal(decodedData, &paymentData)
 	if err != nil {
-		app.badRequestResponse(w, r, fmt.Errorf("invalid order ID format"))
+		app.internalServerError(w, r, err)
 		return
 	}
+
+	log.Println(paymentData.Status)
 
 	ctx := r.Context()
 
-	ticket, err := app.store.Tickets.GetByID(ctx, ticketID)
-	if err != nil {
-		switch {
-		case errors.Is(err, store.ErrNotFound):
-			app.notFoundResponse(w, r, err)
-		default:
-			app.internalServerError(w, r, err)
-		}
-		return
-	}
+	ticket, err := app.store.Tickets.GetByID(ctx, paymentData.OrderID)
 
-	if errCode != nil {
-		ticket.UserID = nil
-
+	if paymentData.Status == "success" || paymentData.Status == "sandbox" {
+		ticket.Status = "confirmed"
 		if err := app.store.Tickets.Update(ctx, ticket); err != nil {
-			app.internalServerError(w, r, err)
+			http.Error(w, "Failed to update ticket status", http.StatusInternalServerError)
 			return
 		}
-
-		if err := app.jsonResponse(w, http.StatusForbidden, map[string]string{"result": "failed"}); err != nil {
-			app.internalServerError(w, r, err)
+	} else {
+		ticket.Status = "failed"
+		if err := app.store.Tickets.Update(ctx, ticket); err != nil {
+			http.Error(w, "Failed to update ticket status", http.StatusInternalServerError)
 			return
 		}
 	}
 
-	if err := app.jsonResponse(w, http.StatusCreated, map[string]string{"result": "ok"}); err != nil {
+	if err := app.jsonResponse(w, http.StatusOK, map[string]string{
+		"status": "ok",
+	}); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
+}
+
+type PaymentData struct {
+	OrderID string `json:"order_id"`
+	Status  string `json:"status"`
 }

@@ -1,9 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Loader2, Calendar, Clock } from "lucide-react";
+import {Loader2, Calendar, Clock, QrCode} from "lucide-react";  // Import the Qrcode icon
 
 import DefaultLayout from "@/layouts/default.tsx";
 import { useAuth } from "@/context/authContext.tsx";
+import { useState } from "react";
+import {QRCodeSVG} from "qrcode.react";
+import {siteConfig} from "@/config/site.ts"; // Import useState for managing QR code visibility
 
 const API_URL = "/tickets/my";
 
@@ -36,85 +39,129 @@ interface Ticket {
   price: number;
   session: Session;
   seat: Seat;
+  status: string;
   created_at: string;
 }
 
 const MyTickets = () => {
   const { fetchWithAuth } = useAuth();
+  const [showQRCode, setShowQRCode] = useState<number | null>(null); // State to manage which QR code to show
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["myTickets"],
     queryFn: async () => {
       const response = await fetchWithAuth<{ data: Ticket[] }>(API_URL);
 
+      if (response == null) {
+        return [];
+      }
       return response.data;
     },
   });
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-      </div>
+        <div className="flex justify-center items-center h-screen">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+        </div>
     );
   }
 
   if (isError || !data || data.length === 0) {
     return (
-      <div className="text-center mt-10">
-        <p className="text-gray-500 text-lg">У вас поки немає квитків.</p>
-        <Link
-          className="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          to="/"
-        >
-          Повернутися на головну
-        </Link>
-      </div>
+        <DefaultLayout>
+          <div className="flex flex-col justify-center items-center h-3/4 text-center mt-10">
+            <p className="text-gray-500 text-lg">У вас поки немає квитків.</p>
+            <Link
+                className="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                to="/"
+            >
+              Повернутися на головну
+            </Link>
+          </div>
+        </DefaultLayout>
     );
   }
 
   return (
-    <DefaultLayout>
-      <div className="max-w-4xl mx-auto p-4">
-        <h1 className="text-2xl font-semibold mb-4">Мої квитки</h1>
-        <div className="grid gap-4">
-          {data.map((ticket) => (
-            <div
-              key={ticket.id}
-              className="p-4 border rounded-lg shadow-md flex items-center gap-4"
-            >
-              <img
-                alt={ticket.session.movie.title}
-                className="w-16 h-24 object-cover rounded-md"
-                src={ticket.session.movie.poster_url}
-              />
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold">
-                  {ticket.session.movie.title}
-                </h2>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-gray-500" />
-                  {new Date(ticket.session.start_time).toLocaleString("uk-UA", {
-                    dateStyle: "long",
-                    timeStyle: "short",
-                  })}
-                </p>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-500" />
-                  {ticket.session.room.name}, Ряд {ticket.seat.row}, Місце{" "}
-                  {ticket.seat.seat_number}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="text-lg font-semibold">
-                  {ticket.price} грн
-                </span>
-              </div>
-            </div>
-          ))}
+      <DefaultLayout>
+        <div className="max-w-4xl mx-auto p-4">
+          <h1 className="text-2xl font-semibold mb-4">Мої квитки</h1>
+          <div className="grid gap-4 md:grid-cols-1 md:gap-6">
+            {data.map((ticket) => (
+                <div
+                    key={ticket.id}
+                    className="p-4 border rounded-lg shadow-md flex items-center gap-4 flex-col md:flex-row"
+                >
+                  <img
+                      alt={ticket.session.movie.title}
+                      className="w-16 h-24 object-cover rounded-md"
+                      src={ticket.session.movie.poster_url}
+                  />
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold text-center md:text-left">
+                      {ticket.session.movie.title}
+                    </h2>
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                      {new Date(ticket.session.start_time).toLocaleString("uk-UA", {
+                        dateStyle: "long",
+                        timeStyle: "short",
+                      })}
+                    </p>
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-gray-500" />
+                      {ticket.session.room.name}, Ряд {ticket.seat.row}, Місце{" "}
+                      {ticket.seat.seat_number}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg text-center font-semibold">
+                      {ticket.price} грн
+                    </span>
+                    <div className="mt-2">
+                      {ticket.status === "confirmed" ? (
+                          <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                      Підтверджено
+                    </span>
+                      ) : ticket.status === "pending" ? (
+                          <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                      Очікує підтвердження оплати
+                    </span>
+                      ) : ticket.status === "failed" ? (
+                          <span className="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                      Помилка оплати
+                    </span>
+                      ) : (
+                          <span className="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                      Невідомо
+                    </span>
+                      )}
+                    </div>
+                    { ticket.status === "confirmed" &&
+                    <div className="md:invisible mt-4 flex justify-center">
+                      <button
+                          className="text-gray-500"
+                          onClick={() =>
+                              setShowQRCode(showQRCode === ticket.id ? null : ticket.id)
+                          }
+                      >
+                        <QrCode className="w-8 h-8" />
+                      </button>
+                    </div>
+                    }
+                  </div>
+                      {showQRCode === ticket.id && (
+                          <div className="py-4 text-center">
+                            <QRCodeSVG value={`${siteConfig.server_api}/validate/${ticket.id}`} size={256} />
+                          </div>
+                      )}
+
+                </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </DefaultLayout>
+      </DefaultLayout>
   );
 };
 
