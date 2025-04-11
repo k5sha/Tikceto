@@ -1,0 +1,64 @@
+name: Audit
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  audit:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.23.3
+
+      - name: Verify Dependencies
+        run: go mod verify
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: staticcheck ./...
+
+      - name: Run Tests
+        run: go test -race ./...
+
+      # Load testing or any server pre-steps
+      - name: Simulate Server Load
+        run: |
+          echo "Simulating load test or performing server health checks..."
+          # Insert your load test or other server-related steps here
+
+      # Build Docker image for backend
+      - name: Build Docker Image for Backend
+        run: |
+          docker build -t ghcr.io/k5sha/ticketo-backend:latest ./
+
+      # Push Docker image for backend to GHCR
+      - name: Push Docker Image for Backend to GHCR
+        run: |
+          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/k5sha/ticketo-backend:latest
+
+      # Build Docker image for frontend
+      - name: Build Docker Image for Frontend
+        run: |
+          docker build -t ghcr.io/k5sha/ticketo-frontend:latest ./web
+
+      # Push Docker image for frontend to GHCR
+      - name: Push Docker Image for Frontend to GHCR
+        run: |
+          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/k5sha/ticketo-frontend:latest
