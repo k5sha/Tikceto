@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/k5sha/Tikceto/compare/v1.0.0...v1.0.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* ssh conetction ([a1c934e](https://github.com/k5sha/Tikceto/commit/a1c934effef5ef63f2bc3fb9162b0541bc4e0518))
+* ssh conetction ([ea6ef8d](https://github.com/k5sha/Tikceto/commit/ea6ef8d9dadab5ad03b3244d3a6ab1dc7d1b06d5))
+
 ## 1.0.0 (2025-04-11)
 
 
