@@ -16,6 +16,11 @@ services:
       - "5432:5432"
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   minio:
     image: bitnami/minio:latest
@@ -48,7 +53,7 @@ services:
       - ADDR
       - EXTERNAL_URL
       - FRONTEND_URL
-      - DB_ADDR
+      - DB_ADDR=postgres-db
       - AUTH_BASIC_USERNAME
       - AUTH_BASIC_PASSWORD
       - AUTH_TOKEN_SECRET
@@ -73,6 +78,11 @@ services:
       - minio
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
+      interval: 30s
+      retries: 3
+      timeout: 5s
 
   frontend:
     image: ghcr.io/k5sha/ticketo-frontend:latest
