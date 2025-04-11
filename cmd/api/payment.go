@@ -120,7 +120,7 @@ func (app *application) validatePaymentHandler(w http.ResponseWriter, r *http.Re
 	expectedSignature := app.payment.GenerateSignature(data)
 
 	if signature != expectedSignature {
-		app.unauthorizedErrorResponse(w, r, fmt.Errorf("Invalid signature"))
+		app.unauthorizedErrorResponse(w, r, fmt.Errorf("invalid signature"))
 		return
 	}
 
@@ -143,6 +143,10 @@ func (app *application) validatePaymentHandler(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 
 	ticket, err := app.store.Tickets.GetByID(ctx, paymentData.OrderID)
+	if err != nil {
+		app.notFoundResponse(w, r, err)
+		return
+	}
 
 	if paymentData.Status == "success" || paymentData.Status == "sandbox" {
 		ticket.Status = "confirmed"

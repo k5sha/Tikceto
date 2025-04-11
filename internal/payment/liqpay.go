@@ -50,7 +50,7 @@ func (s *LiqPayPaymentService) CreatePayment(payment PaymentRequest) (*PaymentRe
 	}
 
 	if resp["result"] != "ok" {
-		return nil, fmt.Errorf("Liqpay API error: %s", resp["err"])
+		return nil, fmt.Errorf("liqpay API error: %s", resp["err"])
 	}
 
 	urlCheckout, _ := resp["url_checkout"].(string)
