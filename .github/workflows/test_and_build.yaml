@@ -84,46 +84,46 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Create .env from GitHub Secrets
+      - name: Create .env file on VPS using SSH
         run: |
-          cat <<EOF > .env
-            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} "cat > /home/debian/Tikceto/.env <<EOF
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           
-            MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}
-            MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}
-            MINIO_USE_SSL=false
-            MINIO_DEFAULT_BUCKETS=${{ secrets.MINIO_DEFAULT_BUCKETS }}
+          MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}
+          MINIO_USE_SSL=false
+          MINIO_DEFAULT_BUCKETS=${{ secrets.MINIO_DEFAULT_BUCKETS }}
           
-            ENV=production
-            ADDR=0.0.0.0:8080
-            EXTERNAL_URL=${{ secrets.EXTERNAL_URL }}
-            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-            DB_ADDR=${{ secrets.DB_ADDR }}
+          ENV=production
+          ADDR=0.0.0.0:8080
+          EXTERNAL_URL=${{ secrets.EXTERNAL_URL }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          DB_ADDR=${{ secrets.DB_ADDR }}
           
-            AUTH_BASIC_USERNAME=${{ secrets.AUTH_BASIC_USERNAME }}
-            AUTH_BASIC_PASSWORD=${{ secrets.AUTH_BASIC_PASSWORD }}
-            AUTH_TOKEN_SECRET=${{ secrets.AUTH_TOKEN_SECRET }}
-            AUTH_TOKEN_HOST=ticketo
+          AUTH_BASIC_USERNAME=${{ secrets.AUTH_BASIC_USERNAME }}
+          AUTH_BASIC_PASSWORD=${{ secrets.AUTH_BASIC_PASSWORD }}
+          AUTH_TOKEN_SECRET=${{ secrets.AUTH_TOKEN_SECRET }}
+          AUTH_TOKEN_HOST=ticketo
           
-            MAIL_TOKEN_EXPIRATION=1h
-            MAIL_FROM_EMAIL=no-reply@example.com
-            MAILTRAP_API_KEY=${{ secrets.MAILTRAP_API_KEY }}
+          MAIL_TOKEN_EXPIRATION=1h
+          MAIL_FROM_EMAIL=no-reply@example.com
+          MAILTRAP_API_KEY=${{ secrets.MAILTRAP_API_KEY }}
           
-            S3_BUCKET_NAME=${{ secrets.MINIO_DEFAULT_BUCKETS }}
-            MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}
-            MINIO_ENDPOINT_PUBLIC=${{ secrets.MINIO_ENDPOINT_PUBLIC }}
-            MINIO_SSL=false
+          S3_BUCKET_NAME=${{ secrets.MINIO_DEFAULT_BUCKETS }}
+          MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}
+          MINIO_ENDPOINT_PUBLIC=${{ secrets.MINIO_ENDPOINT_PUBLIC }}
+          MINIO_SSL=false
           
-            PAYMENT_PUBLIC_KEY=${{ secrets.PAYMENT_PUBLIC_KEY }}
-            PAYMENT_PRIVATE_KEY=${{ secrets.PAYMENT_PRIVATE_KEY }}
-            PAYMENT_FRONTEND_URL=${{ secrets.PAYMENT_FRONTEND_URL }}
-            PAYMENT_SERVER_URL=${{ secrets.PAYMENT_SERVER_URL }}
+          PAYMENT_PUBLIC_KEY=${{ secrets.PAYMENT_PUBLIC_KEY }}
+          PAYMENT_PRIVATE_KEY=${{ secrets.PAYMENT_PRIVATE_KEY }}
+          PAYMENT_FRONTEND_URL=${{ secrets.PAYMENT_FRONTEND_URL }}
+          PAYMENT_SERVER_URL=${{ secrets.PAYMENT_SERVER_URL }}
           
-            VITE_API_URL=${{ secrets.VITE_API_URL }}
-            VITE_APP_NAME=Ticketo
-          EOF
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
+          VITE_APP_NAME=Ticketo
+          EOF"
 
       - name: Upload .env to VPS
         run: |
