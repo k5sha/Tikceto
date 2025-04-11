@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/k5sha/Tikceto/compare/v1.1.0...v1.1.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* admin panel ([b4cf02f](https://github.com/k5sha/Tikceto/commit/b4cf02f8b640dea137b19d367e9a925a23e0df8d))
+
 ## [1.1.0](https://github.com/k5sha/Tikceto/compare/v1.0.2...v1.1.0) (2025-04-11)
 
 
