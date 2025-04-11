@@ -42,6 +42,7 @@ services:
   backend:
     image: ghcr.io/k5sha/ticketo-backend:latest
     container_name: ticketo-api
+    platform: linux/amd64
     env_file: .env
     environment:
       - ENV
