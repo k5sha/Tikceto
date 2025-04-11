@@ -5,80 +5,78 @@ on:
     branches: [master]
 
 jobs:
-#  go-setup:
-#    runs-on: ubuntu-20.04
-#
-#    steps:
-#      - name: Checkout Repository
-#        uses: actions/checkout@v2
-#
-#      - name: Set up Go
-#        uses: actions/setup-go@v2
-#        with:
-#          go-version: 1.23.3
-#
-#      - name: Verify Dependencies
-#        run: go mod verify
-#
-#      - name: Build
-#        run: go build -v ./...
-#
-#      - name: Run go vet
-#        run: go vet ./...
-#
-#      - name: Install staticcheck
-#        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-#
-#      - name: Run staticcheck
-#        run: staticcheck ./...
-#
-#      - name: Run Tests
-#        run: go test -race ./...
-#
-#  backend-docker:
-#    needs: go-setup
-#    runs-on: ubuntu-20.04
-#
-#    steps:
-#      - name: Checkout Repository
-#        uses: actions/checkout@v2
-#
-#      - name: Build Docker Image for Backend
-#        run: |
-#          docker build -t ghcr.io/k5sha/ticketo-backend:latest ./
-#
-#      - name: Push Docker Image for Backend to GHCR
-#        run: |
-#          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-#          docker push ghcr.io/k5sha/ticketo-backend:latest
-#
-#  frontend-docker:
-#    needs: go-setup
-#    runs-on: ubuntu-20.04
-#
-#    steps:
-#      - name: Checkout Repository
-#        uses: actions/checkout@v2
-#
-#      - name: Build Docker Image for Frontend
-#        run: |
-#          docker build -t ghcr.io/k5sha/ticketo-frontend:latest ./web
-#
-#      - name: Push Docker Image for Frontend to GHCR
-#        run: |
-#          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-#          docker push ghcr.io/k5sha/ticketo-frontend:latest
-
-  deploy-to-vps:
-    # Uncomment if needed: needs: [backend-docker, frontend-docker]
+  go-setup:
     runs-on: ubuntu-20.04
 
     steps:
-      # Checkout the code from the repository
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # Set up SSH and configure known hosts
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.23.3
+
+      - name: Verify Dependencies
+        run: go mod verify
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: staticcheck ./...
+
+      - name: Run Tests
+        run: go test -race ./...
+
+  backend-docker:
+    needs: go-setup
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker Image for Backend
+        run: |
+          docker build -t ghcr.io/k5sha/ticketo-backend:latest ./
+
+      - name: Push Docker Image for Backend to GHCR
+        run: |
+          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/k5sha/ticketo-backend:latest
+
+  frontend-docker:
+    needs: go-setup
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker Image for Frontend
+        run: |
+          docker build -t ghcr.io/k5sha/ticketo-frontend:latest ./web
+
+      - name: Push Docker Image for Frontend to GHCR
+        run: |
+          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/k5sha/ticketo-frontend:latest
+
+  deploy-to-vps:
+    needs: [backend-docker, frontend-docker]
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
@@ -86,7 +84,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      # Create .env file on VPS using SSH
       - name: Create .env file on VPS using SSH
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
@@ -128,7 +125,6 @@ jobs:
             echo "VITE_APP_NAME=Ticketo" >> /home/debian/Tikceto/.env
           EOF
 
-      # Deploy to VPS: Pull latest code, stop containers, and restart services
       - name: Deploy to VPS
         run: |
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
