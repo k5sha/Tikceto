@@ -90,10 +90,11 @@ type s3Config struct {
 }
 
 type minioConfig struct {
-	user     string
-	password string
-	ssl      bool
-	endpoint string
+	user           string
+	password       string
+	ssl            bool
+	endpoint       string
+	endpointPublic string
 }
 
 func (app *application) mount() *chi.Mux {

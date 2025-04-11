@@ -1,6 +1,6 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Ticketo",
-  server_api: "http://185.126.115.87/v1",
+  name: import.meta.env.VITE_APP_NAME,
+  server_api: import.meta.env.VITE_API_URL,
 };

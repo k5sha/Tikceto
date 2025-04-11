@@ -65,15 +65,16 @@ func main() {
 		s3: s3Config{
 			bucketName: env.GetString("S3_BUCKET_NAME", "tikceto"),
 			minio: minioConfig{
-				user:     env.GetString("MINIO_ROOT_USER", "admin"),
-				password: env.GetString("MINIO_ROOT_PASSWORD", "adminpassword"),
-				endpoint: env.GetString("MINIO_ENDPOINT", "minio:9000"),
-				ssl:      env.GetBool("MINIO_SSL", false),
+				user:           env.GetString("MINIO_ROOT_USER", "admin"),
+				password:       env.GetString("MINIO_ROOT_PASSWORD", "adminpassword"),
+				endpoint:       env.GetString("MINIO_ENDPOINT", "minio:9000"),
+				endpointPublic: env.GetString("MINIO_ENDPOINT_PUBLIC", "localhost/minio"),
+				ssl:            env.GetBool("MINIO_SSL", false),
 			},
 		},
 		payment: payConfig{
-			pubKey:      env.GetString("PAYMENT_PUBLIC_KEY", "&"),
-			privateKey:  env.GetString("PAYMENT_PRIVATE_KEY", "&"),
+			pubKey:      env.GetString("PAYMENT_PUBLIC_KEY", ""),
+			privateKey:  env.GetString("PAYMENT_PRIVATE_KEY", ""),
 			frontendURL: env.GetString("PAYMENT_FRONTEND_URL", "http://192.168.0.171:5173/payment/complete/"),
 			serverURL:   env.GetString("PAYMENT_SERVER_URL", "http://192.168.0.171/v1/payments/validate"),
 		},
@@ -103,7 +104,7 @@ func main() {
 	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
 
 	// S3
-	s3, err := s3.NewMinioClient(cfg.s3.minio.endpoint, "localhost/minio", cfg.s3.minio.user, cfg.s3.minio.password, cfg.s3.bucketName, cfg.s3.minio.ssl)
+	s3, err := s3.NewMinioClient(cfg.s3.minio.endpoint, cfg.s3.minio.endpointPublic, cfg.s3.minio.user, cfg.s3.minio.password, cfg.s3.bucketName, cfg.s3.minio.ssl)
 	if err != nil {
 		logger.Fatal(err)
 	}

@@ -64,6 +64,7 @@ services:
       - MAILTRAP_API_KEY
       - S3_BUCKET_NAME
       - MINIO_ENDPOINT
+      - MINIO_ENDPOINT_PUBLIC
       - MINIO_ROOT_USER
       - MINIO_ROOT_PASSWORD
       - MINIO_SSL
@@ -88,6 +89,10 @@ services:
   frontend:
     image: ghcr.io/k5sha/ticketo-frontend:latest
     container_name: ticketo-frontend
+    env_file: .env
+    environment:
+      - VITE_API_URL
+      - VITE_APP_NAME
     depends_on:
       - backend
     networks:
