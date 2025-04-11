@@ -1,4 +1,4 @@
-name: Audit
+name: Test and build
 
 on:
   push:
@@ -7,10 +7,12 @@ on:
     branches: [master]
 
 jobs:
-  audit:
+  go-setup:
     runs-on: ubuntu-20.04
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -35,22 +37,35 @@ jobs:
       - name: Run Tests
         run: go test -race ./...
 
+  backend-docker:
+    needs: go-setup
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
       - name: Build Docker Image for Backend
         run: |
           docker build -t ghcr.io/k5sha/ticketo-backend:latest ./
 
-      # Push Docker image for backend to GHCR
       - name: Push Docker Image for Backend to GHCR
         run: |
           echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker push ghcr.io/k5sha/ticketo-backend:latest
 
-      # Build Docker image for frontend
+  frontend-docker:
+    needs: go-setup
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
       - name: Build Docker Image for Frontend
         run: |
           docker build -t ghcr.io/k5sha/ticketo-frontend:latest ./web
 
-      # Push Docker image for frontend to GHCR
       - name: Push Docker Image for Frontend to GHCR
         run: |
           echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin

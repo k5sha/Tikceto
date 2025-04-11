@@ -53,7 +53,7 @@ services:
       - ADDR
       - EXTERNAL_URL
       - FRONTEND_URL
-      - DB_ADDR=postgres-db
+      - DB_ADDR
       - AUTH_BASIC_USERNAME
       - AUTH_BASIC_PASSWORD
       - AUTH_TOKEN_SECRET
@@ -78,6 +78,7 @@ services:
       - minio
     networks:
       - app-network
+    restart: on-failure
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
       interval: 30s
@@ -104,6 +105,7 @@ services:
       - frontend
       - backend
       - minio
+    restart: on-failure
     networks:
       - app-network
 
