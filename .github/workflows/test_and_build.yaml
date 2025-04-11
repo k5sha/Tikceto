@@ -3,8 +3,6 @@ name: Test and build
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
 
 jobs:
   go-setup:
@@ -47,7 +45,7 @@ jobs:
 
       - name: Build Docker Image for Backend
         run: |
-          docker build -t ghcr.io/k5sha/ticketo-backend:latest ./
+          docker build -t ghcr.io/k5sha/ticketo-backend:latest ./ 
 
       - name: Push Docker Image for Backend to GHCR
         run: |
@@ -72,7 +70,7 @@ jobs:
           docker push ghcr.io/k5sha/ticketo-frontend:latest
 
   deploy-to-vps:
-    needs: [ backend-docker, frontend-docker ]
+    needs: [backend-docker, frontend-docker]
     runs-on: ubuntu-20.04
 
     steps:
@@ -120,7 +118,7 @@ jobs:
           
             PAYMENT_PUBLIC_KEY=${{ secrets.PAYMENT_PUBLIC_KEY }}
             PAYMENT_PRIVATE_KEY=${{ secrets.PAYMENT_PRIVATE_KEY }}
-            PAYMENT_FRONTEND_URL==${{ secrets.PAYMENT_FRONTEND_URL }}
+            PAYMENT_FRONTEND_URL=${{ secrets.PAYMENT_FRONTEND_URL }}
             PAYMENT_SERVER_URL=${{ secrets.PAYMENT_SERVER_URL }}
           
             VITE_API_URL=${{ secrets.VITE_API_URL }}
