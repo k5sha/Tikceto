@@ -129,10 +129,7 @@ jobs:
         run: |
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             set -e
-            cd ~/Tikceto
-            echo "📦 Cleaning up untracked files..."
-            git clean -fd
-          
+            cd ~/Tikceto          
             echo "📦 Pulling latest code..."
             git pull origin master
           
