@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/k5sha/Tikceto/compare/v1.0.2...v1.1.0) (2025-04-11)
+
+
+### Features
+
+* create deploy to vps ([b15c2c2](https://github.com/k5sha/Tikceto/commit/b15c2c2c3e4fc15950b27609394128e20d2c2274))
+
 ## [1.0.2](https://github.com/k5sha/Tikceto/compare/v1.0.1...v1.0.2) (2025-04-11)
 
 
