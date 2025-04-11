@@ -1,12 +1,76 @@
-name: Deploy to VPS
+name: Test and build
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
+  go-setup:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.23.3
+
+      - name: Verify Dependencies
+        run: go mod verify
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: staticcheck ./...
+
+      - name: Run Tests
+        run: go test -race ./...
+
+  backend-docker:
+    needs: go-setup
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker Image for Backend
+        run: |
+          docker build -t ghcr.io/k5sha/ticketo-backend:latest ./ 
+
+      - name: Push Docker Image for Backend to GHCR
+        run: |
+          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/k5sha/ticketo-backend:latest
+
+  frontend-docker:
+    needs: go-setup
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker Image for Frontend
+        run: |
+          docker build -t ghcr.io/k5sha/ticketo-frontend:latest ./web
+
+      - name: Push Docker Image for Frontend to GHCR
+        run: |
+          echo ${{ secrets.MY_GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/k5sha/ticketo-frontend:latest
+
   deploy-to-vps:
+    needs: [backend-docker, frontend-docker]
     runs-on: ubuntu-20.04
 
     steps:
@@ -26,47 +90,51 @@ jobs:
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          
             MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}
             MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}
+            MINIO_USE_SSL=false
+            MINIO_DEFAULT_BUCKETS=${{ secrets.MINIO_DEFAULT_BUCKETS }}
+          
             ENV=production
             ADDR=0.0.0.0:8080
             EXTERNAL_URL=${{ secrets.EXTERNAL_URL }}
             FRONTEND_URL=${{ secrets.FRONTEND_URL }}
             DB_ADDR=${{ secrets.DB_ADDR }}
+          
             AUTH_BASIC_USERNAME=${{ secrets.AUTH_BASIC_USERNAME }}
             AUTH_BASIC_PASSWORD=${{ secrets.AUTH_BASIC_PASSWORD }}
             AUTH_TOKEN_SECRET=${{ secrets.AUTH_TOKEN_SECRET }}
+            AUTH_TOKEN_HOST=ticketo
+          
             MAIL_TOKEN_EXPIRATION=1h
             MAIL_FROM_EMAIL=no-reply@example.com
             MAILTRAP_API_KEY=${{ secrets.MAILTRAP_API_KEY }}
+          
             S3_BUCKET_NAME=${{ secrets.MINIO_DEFAULT_BUCKETS }}
             MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}
             MINIO_ENDPOINT_PUBLIC=${{ secrets.MINIO_ENDPOINT_PUBLIC }}
             MINIO_SSL=false
+          
             PAYMENT_PUBLIC_KEY=${{ secrets.PAYMENT_PUBLIC_KEY }}
             PAYMENT_PRIVATE_KEY=${{ secrets.PAYMENT_PRIVATE_KEY }}
             PAYMENT_FRONTEND_URL=${{ secrets.PAYMENT_FRONTEND_URL }}
             PAYMENT_SERVER_URL=${{ secrets.PAYMENT_SERVER_URL }}
+          
             VITE_API_URL=${{ secrets.VITE_API_URL }}
             VITE_APP_NAME=Ticketo
           EOF
 
       - name: Upload .env to VPS
         run: |
-          echo "📦 Uploading .env to VPS..."
-          scp -v .env ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }}:/home/debian/Tikceto/.env
-
-      - name: Test SSH Connection
-        run: |
-          echo "📡 Testing SSH connection..."
-          ssh -v -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} "echo SSH connection successful!"
+          scp .env ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }}:/home/debian/Tikceto/.env
 
       - name: Deploy to VPS
         run: |
-          ssh -v -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             set -e
-            echo "📦 Pulling latest code..."
             cd ~/Tikceto
+            echo "📦 Pulling latest code..."
             git pull origin master
           
             echo "🛑 Stopping containers..."
