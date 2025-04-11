@@ -27,10 +27,10 @@ services:
     container_name: minio
     env_file: .env
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=adminpassword
-      - MINIO_USE_SSL=false
-      - MINIO_DEFAULT_BUCKETS=tikceto
+      - MINIO_ROOT_USER
+      - MINIO_ROOT_PASSWORD
+      - MINIO_USE_SSL
+      - MINIO_DEFAULT_BUCKETS
     ports:
       - "9000:9000"
       - "9001:9001"
