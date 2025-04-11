@@ -137,7 +137,7 @@ jobs:
             docker compose down
           
             echo "🚀 Starting services..."
-            docker compose up -d --build
+            docker compose up -d
           
             echo "✅ Deployment done!"
           EOF
