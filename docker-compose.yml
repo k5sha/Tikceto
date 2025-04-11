@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: postgres:16.3
@@ -38,8 +40,7 @@ services:
       - app-network
 
   backend:
-    build:
-      context: ./
+    image: ghcr.io/k5sha/ticketo-backend:latest
     container_name: ticketo-api
     env_file: .env
     environment:
@@ -74,8 +75,7 @@ services:
       - app-network
 
   frontend:
-    build:
-      context: ./web
+    image: ghcr.io/k5sha/ticketo-frontend:latest
     container_name: ticketo-frontend
     depends_on:
       - backend
