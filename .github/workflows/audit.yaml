@@ -35,13 +35,6 @@ jobs:
       - name: Run Tests
         run: go test -race ./...
 
-      # Load testing or any server pre-steps
-      - name: Simulate Server Load
-        run: |
-          echo "Simulating load test or performing server health checks..."
-          # Insert your load test or other server-related steps here
-
-      # Build Docker image for backend
       - name: Build Docker Image for Backend
         run: |
           docker build -t ghcr.io/k5sha/ticketo-backend:latest ./

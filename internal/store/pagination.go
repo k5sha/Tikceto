@@ -62,9 +62,9 @@ func (pq *PaginatedMoviesQuery) Parse(r *http.Request) (PaginatedMoviesQuery, er
 }
 
 func parseDate(s string) string {
-	t, err := time.Parse("2006-02-01", s)
+	t, err := time.Parse("2006-01-02", s)
 	if err != nil {
 		return ""
 	}
-	return t.Format("2006-02-01")
+	return t.Format("2006-01-02")
 }
