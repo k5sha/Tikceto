@@ -132,9 +132,7 @@ jobs:
             cd ~/Tikceto          
             echo "📦 Pulling latest code..."
             git pull origin master
-          
-            echo "🛑 Stopping containers..."
-            docker compose down
+            docker compose pull
           
             echo "🚀 Starting services..."
             docker compose up -d
