@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/k5sha/Tikceto/compare/v1.1.2...v1.1.3) (2025-04-12)
+
+
+### Bug Fixes
+
+* swagger only dev ([2bb9ab3](https://github.com/k5sha/Tikceto/commit/2bb9ab320d1c7cb02bfd8d23d92b2436a64c750b))
+
 ## [1.1.2](https://github.com/k5sha/Tikceto/compare/v1.1.1...v1.1.2) (2025-04-11)
 
 
