@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2](https://github.com/k5sha/Tikceto/compare/v1.1.1...v1.1.2) (2025-04-11)
+
+
+### Bug Fixes
+
+* deploy ([53d5b99](https://github.com/k5sha/Tikceto/commit/53d5b99783de66c008dd221635dc840beb1a305c))
+* deploy ([588e23d](https://github.com/k5sha/Tikceto/commit/588e23dc544d628fbb3dcb5fd6094bccf58dedfd))
+
 ## [1.1.1](https://github.com/k5sha/Tikceto/compare/v1.1.0...v1.1.1) (2025-04-11)
 
 
