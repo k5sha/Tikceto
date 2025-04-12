@@ -119,8 +119,10 @@ func (app *application) mount() *chi.Mux {
 		r.Get("/health", app.healthCheckHandler)
 
 		// Swagger
-		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.apiURL)
-		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
+		if app.config.env == "development" {
+			docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.apiURL)
+			r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
+		}
 
 		r.Route("/rooms", func(r chi.Router) {
 			r.With(app.AuthTokenMiddleware()).Post("/", app.checkPermissions("admin", app.createRoomHandler))

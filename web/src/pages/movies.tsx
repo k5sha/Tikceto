@@ -98,10 +98,9 @@ export default function MoviesPage() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {isAdmin && (
           <>
-              <h1>Test</h1>
             <h1 className="text-lg font-medium text-gray-900">Адмін панель</h1>
             <Divider className="my-4" />
-            <div className="flex flex-row gap-8">
+            <div className="flex flex-row gap-8 pb-4">
               <Button color="primary" onPress={() => onOpenAddMovie()}>
                 <Film />
                 Додати фільм
