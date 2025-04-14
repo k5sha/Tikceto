@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/k5sha/Tikceto/compare/v1.1.3...v1.2.0) (2025-04-14)
+
+
+### Features
+
+* design update ([739edcf](https://github.com/k5sha/Tikceto/commit/739edcfb090b0a5402e1459f9bf0656b2d5d9bca))
+
 ## [1.1.3](https://github.com/k5sha/Tikceto/compare/v1.1.2...v1.1.3) (2025-04-12)
 
 
