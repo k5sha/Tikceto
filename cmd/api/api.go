@@ -200,6 +200,7 @@ func (app *application) mount() *chi.Mux {
 				r.Use(app.AuthTokenMiddleware())
 				r.Post("/", app.checkPermissions("admin", app.createTicketHandler))
 				r.Get("/my", app.getMyTicketsHandler)
+				r.Get("/session/{sessionID}/seat/{seatID}", app.checkPermissions("admin", app.getTicketBySessionAndSeatHandler))
 			})
 			r.Route("/{ticketID}", func(r chi.Router) {
 				r.Use(app.ticketContextMiddleware)

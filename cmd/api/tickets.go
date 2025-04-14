@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/k5sha/Tikceto/internal/store"
 	"net/http"
+	"strconv"
 )
 
 type ticketKey string
@@ -169,6 +170,64 @@ func (app *application) getTicketHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// GetTicketBySessionAndSeat godoc
+//
+//	@Summary		Get ticket by session and seat
+//	@Description	Returns a ticket for a given session ID and seat ID
+//	@Tags			tickets
+//	@Accept			json
+//	@Produce		json
+//	@Param			sessionID	path		int	true	"Session ID"
+//	@Param			seatID		path		int	true	"Seat ID"
+//	@Success		200			{object}	store.Ticket
+//	@Failure		400			{object}	error
+//	@Failure		404			{object}	error
+//	@Failure		500			{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/tickets/session/{sessionID}/seat/{seatID} [get]
+func (app *application) getTicketBySessionAndSeatHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	sessionIDStr := chi.URLParam(r, "sessionID")
+	seatIDStr := chi.URLParam(r, "seatID")
+
+	sessionID, err := strconv.ParseInt(sessionIDStr, 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, fmt.Errorf("invalid sessionID"))
+		return
+	}
+
+	seatID, err := strconv.ParseInt(seatIDStr, 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, fmt.Errorf("invalid seatID"))
+		return
+	}
+
+	ticket, err := app.store.Tickets.GetBySessionAndSeat(ctx, sessionID, seatID)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			app.notFoundResponse(w, r, err)
+			return
+		}
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	session, err := app.store.Sessions.GetByID(ctx, ticket.SessionID)
+	if err == nil {
+		ticket.Session = *session
+	}
+
+	seat, err := app.store.Seats.GetByID(ctx, ticket.SeatID)
+	if err == nil {
+		ticket.Seat = *seat
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, ticket); err != nil {
+		app.internalServerError(w, r, err)
+	}
+}
+
 // UpdateTicketPayload represents the payload for updating a ticket.
 //
 //	@UserID	int64	"Updated user ID for the ticket" validate:"omitempty,gte=1"`
@@ -176,6 +235,7 @@ func (app *application) getTicketHandler(w http.ResponseWriter, r *http.Request)
 type UpdateTicketPayload struct {
 	UserID *int64   `json:"user_id" validate:"omitempty,gte=1"`
 	Price  *float64 `json:"price" validate:"omitempty,gte=0"`
+	Status *string  `json:"status" validate:"omitempty"`
 }
 
 // UpdateTicket godoc
@@ -225,6 +285,10 @@ func (app *application) updateTicketHandler(w http.ResponseWriter, r *http.Reque
 	}
 	if payload.Price != nil {
 		ticket.Price = *payload.Price
+	}
+
+	if payload.Status != nil {
+		ticket.Status = *payload.Status
 	}
 
 	if err := app.store.Tickets.Update(r.Context(), ticket); err != nil {

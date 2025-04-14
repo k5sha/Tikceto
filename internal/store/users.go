@@ -209,7 +209,7 @@ func (s *UsersStore) update(ctx context.Context, tx *sql.Tx, user *User) error {
 func (s *UsersStore) delete(ctx context.Context, tx *sql.Tx, id int64) error {
 	query := `DELETE FROM users WHERE id = $1`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	ctx, cancel := context.WithTimeout(ctx, 3*QueryTimeoutDuration)
 	defer cancel()
 
 	_, err := tx.ExecContext(ctx, query, id)

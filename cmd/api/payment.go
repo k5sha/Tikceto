@@ -156,8 +156,8 @@ func (app *application) validatePaymentHandler(w http.ResponseWriter, r *http.Re
 		}
 	} else {
 		ticket.Status = "failed"
-		if err := app.store.Tickets.Update(ctx, ticket); err != nil {
-			http.Error(w, "Failed to update ticket status", http.StatusInternalServerError)
+		if err := app.store.Tickets.Delete(ctx, ticket.ID); err != nil {
+			http.Error(w, "Failed to delete ticket", http.StatusInternalServerError)
 			return
 		}
 	}

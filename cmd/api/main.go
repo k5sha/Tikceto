@@ -67,8 +67,8 @@ func main() {
 			minio: minioConfig{
 				user:           env.GetString("MINIO_ROOT_USER", "admin"),
 				password:       env.GetString("MINIO_ROOT_PASSWORD", "adminpassword"),
-				endpoint:       env.GetString("MINIO_ENDPOINT", "minio:9000"),
-				endpointPublic: env.GetString("MINIO_ENDPOINT_PUBLIC", "localhost/minio"),
+				endpoint:       env.GetString("MINIO_ENDPOINT", "localhost:9000"),
+				endpointPublic: env.GetString("MINIO_ENDPOINT_PUBLIC", "localhost:9000"),
 				ssl:            env.GetBool("MINIO_SSL", false),
 			},
 		},
@@ -95,7 +95,7 @@ func main() {
 	store := store.NewStorage(db)
 
 	// Mailer
-	mailer, err := mailer.NewMockMailer("123", cfg.mail.fromEmail)
+	mailer, err := mailer.NewMockMailer(cfg.mail.mailTrap.apiKey, cfg.mail.fromEmail)
 	if err != nil {
 		logger.Fatal(err)
 	}

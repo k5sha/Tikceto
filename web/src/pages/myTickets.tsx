@@ -1,12 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import {Loader2, Calendar, Clock, QrCode} from "lucide-react";  // Import the Qrcode icon
-
+import {
+  Loader2,
+  Calendar,
+  Clock,
+  QrCode,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  BadgeEuro,
+  Loader,
+  HelpCircle,
+} from "lucide-react"; // Іконки для статусів
 import DefaultLayout from "@/layouts/default.tsx";
 import { useAuth } from "@/context/authContext.tsx";
 import { useState } from "react";
-import {QRCodeSVG} from "qrcode.react";
-import {siteConfig} from "@/config/site.ts"; // Import useState for managing QR code visibility
+import { QRCodeSVG } from "qrcode.react";
+import { siteConfig } from "@/config/site.ts";
 
 const API_URL = "/tickets/my";
 
@@ -43,9 +53,31 @@ interface Ticket {
   created_at: string;
 }
 
+const statusIcons: { [key: string]: JSX.Element } = {
+  confirmed: <CheckCircle2 className="w-5 h-5 text-green-600" />,
+  pending: <Loader className="w-5 h-5 text-indigo-500 animate-spin" />,
+  failed: <XCircle className="w-5 h-5  text-red-600" />,
+  reserved: <AlertCircle className="w-5 h-5 text-blue-600" />,
+  available: <CheckCircle2 className="w-5 h-5  text-gray-500" />,
+  unknown: <HelpCircle className="w-5 h-5 text-gray-800" />,
+  refunded: <BadgeEuro className="w-5 h-5 text-teal-600" />,
+  cancelled: <XCircle className="w-5 h-5  text-gray-600" />,
+};
+
+const statusLabels: { [key: string]: string } = {
+  confirmed: "Підтверджено",
+  pending: "Обробляється",
+  failed: "Помилка оплати",
+  reserved: "Зарезервовано",
+  available: "Доступний",
+  unknown: "Невідомо",
+  refunded: "Відшкодовано",
+  cancelled: "Скасовано",
+};
+
 const MyTickets = () => {
   const { fetchWithAuth } = useAuth();
-  const [showQRCode, setShowQRCode] = useState<number | null>(null); // State to manage which QR code to show
+  const [showQRCode, setShowQRCode] = useState<number | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["myTickets"],
@@ -116,47 +148,54 @@ const MyTickets = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-lg text-center font-semibold">
-                      {ticket.price} грн
-                    </span>
-                    <div className="mt-2">
-                      {ticket.status === "confirmed" ? (
-                          <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Підтверджено
-                    </span>
-                      ) : ticket.status === "pending" ? (
-                          <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Очікує підтвердження оплати
-                    </span>
-                      ) : ticket.status === "failed" ? (
-                          <span className="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Помилка оплати
-                    </span>
-                      ) : (
-                          <span className="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Невідомо
-                    </span>
-                      )}
-                    </div>
-                    { ticket.status === "confirmed" &&
-                    <div className="md:invisible mt-4 flex justify-center">
-                      <button
-                          className="text-gray-500"
-                          onClick={() =>
-                              setShowQRCode(showQRCode === ticket.id ? null : ticket.id)
-                          }
+                <span className="text-lg text-center font-semibold">
+                  {ticket.price} грн
+                </span>
+                    <div className="mt-2 flex items-center">
+                      <div
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                              ticket.status === "confirmed"
+                                  ? "bg-green-100 text-green-800"
+                                  : ticket.status === "pending"
+                                      ? "bg-indigo-100 text-indigo-800"
+                                      : ticket.status === "failed"
+                                          ? "bg-red-100 text-red-800"
+                                          : ticket.status === "reserved"
+                                              ? "bg-blue-100 text-blue-800"
+                                              : ticket.status === "available"
+                                                  ? "bg-gray-100 text-gray-800"
+                                                      : ticket.status === "refunded"
+                                                          ? "bg-teal-100 text-teal-800"
+                                                          : ticket.status === "cancelled"
+                                                              ? "bg-gray-200 text-gray-800"
+                                                              : "bg-gray-100 text-gray-800"
+                          }`}
                       >
-                        <QrCode className="w-8 h-8" />
-                      </button>
+                        {statusIcons[ticket.status] ?? statusIcons.unknown}
+                        {statusLabels[ticket.status] || statusLabels.unknown}
+                      </div>
                     </div>
-                    }
+                    {ticket.status === "confirmed" && (
+                        <div className="md:invisible mt-4 flex justify-center">
+                          <button
+                              className="text-gray-500"
+                              onClick={() =>
+                                  setShowQRCode(showQRCode === ticket.id ? null : ticket.id)
+                              }
+                          >
+                            <QrCode className="w-8 h-8" />
+                          </button>
+                        </div>
+                    )}
                   </div>
-                      {showQRCode === ticket.id && (
-                          <div className="py-4 text-center">
-                            <QRCodeSVG value={`${siteConfig.server_api}/validate/${ticket.id}`} size={256} />
-                          </div>
-                      )}
-
+                  {showQRCode === ticket.id && (
+                      <div className="py-4 text-center">
+                        <QRCodeSVG
+                            value={`${siteConfig.server_api}/validate/${ticket.id}`}
+                            size={256}
+                        />
+                      </div>
+                  )}
                 </div>
             ))}
           </div>

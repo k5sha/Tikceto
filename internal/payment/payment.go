@@ -15,6 +15,5 @@ type PaymentResponse struct {
 
 type Client interface {
 	CreatePayment(payment PaymentRequest) (*PaymentResponse, error)
-	ValidatePayment(string) (*string, error)
 	GenerateSignature(data string) string
 }

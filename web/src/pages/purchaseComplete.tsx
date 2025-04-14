@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@heroui/button";
 
 import DefaultLayout from "@/layouts/default";
-import { siteConfig } from "@/config/site.ts";
+import {useAuth} from "@/context/authContext.tsx";
 
 export default function PurchaseComplete() {
   const { orderID } = useParams<{ orderID: string }>();
+  const { fetchWithAuth } = useAuth();
   const navigate = useNavigate();
   const [status, setStatus] = useState<"loading" | "success" | "failed">(
     "loading",
@@ -19,11 +19,12 @@ export default function PurchaseComplete() {
 
     const checkPaymentStatus = async () => {
       try {
-        const { data } = await axios.put(
-          `${siteConfig.server_api}/payments/status/${orderID}`,
+        const data  = await fetchWithAuth(
+         `/tickets/${orderID}`,
         );
 
-        if (data.data.result === "ok") {
+        // @ts-ignore
+        if (data.data.status === "ok" || data.data.status === "pending") {
           setStatus("success");
         } else {
           setStatus("failed");
