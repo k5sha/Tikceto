@@ -237,6 +237,7 @@ export default function MovieDetailPage() {
       }, {})
     : {};
 
+  // @ts-ignore
   return (
       <DefaultLayout>
         <div className="w-full px-6 py-8 space-y-8">
@@ -440,13 +441,13 @@ export default function MovieDetailPage() {
           </div>
 
           {user ? (
-              selectedSeat && (
+              selectedSeat && !isSeatsLoading && (
                   <div className="mx-auto max-w-md w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-2xl shadow-lg">
                     <h2 className="text-center text-xl sm:text-2xl font-semibold text-gray-800">
                       Обрана ціна:
                     </h2>
                     <p className="text-center text-3xl sm:text-4xl font-bold text-green-600 mt-2">
-                      {seats[selectedSeat].price}₴
+                      {seats.find( (item: { id: number; }) => item.id === selectedSeat).price}₴
                     </p>
 
                     <div className="mt-6 flex justify-center">
