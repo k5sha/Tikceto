@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/k5sha/Tikceto/compare/v1.2.0...v1.2.1) (2025-04-14)
+
+
+### Bug Fixes
+
+* index out of a range ([81b84b4](https://github.com/k5sha/Tikceto/commit/81b84b48612bca871e6240940b47c2b5ac3ffeae))
+
 ## [1.2.0](https://github.com/k5sha/Tikceto/compare/v1.1.3...v1.2.0) (2025-04-14)
 
 
