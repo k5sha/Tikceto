@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/k5sha/Tikceto/compare/v1.2.1...v1.2.2) (2025-04-15)
+
+
+### Bug Fixes
+
+* add more types ([40a2b0d](https://github.com/k5sha/Tikceto/commit/40a2b0d5e7c90ec4f10eb06b169141d54954a131))
+
 ## [1.2.1](https://github.com/k5sha/Tikceto/compare/v1.2.0...v1.2.1) (2025-04-14)
 
 
