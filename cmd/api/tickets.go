@@ -132,7 +132,6 @@ func (app *application) getMyTicketsHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// TODO: get many make
 	for i := range tickets {
 		url, err := app.s3.GetOne(tickets[i].Session.Movie.PosterUrl)
 		if err != nil {

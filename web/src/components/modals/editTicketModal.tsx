@@ -7,18 +7,21 @@ import {
     ModalFooter,
     useDisclosure,
 } from "@heroui/react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/authContext.tsx";
-import {
-    AlertCircle,
-    CheckCircle2,
-    XCircle,
-    Loader,
-    BadgeEuro,
-    HelpCircle,
-} from "lucide-react";
-import clsx from "clsx";
 import { toast } from "sonner";
+import {StatusBadge, statusLabels, TicketStatus} from "@/components/ticketStatus.tsx";
+
+interface TicketResponse {
+    data: {
+        id: number;
+        price: number;
+        status: TicketStatus;
+        seat: {
+            seat_number: string;
+        };
+    }
+}
 
 interface EditTicketModalProps {
     isOpen: boolean;
@@ -28,39 +31,6 @@ interface EditTicketModalProps {
     refetch: () => void;
 }
 
-const statusLabels: { [key: string]: string } = {
-    confirmed: "Підтверджено",
-    pending: "Обробляється",
-    failed: "Помилка оплати",
-    reserved: "Зарезервовано",
-    available: "Доступний",
-    unknown: "Невідомо",
-    refunded: "Відшкодовано",
-    cancelled: "Скасовано",
-};
-
-const statusColors: { [key: string]: string } = {
-    confirmed: "text-green-600",
-    pending: "text-indigo-500",
-    failed: "text-red-600",
-    reserved: "text-blue-600",
-    available: "text-gray-500",
-    unknown: "text-gray-800",
-    refunded: "text-teal-600",
-    cancelled: "text-gray-600",
-};
-
-const statusIcons: { [key: string]: JSX.Element } = {
-    confirmed: <CheckCircle2 className="w-5 h-5 mr-1" />,
-    pending: <Loader className="w-5 h-5 mr-1 animate-spin" />,
-    failed: <XCircle className="w-5 h-5 mr-1" />,
-    reserved: <AlertCircle className="w-5 h-5 mr-1" />,
-    available: <CheckCircle2 className="w-5 h-5 mr-1" />,
-    unknown: <HelpCircle className="w-5 h-5 mr-1" />,
-    refunded: <BadgeEuro className="w-5 h-5 mr-1" />,
-    cancelled: <XCircle className="w-5 h-5 mr-1" />,
-};
-
 const EditTicketModal: React.FC<EditTicketModalProps> = ({
                                                              isOpen,
                                                              onOpenChange,
@@ -68,13 +38,13 @@ const EditTicketModal: React.FC<EditTicketModalProps> = ({
                                                              seatId,
                                                              refetch,
                                                          }) => {
-    const { fetchWithAuth } = useAuth();
+    const { fetchWithAuth } = useAuth()
 
     const [ticketId, setTicketId] = useState<number | null>(null);
     const [seatNumber, setSeatNumber] = useState<string>("");
     const [price, setPrice] = useState<number>(0);
-    const [status, setStatus] = useState<string>("available");
-    const [originalStatus, setOriginalStatus] = useState<string>("available");
+    const [status, setStatus] = useState<TicketStatus>("available");
+    const [originalStatus, setOriginalStatus] = useState<TicketStatus>("available");
     const [loading, setLoading] = useState(false);
 
     const {
@@ -86,16 +56,15 @@ const EditTicketModal: React.FC<EditTicketModalProps> = ({
     useEffect(() => {
         const fetchTicket = async () => {
             try {
-                const res = await fetchWithAuth(`/tickets/session/${sessionId}/seat/${seatId}`, {
-                    method: "GET",
-                });
-                // @ts-ignore
-                const ticket = res.data;
-                setTicketId(ticket.id);
-                setSeatNumber(ticket.seat.seat_number);
-                setPrice(ticket.price);
-                setStatus(ticket.status);
-                setOriginalStatus(ticket.status);
+                const { data } = await fetchWithAuth<TicketResponse>(
+                    `/tickets/session/${sessionId}/seat/${seatId}`,
+                    { method: "GET" }
+                );
+                setTicketId(data.id);
+                setSeatNumber(data.seat.seat_number);
+                setPrice(data.price);
+                setStatus(data.status);
+                setOriginalStatus(data.status);
             } catch (err) {
                 toast.error("Не вдалося завантажити дані квитка.");
             }
@@ -110,7 +79,10 @@ const EditTicketModal: React.FC<EditTicketModalProps> = ({
         e.preventDefault();
         if (!ticketId || loading) return;
 
-        if ((status === "available" || status === "cancelled" || status == "refunded") && originalStatus !== "available") {
+        if (
+            (status === "available" || status === "cancelled" || status === "refunded") &&
+            originalStatus !== "available"
+        ) {
             openDeleteModal();
             return;
         }
@@ -173,8 +145,8 @@ const EditTicketModal: React.FC<EditTicketModalProps> = ({
                             <p className="text-sm text-gray-700">
                                 <span className="font-semibold">Місце:</span> {seatNumber}
                             </p>
-                            <p className={clsx("flex items-center text-sm font-medium", statusColors[status])}>
-                                {statusIcons[status]} {statusLabels[status]}
+                            <p className="flex items-center text-sm font-medium">
+                                <StatusBadge status={status} />
                             </p>
                         </div>
 
@@ -195,9 +167,9 @@ const EditTicketModal: React.FC<EditTicketModalProps> = ({
                                 <select
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
+                                    onChange={(e) => setStatus(e.target.value as TicketStatus)}
                                 >
-                                    {Object.entries(statusLabels).map(([key, label]) => (
+                                    {(Object.entries(statusLabels) as [TicketStatus, string][]).map(([key, label]) => (
                                         <option key={key} value={key}>
                                             {label}
                                         </option>
@@ -224,7 +196,8 @@ const EditTicketModal: React.FC<EditTicketModalProps> = ({
                         Підтвердження видалення
                     </ModalHeader>
                     <ModalBody className="text-sm inline-block text-gray-700">
-                        Ви хочете змінити статус на <span className="font-bold">"{statusLabels[status]}"</span>? Квиток буде{" "}
+                        Ви хочете змінити статус на{" "}
+                        <span className="font-bold">"{statusLabels[status]}"</span>? Квиток буде{" "}
                         <span className="font-bold">видалено</span>, і місце стане вільним.
                     </ModalBody>
                     <ModalFooter className="flex justify-end gap-3">

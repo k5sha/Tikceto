@@ -81,7 +81,6 @@ const Login = () => {
               </div>
           )}
 
-          {/* Error message after API response */}
           {error && <p className="text-red-500 text-center">{error}</p>}
 
           <div>

@@ -24,7 +24,6 @@ const validateForm = (username: string, email: string, password: string) => {
     errors.push("Емейл не може бути довшим за 255 символів.");
   }
 
-  // Validate password
   if (!password) {
     errors.push("Пароль є обов'язковим.");
   } else if (password.length < 8) {

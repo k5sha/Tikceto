@@ -14,8 +14,6 @@ type sessionKey string
 
 const sessionCtx sessionKey = "session"
 
-// TODO: check unique
-
 // CreateSessionPayload represents the payload for creating a session.
 //
 //	@MovieID	int64   "Movie ID for the session" validate:"required,gte=1"`
@@ -188,8 +186,6 @@ func (app *application) updateSessionHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	ctx := r.Context()
-
-	// TODO: if payload.MovieID == session.MovieID
 
 	if payload.MovieID != nil {
 		movie, err := app.store.Movies.GetByID(ctx, *payload.MovieID)
