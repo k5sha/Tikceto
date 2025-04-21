@@ -129,6 +129,8 @@ definitions:
       price:
         minimum: 0
         type: number
+      status:
+        type: string
       user_id:
         minimum: 1
         type: integer
@@ -1205,6 +1207,43 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Fetches a ticket
+      tags:
+      - tickets
+  /tickets/session/{sessionID}/seat/{seatID}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a ticket for a given session ID and seat ID
+      parameters:
+      - description: Session ID
+        in: path
+        name: sessionID
+        required: true
+        type: integer
+      - description: Seat ID
+        in: path
+        name: seatID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Ticket'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get ticket by session and seat
       tags:
       - tickets
   /users/activate/{token}:

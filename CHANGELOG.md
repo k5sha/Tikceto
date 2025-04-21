@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.2.4](https://github.com/k5sha/Tikceto/compare/v1.2.3...v1.2.4) (2025-04-21)
+
+
+### Bug Fixes
+
+* actions ([a528219](https://github.com/k5sha/Tikceto/commit/a528219ddf2fb30e28951e4ce75007eb576d3b27))
+
+## [1.2.3](https://github.com/k5sha/Tikceto/compare/v1.2.2...v1.2.3) (2025-04-21)
+
+
+### Bug Fixes
+
+* nginx ([417df87](https://github.com/k5sha/Tikceto/commit/417df871f4b3051f07fa219b0c88f429421a23f7))
+
+## [1.2.2](https://github.com/k5sha/Tikceto/compare/v1.2.1...v1.2.2) (2025-04-15)
+
+
+### Bug Fixes
+
+* add more types ([40a2b0d](https://github.com/k5sha/Tikceto/commit/40a2b0d5e7c90ec4f10eb06b169141d54954a131))
+
+## [1.2.1](https://github.com/k5sha/Tikceto/compare/v1.2.0...v1.2.1) (2025-04-14)
+
+
+### Bug Fixes
+
+* index out of a range ([81b84b4](https://github.com/k5sha/Tikceto/commit/81b84b48612bca871e6240940b47c2b5ac3ffeae))
+
+## [1.2.0](https://github.com/k5sha/Tikceto/compare/v1.1.3...v1.2.0) (2025-04-14)
+
+
+### Features
+
+* design update ([739edcf](https://github.com/k5sha/Tikceto/commit/739edcfb090b0a5402e1459f9bf0656b2d5d9bca))
+
 ## [1.1.3](https://github.com/k5sha/Tikceto/compare/v1.1.2...v1.1.3) (2025-04-12)
 
 

@@ -1263,6 +1263,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/tickets/session/{sessionID}/seat/{seatID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns a ticket for a given session ID and seat ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tickets"
+                ],
+                "summary": "Get ticket by session and seat",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Session ID",
+                        "name": "sessionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Seat ID",
+                        "name": "seatID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.Ticket"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/tickets/{id}": {
             "get": {
                 "description": "Fetches a ticket by ID",
@@ -1661,6 +1717,9 @@ const docTemplate = `{
                 "price": {
                     "type": "number",
                     "minimum": 0
+                },
+                "status": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "integer",

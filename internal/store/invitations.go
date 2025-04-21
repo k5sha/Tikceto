@@ -22,7 +22,7 @@ func (s *UsersStore) createUserInvitations(ctx context.Context, tx *sql.Tx, toke
 func (s *UsersStore) deleteUserInvitations(ctx context.Context, tx *sql.Tx, userID int64) error {
 	query := `DELETE FROM user_invitations WHERE user_id = $1`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	ctx, cancel := context.WithTimeout(ctx, 3*QueryTimeoutDuration)
 	defer cancel()
 
 	_, err := tx.ExecContext(ctx, query, userID)

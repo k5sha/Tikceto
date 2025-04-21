@@ -37,23 +37,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const isAdmin = user?.role.name === "admin";
 
+  const decodeJwt = (token: string) => {
+    const payload = token.split('.')[1];
+    const decodedPayload = atob(payload);
+    return JSON.parse(decodedPayload);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token && !user) {
-      axios
+    if (!token) return;
+
+    const decodedToken = decodeJwt(token);
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    if (decodedToken.exp < currentTime) {
+      console.warn("Токен протерміновано, вихід з акаунту");
+      logout();
+      return;
+    }
+
+    axios
         .get(`${siteConfig.server_api}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
           const userData: User = response.data.data;
-
           setUser(userData);
           localStorage.setItem("user", JSON.stringify(userData));
         })
-        .catch(() => logout());
-    }
-  }, [user]);
+        .catch(() => {
+          console.warn("Помилка при перевірці користувача, вихід з акаунту");
+          logout();
+        });
+  }, []);
+
+
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
@@ -80,7 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchWithAuth = async <T,>(
     url: string,
     options: RequestInit = {},
-  ): Promise<T> => {
+  ): Promise<any> => {
     const token = localStorage.getItem("token");
 
     if (!token) {

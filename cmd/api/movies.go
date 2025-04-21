@@ -57,7 +57,6 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// TODO: rename post url to object id or something like it
 	file, fileHeader, err := r.FormFile("file")
 	if err != nil {
 		app.badRequestResponse(w, r, fmt.Errorf("file is required"))
@@ -196,7 +195,6 @@ func (app *application) getMoviesHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// TODO: get many make
 	for i := range movies {
 		url, err := app.s3.GetOne(movies[i].PosterUrl)
 		if err != nil {

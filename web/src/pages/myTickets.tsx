@@ -1,12 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import {Loader2, Calendar, Clock, QrCode} from "lucide-react";  // Import the Qrcode icon
-
+import {
+  Loader2,
+  Calendar,
+  Clock,
+  QrCode,
+} from "lucide-react"; // Іконки для статусів
 import DefaultLayout from "@/layouts/default.tsx";
 import { useAuth } from "@/context/authContext.tsx";
 import { useState } from "react";
-import {QRCodeSVG} from "qrcode.react";
-import {siteConfig} from "@/config/site.ts"; // Import useState for managing QR code visibility
+import { QRCodeSVG } from "qrcode.react";
+import { siteConfig } from "@/config/site.ts";
+import {StatusBadge, TicketStatus} from "@/components/ticketStatus.tsx";
 
 const API_URL = "/tickets/my";
 
@@ -39,13 +44,14 @@ interface Ticket {
   price: number;
   session: Session;
   seat: Seat;
-  status: string;
+  status: TicketStatus;
   created_at: string;
 }
 
+
 const MyTickets = () => {
   const { fetchWithAuth } = useAuth();
-  const [showQRCode, setShowQRCode] = useState<number | null>(null); // State to manage which QR code to show
+  const [showQRCode, setShowQRCode] = useState<number | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["myTickets"],
@@ -116,47 +122,33 @@ const MyTickets = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-lg text-center font-semibold">
-                      {ticket.price} грн
-                    </span>
-                    <div className="mt-2">
-                      {ticket.status === "confirmed" ? (
-                          <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Підтверджено
-                    </span>
-                      ) : ticket.status === "pending" ? (
-                          <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Очікує підтвердження оплати
-                    </span>
-                      ) : ticket.status === "failed" ? (
-                          <span className="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Помилка оплати
-                    </span>
-                      ) : (
-                          <span className="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                      Невідомо
-                    </span>
-                      )}
+                <span className="text-lg text-center font-semibold">
+                  {ticket.price} грн
+                </span>
+                    <div className="mt-2 flex items-center">
+                      <StatusBadge status={ticket.status} />
                     </div>
-                    { ticket.status === "confirmed" &&
-                    <div className="md:invisible mt-4 flex justify-center">
-                      <button
-                          className="text-gray-500"
-                          onClick={() =>
-                              setShowQRCode(showQRCode === ticket.id ? null : ticket.id)
-                          }
-                      >
-                        <QrCode className="w-8 h-8" />
-                      </button>
-                    </div>
-                    }
+                    {ticket.status === "confirmed" && (
+                        <div className="md:invisible mt-4 flex justify-center">
+                          <button
+                              className="text-gray-500"
+                              onClick={() =>
+                                  setShowQRCode(showQRCode === ticket.id ? null : ticket.id)
+                              }
+                          >
+                            <QrCode className="w-8 h-8" />
+                          </button>
+                        </div>
+                    )}
                   </div>
-                      {showQRCode === ticket.id && (
-                          <div className="py-4 text-center">
-                            <QRCodeSVG value={`${siteConfig.server_api}/validate/${ticket.id}`} size={256} />
-                          </div>
-                      )}
-
+                  {showQRCode === ticket.id && (
+                      <div className="py-4 text-center">
+                        <QRCodeSVG
+                            value={`${siteConfig.server_api}/validate/${ticket.id}`}
+                            size={256}
+                        />
+                      </div>
+                  )}
                 </div>
             ))}
           </div>

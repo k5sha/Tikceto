@@ -115,17 +115,22 @@ func (s *TicketStore) GetByUserID(ctx context.Context, id int64) ([]Ticket, erro
 
 func (s *TicketStore) GetBySessionAndSeat(ctx context.Context, sessionID, seatID int64) (*Ticket, error) {
 	query := `
-			SELECT id, user_id, price, created_at
-			FROM tickets
-			WHERE session_id = $1 AND seat_id = $2 AND user_id IS NULL
-		`
+		SELECT 
+			t.id, t.user_id, t.price, t.created_at, t.status,
+			se.seat_number
+		FROM tickets t
+		JOIN seats se ON t.seat_id = se.id
+		WHERE t.session_id = $1 AND t.seat_id = $2
+	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
 	ticket := &Ticket{}
+
 	err := s.db.QueryRowContext(ctx, query, sessionID, seatID).Scan(
-		&ticket.ID, &ticket.UserID, &ticket.Price, &ticket.CreatedAt,
+		&ticket.ID, &ticket.UserID, &ticket.Price, &ticket.CreatedAt, &ticket.Status,
+		&ticket.Seat.Number,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
