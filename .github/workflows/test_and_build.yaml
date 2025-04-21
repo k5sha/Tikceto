@@ -6,7 +6,7 @@ on:
 
 jobs:
   go-setup:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -37,7 +37,7 @@ jobs:
 
   backend-docker:
     needs: go-setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -54,7 +54,7 @@ jobs:
 
   frontend-docker:
     needs: go-setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -71,7 +71,7 @@ jobs:
 
   deploy-to-vps:
     needs: [backend-docker, frontend-docker]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
