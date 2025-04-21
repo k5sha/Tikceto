@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/k5sha/Tikceto/compare/v1.2.3...v1.2.4) (2025-04-21)
+
+
+### Bug Fixes
+
+* actions ([a528219](https://github.com/k5sha/Tikceto/commit/a528219ddf2fb30e28951e4ce75007eb576d3b27))
+
 ## [1.2.3](https://github.com/k5sha/Tikceto/compare/v1.2.2...v1.2.3) (2025-04-21)
 
 
