@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.0](https://github.com/k5sha/Tikceto/compare/v1.2.4...v1.3.0) (2025-04-21)
+
+
+### Features
+
+* add brevo mailer ([8da6681](https://github.com/k5sha/Tikceto/commit/8da6681f9152556c00d3cb8024492ba51cc73bd9))
+* add brevo mailer ([cfd303a](https://github.com/k5sha/Tikceto/commit/cfd303ab63a68ba19e65ae46d98940fbe18601bd))
+* change user invitation ([b1a86cd](https://github.com/k5sha/Tikceto/commit/b1a86cddeaf884a86084db009e2e8952731425a4))
+
+
+### Bug Fixes
+
+* add new env to action ([9e4fc62](https://github.com/k5sha/Tikceto/commit/9e4fc624fac2fb0986d45d4b1886963cffd510a8))
+* add ssl ([bae0370](https://github.com/k5sha/Tikceto/commit/bae0370b585602041742849d792a14ec2eb73d0b))
+* docker file web ([91bd21c](https://github.com/k5sha/Tikceto/commit/91bd21c93d9bc912b184056db0b77e726cb11371))
+
 ## [1.2.4](https://github.com/k5sha/Tikceto/compare/v1.2.3...v1.2.4) (2025-04-21)
 
 
