@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/k5sha/Tikceto/compare/v1.2.2...v1.2.3) (2025-04-21)
+
+
+### Bug Fixes
+
+* nginx ([417df87](https://github.com/k5sha/Tikceto/commit/417df871f4b3051f07fa219b0c88f429421a23f7))
+
 ## [1.2.2](https://github.com/k5sha/Tikceto/compare/v1.2.1...v1.2.2) (2025-04-15)
 
 
