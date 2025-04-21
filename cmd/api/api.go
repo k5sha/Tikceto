@@ -71,7 +71,7 @@ type tokenConfig struct {
 type mailConfig struct {
 	exp       time.Duration
 	fromEmail string
-	mailTrap  mailTrapConfig
+	brevo     BrevoConfig
 }
 
 type payConfig struct {
@@ -80,8 +80,11 @@ type payConfig struct {
 	frontendURL string
 	serverURL   string
 }
-type mailTrapConfig struct {
-	apiKey string
+type BrevoConfig struct {
+	username string
+	password string
+	host     string
+	port     int
 }
 
 type s3Config struct {

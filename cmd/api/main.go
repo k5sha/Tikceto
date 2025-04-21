@@ -58,8 +58,11 @@ func main() {
 		mail: mailConfig{
 			exp:       env.GetDuration("MAIL_TOKEN_EXPIRATION", 1*time.Hour),
 			fromEmail: env.GetString("MAIL_FROM_EMAIL", "hello@demomailtrap.com"),
-			mailTrap: mailTrapConfig{
-				apiKey: env.GetString("MAILTRAP_API_KEY", ""),
+			brevo: BrevoConfig{
+				username: env.GetString("BREVO_USERNAME", ""),
+				password: env.GetString("BREVO_PASSWORD", ""),
+				host:     env.GetString("BREVO_HOST", "smtp-relay.brevo.com"),
+				port:     env.GetInt("BREVO_PORT", 587),
 			},
 		},
 		s3: s3Config{
@@ -95,7 +98,7 @@ func main() {
 	store := store.NewStorage(db)
 
 	// Mailer
-	mailer, err := mailer.NewMockMailer("123", cfg.mail.fromEmail)
+	mailer, err := mailer.NewBrevo(cfg.mail.brevo.host, cfg.mail.brevo.username, cfg.mail.brevo.password, cfg.mail.fromEmail, cfg.mail.brevo.port)
 	if err != nil {
 		logger.Fatal(err)
 	}
