@@ -61,13 +61,6 @@ func (m *minioClient) CreateOne(ctx context.Context, file FileDataType) (string,
 
 func (m *minioClient) GetOne(objectID string) (string, error) {
 	fileURL := fmt.Sprintf("%s/%s/%s", m.publicEndpoint, m.bucketName, objectID)
-
-	if m.useSSL {
-		fileURL = "https://" + fileURL
-	} else {
-		fileURL = "http://" + fileURL
-	}
-
 	return fileURL, nil
 }
 
