@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/k5sha/Tikceto/compare/v1.3.0...v1.3.1) (2025-04-29)
+
+
+### Bug Fixes
+
+* nginx.conf + certbot ([197edab](https://github.com/k5sha/Tikceto/commit/197edabe43435a3abf7ec61a94d763ab77cf6022))
+
 ## [1.3.0](https://github.com/k5sha/Tikceto/compare/v1.2.4...v1.3.0) (2025-04-21)
 
 
