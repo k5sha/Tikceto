@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/k5sha/Tikceto/compare/v1.3.1...v1.3.2) (2025-05-05)
+
+
+### Bug Fixes
+
+* session select ([263c473](https://github.com/k5sha/Tikceto/commit/263c47386a1a4122c15793373d1afe39c4bf6776))
+
 ## [1.3.1](https://github.com/k5sha/Tikceto/compare/v1.3.0...v1.3.1) (2025-04-29)
 
 
