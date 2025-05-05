@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16.3
@@ -84,7 +82,7 @@ services:
       - app-network
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
+      test: ["CMD", "curl", "-sS", "http://localhost:8080/v1/health"]
       interval: 30s
       retries: 3
       timeout: 5s
@@ -131,7 +129,14 @@ services:
       sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot \
             --register-unsafely-without-email --agree-tos --no-eff-email \
             -d k5sha.run.place"
-
+  telegram-notifier:
+    image: lorcas/docker-telegram-notifier:latest
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock:ro 
+    env_file: .env
+    environment:
+      - TELEGRAM_NOTIFIER_BOT_TOKEN
+      - TELEGRAM_NOTIFIER_CHAT_ID
 
 volumes:
   db-data:
@@ -142,3 +147,4 @@ volumes:
 networks:
   app-network:
     driver: bridge
+
