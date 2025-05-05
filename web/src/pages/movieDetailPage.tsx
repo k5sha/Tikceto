@@ -153,13 +153,8 @@ export default function MovieDetailPage() {
     }
   }, [sessionsArray]);
 
-  const handleSessionSelect = (e: ChangeEvent<HTMLSelectElement>) => {
-    e.preventDefault();
-    const sessionId = Number(e.target.value);
-
-    if (sessionId !== selectedSession) {
+  const handleSessionSelect = (sessionId: number) => {
       setSelectedSession(sessionId);
-    }
   };
 
   const handleSeatSelect = (seatId: number) => {
@@ -283,7 +278,7 @@ export default function MovieDetailPage() {
                       variant="bordered"
                       onPress={onOpenAddSessionModal}
                   >
-                    Додати сесію
+                    Додати сеанс
                   </Button>
                   <Button
                       color="warning"
@@ -323,7 +318,7 @@ export default function MovieDetailPage() {
               id="session-select"
               value={selectedSession ?? ""}
               onChange={() =>
-                  handleSessionSelect
+                  handleSessionSelect(session.id)
               }
               className="w-full px-4 py-2 rounded-lg border bg-white text-black"
           >
