@@ -25,7 +25,7 @@ const fetchMovieDetails = async (movieSlug: string | undefined) => {
   }
   try {
     const { data } = await axios.get(
-      ${siteConfig.server_api}/movies/${movieSlug},
+      `${siteConfig.server_api}/movies/${movieSlug}`,
     );
 
     return data.data;
@@ -43,7 +43,7 @@ const fetchSessions = async (movieSlug: string | undefined) => {
   }
   try {
     const { data } = await axios.get(
-      ${siteConfig.server_api}/sessions/movie/${movieSlug},
+      `${siteConfig.server_api}/sessions/movie/${movieSlug}`,
     );
 
     return data.data;
@@ -58,7 +58,7 @@ const fetchSessions = async (movieSlug: string | undefined) => {
 const fetchSeats = async (sessionId: number) => {
   try {
     const { data } = await axios.get(
-      ${siteConfig.server_api}/seats/session/${sessionId},
+      `${siteConfig.server_api}/seats/session/${sessionId}`,
     );
 
     return data.data;
