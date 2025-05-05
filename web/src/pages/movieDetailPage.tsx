@@ -207,7 +207,7 @@ export default function MovieDetailPage() {
           <Button
             className="mt-4"
             color="primary"
-            onPress={() => navigate(/movie/${movieSlug})}
+            onPress={() => navigate(`/movie/${movieSlug}`)}
           >
             Спробувати ще раз
           </Button>
@@ -322,7 +322,9 @@ export default function MovieDetailPage() {
           <select
               id="session-select"
               value={selectedSession ?? ""}
-              onChange={handleSessionSelect}
+              onChange={
+                  handleSessionSelect
+              }
               className="w-full px-4 py-2 rounded-lg border bg-white text-black"
           >
             <option value="">-- Виберіть сеанс --</option>
@@ -390,13 +392,13 @@ export default function MovieDetailPage() {
                               }
                           >
                             <button
-                                className={transition-all duration-300 transform w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-md ${
+                                className={`transition-all duration-300 transform w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-md ${
                                     seat.status === "reserved"
                                         ? "bg-gray-600 cursor-not-allowed"
                                         : selectedSeat === seat.id
                                             ? "bg-blue-500 border-4 border-white scale-110"
                                             : getPriceColor(seat.price)
-                                }}
+                                }`}
                                 disabled={seat.status === "reserved" && !isAdmin}
                                 onClick={() => {
                                   handleSeatSelect(seat.id);
@@ -517,4 +519,4 @@ export default function MovieDetailPage() {
 
       </DefaultLayout>
   );
-} 
+}
