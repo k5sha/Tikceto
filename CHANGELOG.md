@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.0](https://github.com/k5sha/Tikceto/compare/v1.5.0...v1.6.0) (2025-05-06)
+
+
+### Features
+
+* add link to movie from page my tickets ([3ef8ba7](https://github.com/k5sha/Tikceto/commit/3ef8ba7c5f9ce4109ee708e826f0e69f9a0afd27))
+
+
+### Bug Fixes
+
+* purchase complete temporaly fix ([74483b9](https://github.com/k5sha/Tikceto/commit/74483b9fdc1db3a22e8e96795f8781632a5cb3f2))
+* purchase complete temporarily ([bea5ec0](https://github.com/k5sha/Tikceto/commit/bea5ec0d7aa9b5c8e6d6a0cccc6ea00fd6e842c9))
+
 ## [1.5.0](https://github.com/k5sha/Tikceto/compare/v1.4.1...v1.5.0) (2025-05-06)
 
 
