@@ -4,7 +4,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@heroui/button";
 
 import DefaultLayout from "@/layouts/default";
-import {useAuth} from "@/context/authContext.tsx";
+import { useAuth } from "@/context/authContext.tsx";
 
 export default function PurchaseComplete() {
   const { orderID } = useParams<{ orderID: string }>();
@@ -19,18 +19,17 @@ export default function PurchaseComplete() {
 
     const checkPaymentStatus = async () => {
       try {
-        const data  = await fetchWithAuth(
-         `/tickets/${orderID}`,
-        );
+        const data = await fetchWithAuth(`/tickets/${orderID}`);
 
+        // TODO: fix purchase complete
         // @ts-ignore
         if (data.data.status === "ok" || data.data.status === "pending") {
-          setStatus("success");
+          setStatus("failed");
         } else {
           setStatus("failed");
         }
       } catch (error) {
-        setStatus("failed");
+        setStatus("success");
       }
     };
 
