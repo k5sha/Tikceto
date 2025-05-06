@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/k5sha/Tikceto/compare/v1.4.1...v1.5.0) (2025-05-06)
+
+
+### Features
+
+* add animation ([9729b28](https://github.com/k5sha/Tikceto/commit/9729b284b6fbc2f8fc14b73ba9cc29cf559bf2e7))
+
 ## [1.4.1](https://github.com/k5sha/Tikceto/compare/v1.4.0...v1.4.1) (2025-05-06)
 
 
