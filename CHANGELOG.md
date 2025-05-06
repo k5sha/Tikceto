@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.0](https://github.com/k5sha/Tikceto/compare/v1.3.2...v1.4.0) (2025-05-06)
+
+
+### Features
+
+* add logo + back on auth pages ([e986174](https://github.com/k5sha/Tikceto/commit/e98617481438a7712f70475a0c77bbee56150bf8))
+* Update test_and_build.yaml ([d7be22d](https://github.com/k5sha/Tikceto/commit/d7be22dbbe9f95c5cdb8e0fb3dc8144b07cec2d3))
+
+
+### Bug Fixes
+
+* bug with select ([5508b85](https://github.com/k5sha/Tikceto/commit/5508b85e8572a51c49b9242944d480ab622488b5))
+* movieDetailPage.tsx ([bc92063](https://github.com/k5sha/Tikceto/commit/bc92063375235f6ab24c131c582793888587a5fd))
+
 ## [1.3.2](https://github.com/k5sha/Tikceto/compare/v1.3.1...v1.3.2) (2025-05-05)
 
 
