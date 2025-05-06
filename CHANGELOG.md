@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/k5sha/Tikceto/compare/v1.4.0...v1.4.1) (2025-05-06)
+
+
+### Bug Fixes
+
+* delete ./static ([ce2bb3f](https://github.com/k5sha/Tikceto/commit/ce2bb3fd630e67ef20070c38d4bc44bef48a94ed))
+
 ## [1.4.0](https://github.com/k5sha/Tikceto/compare/v1.3.2...v1.4.0) (2025-05-06)
 
 
