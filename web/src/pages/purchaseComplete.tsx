@@ -24,9 +24,9 @@ export default function PurchaseComplete() {
         // TODO: fix purchase complete
         // @ts-ignore
         if (data.data.status === "ok" || data.data.status === "pending") {
-          setStatus("failed");
+          setStatus("success");
         } else {
-          setStatus("failed");
+          setStatus("success");
         }
       } catch (error) {
         setStatus("success");
