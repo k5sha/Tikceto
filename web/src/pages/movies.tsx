@@ -2,11 +2,13 @@ import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { Divider } from "@heroui/divider";
 import { useDisclosure } from "@heroui/modal";
-import {Calendar, Clock, Film, MapPlus, Ticket} from "lucide-react";
+import { Calendar, Clock, Film, MapPlus, Ticket } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+
+import { motion } from "framer-motion";
 
 import DefaultLayout from "@/layouts/default";
 import { siteConfig } from "@/config/site.ts";
@@ -37,8 +39,11 @@ export default function MoviesPage() {
   });
 
   const { isAdmin } = useAuth();
-  const { isOpen: isAddMovieOpen, onOpenChange: onOpenAddMovie } = useDisclosure();
-  const { isOpen: isAddRoomOpen, onOpenChange: onOpenAddRoom } = useDisclosure();
+  const { isOpen: isAddMovieOpen, onOpenChange: onOpenAddMovie } =
+    useDisclosure();
+  const { isOpen: isAddRoomOpen, onOpenChange: onOpenAddRoom } =
+    useDisclosure();
+
   if (isLoading) {
     return (
       <DefaultLayout>
@@ -52,7 +57,7 @@ export default function MoviesPage() {
               >
                 <Skeleton
                   className="w-full rounded-t-xl bottom-1"
-                  height={getRandomInt(250, 300)}
+                  height={getRandomInt(200, 250)}
                 />
                 <div className="p-5">
                   <Skeleton
@@ -95,9 +100,18 @@ export default function MoviesPage() {
 
   return (
     <DefaultLayout>
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <motion.div
+        animate={{ opacity: 1 }}
+        className="max-w-7xl mx-auto px-4 py-6"
+        initial={{ opacity: 0 }}
+        transition={{ delay: 0.1, duration: 1 }}
+      >
         {isAdmin && (
-          <>
+          <motion.div
+            animate={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+          >
             <h1 className="text-lg font-medium text-gray-900">Адмін панель</h1>
             <Divider className="my-4" />
             <div className="flex flex-row gap-8 pb-4">
@@ -110,17 +124,22 @@ export default function MoviesPage() {
                 Додати зал
               </Button>
             </div>
-          </>
+          </motion.div>
         )}
 
-        <h1 className="text-4xl font-bold text-center mb-10 text-gray-900">
+        <motion.h1
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl font-bold text-center mb-10 text-gray-900"
+          initial={{ opacity: 0, y: -30 }}
+          transition={{ duration: 0.4 }}
+        >
           🎬 Зараз у прокаті
-        </h1>
+        </motion.h1>
 
         <div>
           {movies.data && movies.data.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 items-baseline">
-              {movies!.data.map((movie: any) => {
+              {movies!.data.map((movie: any, index: number) => {
                 const releaseDate = new Date(
                   movie.release_date,
                 ).toLocaleDateString("uk-UA", {
@@ -131,7 +150,15 @@ export default function MoviesPage() {
 
                 return (
                   <Link key={movie.id} href={`/movie/${movie.slug}`}>
-                    <div className="bg-white border rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer">
+                    <motion.div
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white border rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer"
+                      initial={{ opacity: 0, y: -20 }}
+                      transition={{
+                        duration: 0.2,
+                        delay: index * 0.1,
+                      }}
+                    >
                       <img
                         alt={movie.title}
                         className="w-full h-72 md:h-full lg:h-96 object-cover"
@@ -166,7 +193,7 @@ export default function MoviesPage() {
                           Купити квиток
                         </Button>
                       </div>
-                    </div>
+                    </motion.div>
                   </Link>
                 );
               })}
@@ -177,16 +204,13 @@ export default function MoviesPage() {
             </h1>
           )}
         </div>
-      </div>
+      </motion.div>
       <AddMovieModal
         isOpen={isAddMovieOpen}
         refetch={refetch}
         onOpenChange={onOpenAddMovie}
       />
-      <AddRoomModal
-          isOpen={isAddRoomOpen}
-          onOpenChange={onOpenAddRoom}
-      />
+      <AddRoomModal isOpen={isAddRoomOpen} onOpenChange={onOpenAddRoom} />
     </DefaultLayout>
   );
 }
