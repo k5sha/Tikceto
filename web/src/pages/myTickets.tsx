@@ -97,71 +97,81 @@ const MyTickets = () => {
       >
         <h1 className="text-2xl font-semibold mb-4">Мої квитки</h1>
         <div className="grid gap-4 md:grid-cols-1 md:gap-6">
-          {data.map((ticket, index) => (
-            <motion.div
-              key={ticket.id}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-4 border rounded-lg shadow-md flex items-center gap-4 flex-col md:flex-row"
-              initial={{ opacity: 0, y: 20 }}
-              transition={{
-                duration: 0.4,
-                delay: index * 0.1,
-              }}
-            >
-              <img
-                alt={ticket.session.movie.title}
-                className="w-16 h-24 object-cover rounded-md"
-                src={ticket.session.movie.poster_url}
-              />
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold text-center md:text-left">
-                  {ticket.session.movie.title}
-                </h2>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-gray-500" />
-                  {new Date(ticket.session.start_time).toLocaleString("uk-UA", {
-                    dateStyle: "long",
-                    timeStyle: "short",
-                  })}
-                </p>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-500" />
-                  {ticket.session.room.name}, Ряд {ticket.seat.row}, Місце{" "}
-                  {ticket.seat.seat_number}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="text-lg text-center font-semibold">
-                  {ticket.price} грн
-                </span>
-                <div className="mt-2 flex items-center">
-                  <StatusBadge status={ticket.status} />
-                </div>
-                {ticket.status === "confirmed" && (
-                  <div className="md:invisible mt-4 flex justify-center">
-                    <button
-                      className="text-gray-500"
-                      onClick={() =>
-                        setShowQRCode(
-                          showQRCode === ticket.id ? null : ticket.id,
-                        )
-                      }
-                    >
-                      <QrCode className="w-8 h-8" />
-                    </button>
-                  </div>
-                )}
-              </div>
-              {showQRCode === ticket.id && (
-                <div className="py-4 text-center">
-                  <QRCodeSVG
-                    size={256}
-                    value={`${siteConfig.server_api}/validate/${ticket.id}`}
+          {data
+            .sort(
+              (a, b) =>
+                -new Date(b.session.start_time).getTime() -
+                new Date(a.session.start_time).getTime(),
+            )
+            .map((ticket, index) => (
+              <Link key={ticket.id} to={`/movie/${ticket.session.movie.id}`}>
+                <motion.div
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 border rounded-lg shadow-md flex items-center gap-4 flex-col md:flex-row"
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.1,
+                  }}
+                >
+                  <img
+                    alt={ticket.session.movie.title}
+                    className="w-16 h-24 object-cover rounded-md"
+                    src={ticket.session.movie.poster_url}
                   />
-                </div>
-              )}
-            </motion.div>
-          ))}
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold text-center md:text-left">
+                      {ticket.session.movie.title}
+                    </h2>
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                      {new Date(ticket.session.start_time).toLocaleString(
+                        "uk-UA",
+                        {
+                          dateStyle: "long",
+                          timeStyle: "short",
+                        },
+                      )}
+                    </p>
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-gray-500" />
+                      {ticket.session.room.name}, Ряд {ticket.seat.row}, Місце{" "}
+                      {ticket.seat.seat_number}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg text-center font-semibold">
+                      {ticket.price} грн
+                    </span>
+                    <div className="mt-2 flex items-center">
+                      <StatusBadge status={ticket.status} />
+                    </div>
+                    {ticket.status === "confirmed" && (
+                      <div className="md:invisible mt-4 flex justify-center">
+                        <button
+                          className="text-gray-500"
+                          onClick={() =>
+                            setShowQRCode(
+                              showQRCode === ticket.id ? null : ticket.id,
+                            )
+                          }
+                        >
+                          <QrCode className="w-8 h-8" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {showQRCode === ticket.id && (
+                    <div className="py-4 text-center">
+                      <QRCodeSVG
+                        size={256}
+                        value={`${siteConfig.server_api}/validate/${ticket.id}`}
+                      />
+                    </div>
+                  )}
+                </motion.div>
+              </Link>
+            ))}
         </div>
       </motion.div>
     </DefaultLayout>

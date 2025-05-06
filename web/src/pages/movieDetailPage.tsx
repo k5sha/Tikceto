@@ -374,7 +374,7 @@ export default function MovieDetailPage() {
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         transition={{ duration: 0.3 }}
       >
-        <label className="block mb-1 text-white" htmlFor="session-select">
+        <label className="block mb-1 font-bold text-lg" htmlFor="session-select">
           Оберіть сеанс:
         </label>
         <select
@@ -383,7 +383,7 @@ export default function MovieDetailPage() {
           value={selectedSession ?? ""}
           onChange={handleSessionSelect}
         >
-          <option value="">-- Виберіть сеанс --</option>
+          <option value="" disabled>-- Виберіть сеанс --</option>
           {isSessionsLoading ? (
             <option disabled>Завантаження сеансів...</option>
           ) : sessionsError ? (
