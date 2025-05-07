@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"gopkg.in/gomail.v2"
 	"html/template"
 	"time"
+
+	"gopkg.in/gomail.v2"
 )
 
-type BrevoMailer struct {
+type SmtpMailer struct {
 	fromEmail string
 	username  string
 	password  string
@@ -17,12 +18,12 @@ type BrevoMailer struct {
 	port      int
 }
 
-func NewBrevo(host, username, password, fromEmail string, port int) (*BrevoMailer, error) {
+func NewSmtp(host, username, password, fromEmail string, port int) (*SmtpMailer, error) {
 	if username == "" || password == "" {
 		return nil, errors.New("username and password are required")
 	}
 
-	return &BrevoMailer{
+	return &SmtpMailer{
 		fromEmail: fromEmail,
 		host:      host,
 		username:  username,
@@ -31,7 +32,7 @@ func NewBrevo(host, username, password, fromEmail string, port int) (*BrevoMaile
 	}, nil
 }
 
-func (m *BrevoMailer) Send(templateFile string, username, email string, data any, isSandbox bool) error {
+func (m *SmtpMailer) Send(templateFile string, username, email string, data any, isSandbox bool) error {
 	tmpl, err := template.ParseFS(FS, "templates/"+templateFile)
 	if err != nil {
 		return fmt.Errorf("error parsing template: %w", err)

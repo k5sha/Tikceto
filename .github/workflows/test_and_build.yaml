@@ -150,8 +150,8 @@ jobs:
             echo "MAIL_TOKEN_EXPIRATION=1h" >> /home/debian/Tikceto/.env
             echo "MAIL_FROM_EMAIL=${{ secrets.MAIL_FROM_EMAIL}}" >> /home/debian/Tikceto/.env
             
-            echo "BREVO_PASSWORD=${{ secrets.BREVO_PASSWORD }}" >> /home/debian/Tikceto/.env
-            echo "BREVO_USERNAME=${{ secrets.BREVO_USERNAME}}" >> /home/debian/Tikceto/.env
+            echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> /home/debian/Tikceto/.env
+            echo "SMTP_USERNAME=${{ secrets.SMTP_USERNAME}}" >> /home/debian/Tikceto/.env
   
             echo "S3_BUCKET_NAME=${{ secrets.MINIO_DEFAULT_BUCKETS }}" >> /home/debian/Tikceto/.env
             echo "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}" >> /home/debian/Tikceto/.env

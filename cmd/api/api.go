@@ -4,6 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -16,11 +22,6 @@ import (
 	"github.com/k5sha/Tikceto/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"go.uber.org/zap"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 type application struct {
@@ -71,7 +72,7 @@ type tokenConfig struct {
 type mailConfig struct {
 	exp       time.Duration
 	fromEmail string
-	brevo     BrevoConfig
+	smtp      smtpConfig
 }
 
 type payConfig struct {
@@ -80,7 +81,7 @@ type payConfig struct {
 	frontendURL string
 	serverURL   string
 }
-type BrevoConfig struct {
+type smtpConfig struct {
 	username string
 	password string
 	host     string

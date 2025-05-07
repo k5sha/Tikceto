@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/k5sha/Tikceto/internal/auth"
 	"github.com/k5sha/Tikceto/internal/db"
 	"github.com/k5sha/Tikceto/internal/env"
@@ -10,7 +12,6 @@ import (
 	"github.com/k5sha/Tikceto/internal/store"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
-	"time"
 )
 
 const version = "0.0.1"
@@ -57,12 +58,12 @@ func main() {
 		},
 		mail: mailConfig{
 			exp:       env.GetDuration("MAIL_TOKEN_EXPIRATION", 1*time.Hour),
-			fromEmail: env.GetString("MAIL_FROM_EMAIL", "hello@demomailtrap.com"),
-			brevo: BrevoConfig{
-				username: env.GetString("BREVO_USERNAME", ""),
-				password: env.GetString("BREVO_PASSWORD", ""),
-				host:     env.GetString("BREVO_HOST", "smtp-relay.brevo.com"),
-				port:     env.GetInt("BREVO_PORT", 587),
+			fromEmail: env.GetString("MAIL_FROM_EMAIL", "ticketo149@gmail.com"),
+			smtp: smtpConfig{
+				username: env.GetString("SMTP_USERNAME", ""),
+				password: env.GetString("SMTP_PASSWORD", ""),
+				host:     env.GetString("SMTP_HOST", "smtp.gmail.com"),
+				port:     env.GetInt("SMTP_PORT", 465),
 			},
 		},
 		s3: s3Config{
@@ -98,7 +99,7 @@ func main() {
 	store := store.NewStorage(db)
 
 	// Mailer
-	mailer, err := mailer.NewBrevo(cfg.mail.brevo.host, cfg.mail.brevo.username, cfg.mail.brevo.password, cfg.mail.fromEmail, cfg.mail.brevo.port)
+	mailer, err := mailer.NewSmtp(cfg.mail.smtp.host, cfg.mail.smtp.username, cfg.mail.smtp.password, cfg.mail.fromEmail, cfg.mail.smtp.port)
 	if err != nil {
 		logger.Fatal(err)
 	}
