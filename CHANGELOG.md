@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.1](https://github.com/k5sha/Tikceto/compare/v1.6.0...v1.6.1) (2025-05-07)
+
+
+### Bug Fixes
+
+* minio localy ([b580aa5](https://github.com/k5sha/Tikceto/commit/b580aa5e38222bec0566d322412a58d722a8d11c))
+* secure improve ([58f66d2](https://github.com/k5sha/Tikceto/commit/58f66d29e6177ac6a67a968cf3928017772c847a))
+
 ## [1.6.0](https://github.com/k5sha/Tikceto/compare/v1.5.0...v1.6.0) (2025-05-06)
 
 
