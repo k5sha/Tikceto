@@ -10,8 +10,6 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./scripts:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
     networks:
       - app-network
     healthcheck:
@@ -31,7 +29,6 @@ services:
       - MINIO_DEFAULT_BUCKETS
     ports:
       - "9000:9000"
-      - "9001:9001"
     volumes:
       - minio_data:/data
     healthcheck:

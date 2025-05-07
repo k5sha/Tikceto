@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Loader2, Calendar, Clock, QrCode } from "lucide-react"; // Іконки для статусів
+import { Loader2, Calendar, Clock, QrCode } from "lucide-react";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { motion } from "framer-motion";
