@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.7.0](https://github.com/k5sha/Tikceto/compare/v1.6.0...v1.7.0) (2025-05-08)
+
+
+### Features
+
+* add anim to auth ([ff06720](https://github.com/k5sha/Tikceto/commit/ff067209f941609142d53183705bb8009d45d911))
+
+
+### Bug Fixes
+
+* html lang ([4ccaa1d](https://github.com/k5sha/Tikceto/commit/4ccaa1dd0e7fc6043a55edd8744e7a149cfc9b1b))
+* minio localy ([b580aa5](https://github.com/k5sha/Tikceto/commit/b580aa5e38222bec0566d322412a58d722a8d11c))
+* secure improve ([58f66d2](https://github.com/k5sha/Tikceto/commit/58f66d29e6177ac6a67a968cf3928017772c847a))
+* use gmail insted of brevo ([9aba67c](https://github.com/k5sha/Tikceto/commit/9aba67c74d9692e9772b3fdd9ebe017245b58ecd))
+
 ## [1.6.0](https://github.com/k5sha/Tikceto/compare/v1.5.0...v1.6.0) (2025-05-06)
 
 
