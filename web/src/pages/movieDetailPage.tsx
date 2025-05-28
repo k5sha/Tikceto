@@ -19,6 +19,7 @@ import EditMovieModal from "@/components/modals/editMovieModal.tsx";
 import AddSessionModal from "@/components/modals/addSessionModal.tsx";
 import DeleteSessionModal from "@/components/modals/deleteSessionModal.tsx";
 import EditTicketModal from "@/components/modals/editTicketModal.tsx";
+import NotFoundPage from "./NotFoundPage";
 
 const fetchMovieDetails = async (movieSlug: string | undefined) => {
   if (!movieSlug) {
@@ -252,13 +253,7 @@ export default function MovieDetailPage() {
 
   if (movie == null) {
     return (
-      <DefaultLayout>
-        <div className="flex items-center justify-center h-3/4 flex-col">
-          <p className="text-lg text-primary-600">
-            Схоже це застаріла сторінка
-          </p>
-        </div>
-      </DefaultLayout>
+      <NotFoundPage />
     );
   }
 

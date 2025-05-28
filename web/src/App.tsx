@@ -8,6 +8,7 @@ import Register from "@/pages/register.tsx";
 import PurchaseComplete from "@/pages/purchaseComplete.tsx";
 import MyTickets from "@/pages/myTickets.tsx";
 import MovieDetailPage from "@/pages/movieDetailPage.tsx";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
       <Route element={<ActivationPage />} path="/confirm/:token" />
+      <Route element={<NotFoundPage />} path="*" />
     </Routes>
   );
 }
