@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/k5sha/Tikceto/compare/v1.7.0...v1.8.0) (2025-05-28)
+
+
+### Features
+
+* Update movies.tsx ([8f4350e](https://github.com/k5sha/Tikceto/commit/8f4350ed868817c3751ec658dfd7f0c20df5166a))
+
 ## [1.7.0](https://github.com/k5sha/Tikceto/compare/v1.6.0...v1.7.0) (2025-05-08)
 
 
