@@ -161,8 +161,8 @@ export default function MoviesPage() {
                     >
                       <img
                         alt={movie.title}
-                        className="w-full h-72 md:h-full lg:h-96 object-cover"
-                        src={movie.poster_url || "/path/to/fallback-image.jpg"}
+                        className="w-full h-72 md:h-full object-cover"
+                        src={movie.poster_url || "https://www.mangobeds.com/images/image-fallback.jpg"}
                       />
 
                       <div className="p-5">
