@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@heroui/button";
 import axios from "axios";
-import DefaultLayout from "@/layouts/default";
+import DefaultLayout from "@/layouts/DefaultLayout";
 
 export default function NotFoundPage() {
   const [catGif, setCatGif] = useState<string | null>(null);

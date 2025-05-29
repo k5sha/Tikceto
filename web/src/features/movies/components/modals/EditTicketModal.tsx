@@ -10,7 +10,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/authContext.tsx";
 import { toast } from "sonner";
-import {StatusBadge, statusLabels, TicketStatus} from "@/components/ticketStatus.tsx";
+import {StatusBadge, statusLabels, TicketStatus} from "@/features/tickets/components/StatusBadge";
 
 interface TicketResponse {
     data: {

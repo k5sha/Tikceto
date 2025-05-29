@@ -10,11 +10,11 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import { motion } from "framer-motion";
 
-import DefaultLayout from "@/layouts/default";
+import DefaultLayout from "@/layouts/DefaultLayout";
 import { siteConfig } from "@/config/site.ts";
 import { useAuth } from "@/context/authContext.tsx";
-import AddMovieModal from "@/components/modals/addMovieModal.tsx";
-import AddRoomModal from "@/components/modals/addRoomModal.tsx";
+import AddMovieModal from "@/features/movies/components/modals/addMovieModal";
+import AddRoomModal from "@/features/movies/components/modals/addRoomModal";
 
 const fetchMovies = async () => {
   const { data } = await axios.get(`${siteConfig.server_api}/movies`);

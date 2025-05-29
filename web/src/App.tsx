@@ -1,19 +1,17 @@
 import { Route, Routes } from "react-router-dom";
 
-import IndexPage from "@/pages/landing.tsx";
-import MoviesPage from "@/pages/movies.tsx";
-import ActivationPage from "@/pages/activation.tsx";
-import Login from "@/pages/login.tsx";
-import Register from "@/pages/register.tsx";
-import PurchaseComplete from "@/pages/purchaseComplete.tsx";
-import MyTickets from "@/pages/myTickets.tsx";
-import MovieDetailPage from "@/pages/movieDetailPage.tsx";
-import NotFoundPage from "./pages/NotFoundPage";
+import MoviesPage from "@/features/movies/pages/Movies";
+import ActivationPage from "@/features/activation/pages/Activation";
+import PurchaseComplete from "@/features/tickets/pages/PurchaseComplete";
+import MyTickets from "@/features/tickets/pages/MyTickets";
+import MovieDetailPage from "@/features/movies/pages/MovieDetailPage";
+import NotFoundPage from "@/features/notFound/pages/NotFoundPage";
+import Login from "@/features/auth/pages/Login";
+import Register from "@/features/auth/pages/Register";
 
 function App() {
   return (
     <Routes>
-      <Route element={<IndexPage />} path="/landing" />
       <Route element={<PurchaseComplete />} path="payment/complete/:orderID" />
       <Route element={<MyTickets />} path="/my/tickets/" />
       <Route element={<MoviesPage />} path="/" />

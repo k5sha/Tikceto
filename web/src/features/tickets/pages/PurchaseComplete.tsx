@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@heroui/button";
 
-import DefaultLayout from "@/layouts/default";
+import DefaultLayout from "@/layouts/DefaultLayout";
 import { useAuth } from "@/context/authContext.tsx";
 
 export default function PurchaseComplete() {

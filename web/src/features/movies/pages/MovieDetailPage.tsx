@@ -11,15 +11,15 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { useDisclosure } from "@heroui/modal";
 import { AnimatePresence, motion } from "framer-motion";
 
-import DefaultLayout from "@/layouts/default";
+import DefaultLayout from "@/layouts/DefaultLayout";
 import { useAuth } from "@/context/authContext.tsx";
 import { siteConfig } from "@/config/site.ts";
-import DeleteMovieModal from "@/components/modals/deleteMovieModal.tsx";
-import EditMovieModal from "@/components/modals/editMovieModal.tsx";
-import AddSessionModal from "@/components/modals/addSessionModal.tsx";
-import DeleteSessionModal from "@/components/modals/deleteSessionModal.tsx";
-import EditTicketModal from "@/components/modals/editTicketModal.tsx";
-import NotFoundPage from "./NotFoundPage";
+import DeleteMovieModal from "@/features/movies/components/modals/DeleteMovieModal";
+import EditMovieModal from "@/features/movies/components/modals/EditMovieModal";
+import AddSessionModal from "@/features/movies/components/modals/AddSessionModal";
+import DeleteSessionModal from "@/features/movies/components/modals/DeleteSessionModal";
+import EditTicketModal from "@/features/movies/components/modals/EditTicketModal";
+import NotFoundPage from "@/features/notFound/pages/NotFoundPage";
 
 const fetchMovieDetails = async (movieSlug: string | undefined) => {
   if (!movieSlug) {

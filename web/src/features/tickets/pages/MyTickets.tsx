@@ -5,10 +5,10 @@ import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { motion } from "framer-motion";
 
-import DefaultLayout from "@/layouts/default.tsx";
+import DefaultLayout from "@/layouts/DefaultLayout";
 import { useAuth } from "@/context/authContext.tsx";
 import { siteConfig } from "@/config/site.ts";
-import { StatusBadge, TicketStatus } from "@/components/ticketStatus.tsx";
+import { StatusBadge, TicketStatus } from "@/features/tickets/components/StatusBadge";
 
 const API_URL = "/tickets/my";
 
