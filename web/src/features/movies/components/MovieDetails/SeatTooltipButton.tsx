@@ -1,5 +1,4 @@
 import { Tooltip } from "@heroui/react";
-import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 
 

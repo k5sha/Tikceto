@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
