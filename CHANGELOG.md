@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.9.0](https://github.com/k5sha/Tikceto/compare/v1.8.0...v1.9.0) (2025-05-29)
+
+
+### Features
+
+* add 404 page ([0560faf](https://github.com/k5sha/Tikceto/commit/0560faf69a78ae6e89cc4b5ef63ad589d537a15f))
+* new ./web structure ([4c820d7](https://github.com/k5sha/Tikceto/commit/4c820d7392e645a48b21ca64e0602984d3c3794a))
+
+
+### Bug Fixes
+
+* broken import of Navbar ([c6ffccb](https://github.com/k5sha/Tikceto/commit/c6ffccb04f5294ffcce2cc2e7acfd8283dd72338))
+* broken imports ([48cee17](https://github.com/k5sha/Tikceto/commit/48cee173d5d6dc7c48195ecc8443f3014c714c65))
+* broken imports ([9867054](https://github.com/k5sha/Tikceto/commit/98670543850bf13d02503942c10a7d177020cf18))
+* broken imports ([b410725](https://github.com/k5sha/Tikceto/commit/b4107258a737fcc7e37f9bf3d6cf74b033423b9c))
+* broken imports ([9bc065b](https://github.com/k5sha/Tikceto/commit/9bc065babd85450be5d7465a587248e7cb37983d))
+* broken imports ([0f32d7f](https://github.com/k5sha/Tikceto/commit/0f32d7fec9858b13079db5b8c259dde6fec8d7cc))
+* bugs ([f1be893](https://github.com/k5sha/Tikceto/commit/f1be893a281b4c6d3534d97f4130bde48e8de9a7))
+
 ## [1.8.0](https://github.com/k5sha/Tikceto/compare/v1.7.0...v1.8.0) (2025-05-28)
 
 
