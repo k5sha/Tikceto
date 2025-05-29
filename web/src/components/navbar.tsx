@@ -17,7 +17,7 @@ import { Ticket } from "lucide-react";
 
 import { useAuth } from "@/context/authContext";
 
-export const Navbar = () => {
+const Navbar = () => {
   const { user, logout, isAdmin } = useAuth();
 
   return (
@@ -99,3 +99,5 @@ export const Navbar = () => {
     </HeroUINavbar>
   );
 };
+
+export default Navbar;
