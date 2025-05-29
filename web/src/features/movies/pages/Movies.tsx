@@ -13,8 +13,8 @@ import { motion } from "framer-motion";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { siteConfig } from "@/config/site.ts";
 import { useAuth } from "@/context/authContext.tsx";
-import AddMovieModal from "@/features/movies/components/modals/addMovieModal";
-import AddRoomModal from "@/features/movies/components/modals/addRoomModal";
+import AddMovieModal from "@/features/movies/components/modals/AddMovieModal";
+import AddRoomModal from "@/features/movies/components/modals/AddRoomModal";
 
 const fetchMovies = async () => {
   const { data } = await axios.get(`${siteConfig.server_api}/movies`);
