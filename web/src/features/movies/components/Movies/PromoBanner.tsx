@@ -7,7 +7,7 @@ export default function PromoBanner() {
     description:
       "Комедійний фільм про казахського журналіста, який подорожує Америкою та потрапляє у безліч курйозних ситуацій.",
     imageUrl:
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80",
+      "https://film-authority.com/wp-content/uploads/2020/10/www.curzoncinemas.com_.jpg",
     slug: "borat-one",
   };
 
@@ -21,17 +21,18 @@ export default function PromoBanner() {
         window.location.href = `/movie/${movie.slug}`;
       }}
     >
-      <img
-        src={movie.imageUrl}
-        alt={movie.title}
-        className="w-full h-64 sm:h-96 object-cover brightness-75"
-      />
+     <img
+  src={movie.imageUrl}
+  alt={movie.title}
+  className="w-full h-64 sm:h-96 object-cover brightness-75 object-top" 
+/>
+
 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 
       <div className="absolute bottom-5 left-5 text-white max-w-xl">
-        <h2 className="text-3xl font-extrabold mb-2">{movie.title}</h2>
-        <p className="mb-4 text-lg">{movie.description}</p>
+        <h2 className="text-xl md:text-3xl font-extrabold mb-2">{movie.title}</h2>
+        <p className="mb-4 text-sm md:text-lg ">{movie.description}</p>
         <Button color="primary" variant="solid">
           Дізнатися більше
         </Button>

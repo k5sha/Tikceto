@@ -46,7 +46,7 @@ export default function MovieCard({ movie, index }: MovieCardProps) {
             }
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-          <div className="absolute top-2 right-2 bg-yellow-400 text-gray-900 flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold">
+          <div className="absolute top-2 right-2 bg-primary-200 text-gray-900 flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold">
             <Star fill="currentColor" size={16} />
             {movie.rating?.toFixed(1) ?? "4.0"}
           </div>
