@@ -1,14 +1,15 @@
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
-import { Divider } from "@heroui/divider";
 import { useDisclosure } from "@heroui/modal";
-import { Calendar, Clock, Film, MapPlus, Ticket } from "lucide-react";
+import { Calendar, Clock, Ticket } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import { motion } from "framer-motion";
+
+import AdminControls from "../components/Movies/AdminControls";
 
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { siteConfig } from "@/config/site.ts";
@@ -107,24 +108,10 @@ export default function MoviesPage() {
         transition={{ delay: 0.1, duration: 1 }}
       >
         {isAdmin && (
-          <motion.div
-            animate={{ opacity: 1 }}
-            initial={{ opacity: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-          >
-            <h1 className="text-lg font-medium text-gray-900">Адмін панель</h1>
-            <Divider className="my-4" />
-            <div className="flex flex-row gap-8 pb-4">
-              <Button color="primary" onPress={() => onOpenAddMovie()}>
-                <Film />
-                Додати фільм
-              </Button>
-              <Button color="primary" onPress={() => onOpenAddRoom()}>
-                <MapPlus />
-                Додати зал
-              </Button>
-            </div>
-          </motion.div>
+          <AdminControls
+            onOpenAddMovie={onOpenAddMovie}
+            onOpenAddRoom={onOpenAddRoom}
+          />
         )}
 
         <motion.h1
@@ -162,7 +149,10 @@ export default function MoviesPage() {
                       <img
                         alt={movie.title}
                         className="w-full h-72 md:h-full object-cover"
-                        src={movie.poster_url || "https://www.mangobeds.com/images/image-fallback.jpg"}
+                        src={
+                          movie.poster_url ||
+                          "https://www.mangobeds.com/images/image-fallback.jpg"
+                        }
                       />
 
                       <div className="p-5">

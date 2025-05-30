@@ -84,7 +84,7 @@ const AddMovieModal: React.FC<AddMovieModalProps> = ({
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="flex items-center border border-gray-300 rounded-md overflow-hidden w-full">
               <span className="ms-2 px-2 bg-gray-100 text-gray-500 rounded text-sm whitespace-nowrap select-none">
-                ticketo.io/movie/
+                k5sha.io/movie/
               </span>
               <input
                   required
