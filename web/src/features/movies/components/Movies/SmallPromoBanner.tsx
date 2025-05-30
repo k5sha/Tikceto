@@ -18,7 +18,7 @@ export default function SmallPromoBanner() {
       {visible && (
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="relative bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 text-white rounded-xl p-6 mb-6 overflow-hidden shadow-lg"
+          className="relative bg-gradient-to-r from-blue-800 via-blue-700 to-teal-700 text-white rounded-xl p-6 mb-6 overflow-hidden shadow-lg"
           exit={{ opacity: 0, y: -30 }}
           initial={{ opacity: 0, y: -30 }}
           transition={{ duration: 0.4 }}
@@ -44,7 +44,7 @@ export default function SmallPromoBanner() {
             </div>
 
             <button
-              className="bg-yellow-400 text-gray-900 font-semibold px-6 py-2 rounded-md shadow-md hover:bg-yellow-500 hover:scale-105 transition-transform duration-300"
+              className="bg-yellow-400 text-gray-900 font-semibold px-6 py-2 rounded-md shadow-md hover:scale-105 transition-transform duration-300"
               onClick={scrollToTickets}
             >
               Купити квитки
