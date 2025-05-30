@@ -1,7 +1,5 @@
 import { Button } from "@heroui/button";
-import { Link } from "@heroui/link";
 import { useDisclosure } from "@heroui/modal";
-import { Calendar, Clock, Ticket } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Skeleton from "react-loading-skeleton";
@@ -10,6 +8,9 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { motion } from "framer-motion";
 
 import AdminControls from "../components/Movies/AdminControls";
+import PromoBanner from "../components/Movies/PromoBanner";
+import SmallPromoBanner from "../components/Movies/SmallPromoBanner";
+import MovieCard from "../components/Movies/MovieCard";
 
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { siteConfig } from "@/config/site.ts";
@@ -107,6 +108,8 @@ export default function MoviesPage() {
         initial={{ opacity: 0 }}
         transition={{ delay: 0.1, duration: 1 }}
       >
+        <PromoBanner />
+        <SmallPromoBanner />
         {isAdmin && (
           <AdminControls
             onOpenAddMovie={onOpenAddMovie}
@@ -114,78 +117,14 @@ export default function MoviesPage() {
           />
         )}
 
-        <motion.h1
-          animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-bold text-center mb-10 text-gray-900"
-          initial={{ opacity: 0, y: -30 }}
-          transition={{ duration: 0.4 }}
-        >
-          🎬 Зараз у прокаті
-        </motion.h1>
-
         <div>
           {movies.data && movies.data.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 items-baseline">
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 items-baseline"
+              id="tickets-section"
+            >
               {movies!.data.map((movie: any, index: number) => {
-                const releaseDate = new Date(
-                  movie.release_date,
-                ).toLocaleDateString("uk-UA", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                });
-
-                return (
-                  <Link key={movie.id} href={`/movie/${movie.slug}`}>
-                    <motion.div
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-white border rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer"
-                      initial={{ opacity: 0, y: -20 }}
-                      transition={{
-                        duration: 0.2,
-                        delay: index * 0.1,
-                      }}
-                    >
-                      <img
-                        alt={movie.title}
-                        className="w-full h-72 md:h-full object-cover"
-                        src={
-                          movie.poster_url ||
-                          "https://www.mangobeds.com/images/image-fallback.jpg"
-                        }
-                      />
-
-                      <div className="p-5">
-                        <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                          {movie.title}
-                        </h2>
-                        <p className="text-gray-600 mb-4">
-                          {movie.description.length > 150
-                            ? movie.description.substring(0, 150) + "..."
-                            : movie.description}
-                        </p>
-
-                        <div className="flex items-center gap-3 text-gray-700 mb-4">
-                          <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                            <Clock size={16} /> {movie.duration} хвилин
-                          </span>
-                          <span className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                            <Calendar size={16} /> {releaseDate}
-                          </span>
-                        </div>
-
-                        <Button
-                          className="w-1/2 flex items-center justify-center gap-2"
-                          color="primary"
-                          variant="solid"
-                        >
-                          <Ticket size={18} />
-                          Купити квиток
-                        </Button>
-                      </div>
-                    </motion.div>
-                  </Link>
-                );
+                return <MovieCard key={movie.id} index={index} movie={movie} />;
               })}
             </div>
           ) : (
