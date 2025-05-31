@@ -23,15 +23,19 @@ services:
     container_name: minio
     env_file: .env
     environment:
+      - MINIO_SKIP_CLIENT=yes
       - MINIO_ROOT_USER
       - MINIO_ROOT_PASSWORD
-      - MINIO_USE_SSL
+      - MINIO_USE_SSL=no
       - MINIO_DEFAULT_BUCKETS
+      - MINIO_SERVER_URL=https://k5sha.run.place/minio
+      - MINIO_SCHEME=https
     ports:
       - "9000:9000"
       - "127.0.0.1:9001:9001"
     volumes:
       - minio_data:/data
+    restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 30s
