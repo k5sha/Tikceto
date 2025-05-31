@@ -29,7 +29,7 @@ const Navbar = () => {
       </NavbarBrand>
 
       <NavbarContent justify="end">
-        {user && (
+        {user && !isAdmin && (
           <NavbarItem className="flex flex-row gap-4">
             <Button
               as={Link}
