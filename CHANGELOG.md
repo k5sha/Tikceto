@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.10.0](https://github.com/k5sha/Tikceto/compare/v1.9.0...v1.10.0) (2025-05-31)
+
+
+### Features
+
+* update a admin controls ([b82eaa1](https://github.com/k5sha/Tikceto/commit/b82eaa1a59c8c78aa2c6218845c818aee64fa489))
+* update movie card ([c6a58ce](https://github.com/k5sha/Tikceto/commit/c6a58cea00679bf416082513bd097ac15fb3dbce))
+* update MovieDetail structure ([6d45e7c](https://github.com/k5sha/Tikceto/commit/6d45e7cf462f35978e33bb0a130511e4b2263a26))
+* update small promo ([29def0f](https://github.com/k5sha/Tikceto/commit/29def0f9b5eee32257c663bf96db6effa30ec19b))
+
+
+### Bug Fixes
+
+* Promo banner ([faba19c](https://github.com/k5sha/Tikceto/commit/faba19c363173364abb6b229180d21961ba27be9))
+* unused imports ([43bb4b9](https://github.com/k5sha/Tikceto/commit/43bb4b9abcc509d7133cd125387f5eb77aa73f26))
+
 ## [1.9.0](https://github.com/k5sha/Tikceto/compare/v1.8.0...v1.9.0) (2025-05-29)
 
 
