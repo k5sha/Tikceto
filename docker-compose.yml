@@ -44,8 +44,8 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      - app-network
       - traefik-net
+      - app-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.rule=Host(`minio.k5sha.run.place`)"
@@ -96,8 +96,8 @@ services:
       minio:
         condition: service_healthy
     networks:
-      - app-network
       - traefik-net
+      - app-network
     restart: on-failure
     healthcheck:
       test: ["CMD", "curl", "-sS", "http://localhost:8080/v1/health"]
@@ -122,14 +122,18 @@ services:
     depends_on:
       - backend
     networks:
-      - app-network
       - traefik-net
+      - app-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ticketo-frontend.rule=Host(`k5sha.run.place`)"
       - "traefik.http.routers.ticketo-frontend.entrypoints=https"
-      - "traefik.http.services.ticketo-frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.ticketo-frontend.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.ticketo-frontend-http.rule=Host(`k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-frontend-http.entrypoints=http"
+      - "traefik.http.routers.ticketo-frontend-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.services.ticketo-frontend.loadbalancer.server.port=3000"
 
 volumes:
   db-data:
