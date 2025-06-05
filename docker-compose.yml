@@ -107,10 +107,13 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ticketo-api.rule=Host(`api.k5sha.run.place`)"
-      - "traefik.http.routers.ticketo-api.entrypoints=https"
-      - "traefik.http.services.ticketo-api.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.ticketo-api-https.rule=Host(`api.k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-api-https.entrypoints=https"
+      - "traefik.http.routers.ticketo-api-https.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.ticketo-api-http.rule=Host(`api.k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-api-http.entrypoints=http"
+      - "traefik.http.routers.ticketo-api-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   frontend:
     image: ghcr.io/k5sha/ticketo-frontend:latest
