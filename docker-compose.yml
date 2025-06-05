@@ -30,8 +30,8 @@ services:
       - MINIO_ROOT_PASSWORD
       - MINIO_USE_SSL=no
       - MINIO_DEFAULT_BUCKETS
-      - MINIO_SERVER_URL=https://k5sha.run.place/minio
-      - MINIO_SCHEME=https
+      - MINIO_SERVER_URL=http://minio:9000
+      - MINIO_SCHEME=http
     ports:
       - "9000:9000"
       - "127.0.0.1:9001:9001"
@@ -91,8 +91,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
-      - minio
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     networks:
       - app-network
       - traefik-net
