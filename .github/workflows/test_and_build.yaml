@@ -127,44 +127,44 @@ jobs:
       - name: Create .env file on VPS using SSH
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > /home/debian/Tikceto/.env
-            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> /home/debian/Tikceto/.env
-            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> /home/debian/Tikceto/.env
+            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > /home/k5sha/Tikceto/.env
+            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> /home/k5sha/Tikceto/.env
+            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> /home/k5sha/Tikceto/.env
   
-            echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> /home/debian/Tikceto/.env
-            echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> /home/debian/Tikceto/.env
-            echo "MINIO_USE_SSL=false" >> /home/debian/Tikceto/.env
-            echo "MINIO_DEFAULT_BUCKETS=${{ secrets.MINIO_DEFAULT_BUCKETS }}" >> /home/debian/Tikceto/.env
+            echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> /home/k5sha/Tikceto/.env
+            echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> /home/k5sha/Tikceto/.env
+            echo "MINIO_USE_SSL=false" >> /home/k5sha/Tikceto/.env
+            echo "MINIO_DEFAULT_BUCKETS=${{ secrets.MINIO_DEFAULT_BUCKETS }}" >> /home/k5sha/Tikceto/.env
   
-            echo "ENV=production" >> /home/debian/Tikceto/.env
-            echo "ADDR=0.0.0.0:8080" >> /home/debian/Tikceto/.env
-            echo "EXTERNAL_URL=${{ secrets.EXTERNAL_URL }}" >> /home/debian/Tikceto/.env
-            echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> /home/debian/Tikceto/.env
-            echo "DB_ADDR=${{ secrets.DB_ADDR }}" >> /home/debian/Tikceto/.env
+            echo "ENV=production" >> /home/k5sha/Tikceto/.env
+            echo "ADDR=0.0.0.0:8080" >> /home/k5sha/Tikceto/.env
+            echo "EXTERNAL_URL=${{ secrets.EXTERNAL_URL }}" >> /home/k5sha/Tikceto/.env
+            echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> /home/k5sha/Tikceto/.env
+            echo "DB_ADDR=${{ secrets.DB_ADDR }}" >> /home/k5sha/Tikceto/.env
   
-            echo "AUTH_BASIC_USERNAME=${{ secrets.AUTH_BASIC_USERNAME }}" >> /home/debian/Tikceto/.env
-            echo "AUTH_BASIC_PASSWORD=${{ secrets.AUTH_BASIC_PASSWORD }}" >> /home/debian/Tikceto/.env
-            echo "AUTH_TOKEN_SECRET=${{ secrets.AUTH_TOKEN_SECRET }}" >> /home/debian/Tikceto/.env
-            echo "AUTH_TOKEN_HOST=ticketo" >> /home/debian/Tikceto/.env
+            echo "AUTH_BASIC_USERNAME=${{ secrets.AUTH_BASIC_USERNAME }}" >> /home/k5sha/Tikceto/.env
+            echo "AUTH_BASIC_PASSWORD=${{ secrets.AUTH_BASIC_PASSWORD }}" >> /home/k5sha/Tikceto/.env
+            echo "AUTH_TOKEN_SECRET=${{ secrets.AUTH_TOKEN_SECRET }}" >> /home/k5sha/Tikceto/.env
+            echo "AUTH_TOKEN_HOST=ticketo" >> /home/k5sha/Tikceto/.env
   
-            echo "MAIL_TOKEN_EXPIRATION=1h" >> /home/debian/Tikceto/.env
-            echo "MAIL_FROM_EMAIL=${{ secrets.MAIL_FROM_EMAIL}}" >> /home/debian/Tikceto/.env
+            echo "MAIL_TOKEN_EXPIRATION=1h" >> /home/k5sha/Tikceto/.env
+            echo "MAIL_FROM_EMAIL=${{ secrets.MAIL_FROM_EMAIL}}" >> /home/k5sha/Tikceto/.env
             
-            echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> /home/debian/Tikceto/.env
-            echo "SMTP_USERNAME=${{ secrets.SMTP_USERNAME}}" >> /home/debian/Tikceto/.env
+            echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> /home/k5sha/Tikceto/.env
+            echo "SMTP_USERNAME=${{ secrets.SMTP_USERNAME}}" >> /home/k5sha/Tikceto/.env
   
-            echo "S3_BUCKET_NAME=${{ secrets.MINIO_DEFAULT_BUCKETS }}" >> /home/debian/Tikceto/.env
-            echo "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}" >> /home/debian/Tikceto/.env
-            echo "MINIO_ENDPOINT_PUBLIC=${{ secrets.MINIO_ENDPOINT_PUBLIC }}" >> /home/debian/Tikceto/.env
-            echo "MINIO_SSL=false" >> /home/debian/Tikceto/.env
+            echo "S3_BUCKET_NAME=${{ secrets.MINIO_DEFAULT_BUCKETS }}" >> /home/k5sha/Tikceto/.env
+            echo "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}" >> /home/k5sha/Tikceto/.env
+            echo "MINIO_ENDPOINT_PUBLIC=${{ secrets.MINIO_ENDPOINT_PUBLIC }}" >> /home/k5sha/Tikceto/.env
+            echo "MINIO_SSL=false" >> /home/k5sha/Tikceto/.env
   
-            echo "PAYMENT_PUBLIC_KEY=${{ secrets.PAYMENT_PUBLIC_KEY }}" >> /home/debian/Tikceto/.env
-            echo "PAYMENT_PRIVATE_KEY=${{ secrets.PAYMENT_PRIVATE_KEY }}" >> /home/debian/Tikceto/.env
-            echo "PAYMENT_FRONTEND_URL=${{ secrets.PAYMENT_FRONTEND_URL }}" >> /home/debian/Tikceto/.env
-            echo "PAYMENT_SERVER_URL=${{ secrets.PAYMENT_SERVER_URL }}" >> /home/debian/Tikceto/.env
+            echo "PAYMENT_PUBLIC_KEY=${{ secrets.PAYMENT_PUBLIC_KEY }}" >> /home/k5sha/Tikceto/.env
+            echo "PAYMENT_PRIVATE_KEY=${{ secrets.PAYMENT_PRIVATE_KEY }}" >> /home/k5sha/Tikceto/.env
+            echo "PAYMENT_FRONTEND_URL=${{ secrets.PAYMENT_FRONTEND_URL }}" >> /home/k5sha/Tikceto/.env
+            echo "PAYMENT_SERVER_URL=${{ secrets.PAYMENT_SERVER_URL }}" >> /home/k5sha/Tikceto/.env
   
-            echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> /home/debian/Tikceto/.env
-            echo "VITE_APP_NAME=Ticketo" >> /home/debian/Tikceto/.env
+            echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> /home/k5sha/Tikceto/.env
+            echo "VITE_APP_NAME=Ticketo" >> /home/k5sha/Tikceto/.env
 
           EOF
 
