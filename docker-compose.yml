@@ -49,11 +49,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.rule=Host(`minio.k5sha.run.place`)"
-      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.entrypoints=https"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
-      - "traefik.http.routers.minio.tls.certresolver=myresolver"
+      - "traefik.http.routers.minio.tls.certresolver=letsEncrypt"
       - "traefik.http.routers.minio-http.rule=Host(`minio.k5sha.run.place`)"
-      - "traefik.http.routers.minio-http.entrypoints=web"
+      - "traefik.http.routers.minio-http.entrypoints=http"
       - "traefik.http.routers.minio-http.middlewares=https-redirect"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
 
@@ -106,9 +106,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ticketo-api.rule=Host(`api.k5sha.run.place`)"
-      - "traefik.http.routers.ticketo-api.entrypoints=websecure"
+      - "traefik.http.routers.ticketo-api.entrypoints=https"
       - "traefik.http.services.ticketo-api.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ticketo-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
 
   frontend:
     image: ghcr.io/k5sha/ticketo-frontend:latest
@@ -125,9 +125,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ticketo-frontend.rule=Host(`k5sha.run.place`)"
-      - "traefik.http.routers.ticketo-frontend.entrypoints=websecure"
+      - "traefik.http.routers.ticketo-frontend.entrypoints=https"
       - "traefik.http.services.ticketo-frontend.loadbalancer.server.port=3000"
-      - "traefik.http.routers.ticketo-frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.ticketo-frontend.tls.certresolver=letsEncrypt"
 
 volumes:
   db-data:
