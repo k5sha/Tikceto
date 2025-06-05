@@ -37,7 +37,6 @@ services:
       - "127.0.0.1:9001:9001"
     volumes:
       - minio_data:/data
-    command: server /data --console-address ":9001"
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
