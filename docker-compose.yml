@@ -45,6 +45,17 @@ services:
       retries: 3
     networks:
       - app-network
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.minio.rule=Host(`minio.k5sha.run.place`)"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+      - "traefik.http.routers.minio.tls.certresolver=myresolver"
+      - "traefik.http.routers.minio-http.rule=Host(`minio.k5sha.run.place`)"
+      - "traefik.http.routers.minio-http.entrypoints=web"
+      - "traefik.http.routers.minio-http.middlewares=https-redirect"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
 
   backend:
     image: ghcr.io/k5sha/ticketo-backend:latest
@@ -84,12 +95,20 @@ services:
       - minio
     networks:
       - app-network
+      - traefik-net
     restart: on-failure
     healthcheck:
       test: ["CMD", "curl", "-sS", "http://localhost:8080/v1/health"]
       interval: 30s
-      retries: 3
       timeout: 5s
+      retries: 5
+      start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ticketo-api.rule=Host(`api.k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-api.entrypoints=websecure"
+      - "traefik.http.services.ticketo-api.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ticketo-api.tls.certresolver=myresolver"
 
   frontend:
     image: ghcr.io/k5sha/ticketo-frontend:latest
@@ -102,53 +121,21 @@ services:
       - backend
     networks:
       - app-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    depends_on:
-      - frontend
-      - backend
-      - minio
-    restart: on-failure
-    networks:
-      - app-network
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    depends_on:
-      - nginx
-    entrypoint: >
-      sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot \
-            --register-unsafely-without-email --agree-tos --no-eff-email \
-            -d k5sha.run.place"
-  telegram-notifier:
-    image: lorcas/docker-telegram-notifier:latest
-    volumes:
-        - /var/run/docker.sock:/var/run/docker.sock:ro 
-    env_file: .env
-    environment:
-      - TELEGRAM_NOTIFIER_BOT_TOKEN
-      - TELEGRAM_NOTIFIER_CHAT_ID
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ticketo-frontend.rule=Host(`k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-frontend.entrypoints=websecure"
+      - "traefik.http.services.ticketo-frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.ticketo-frontend.tls.certresolver=myresolver"
 
 volumes:
   db-data:
   minio_data:
-  certbot-etc:
-  certbot-var:
 
 networks:
+  traefik-net:
+    external: true
+    name: traefik_default
   app-network:
     driver: bridge
-

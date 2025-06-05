@@ -166,8 +166,6 @@ jobs:
             echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> /home/debian/Tikceto/.env
             echo "VITE_APP_NAME=Ticketo" >> /home/debian/Tikceto/.env
 
-            echo "TELEGRAM_NOTIFIER_BOT_TOKEN=${{ secrets.TELEGRAM_NOTIFIER_BOT_TOKEN }}" >> /home/debian/Tikceto/.env
-            echo "TELEGRAM_NOTIFIER_CHAT_ID=${{ secrets.TELEGRAM_NOTIFIER_CHAT_ID }}" >> /home/debian/Tikceto/.env
           EOF
 
       - name: Deploy to VPS
