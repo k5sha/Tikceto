@@ -100,11 +100,6 @@ services:
       - traefik-net
       - app-network
     restart: on-failure
-    healthcheck:
-      test: ["CMD", "/app/api", "health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ticketo-api.rule=Host(`api.k5sha.run.place`)"
