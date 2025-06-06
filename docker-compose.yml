@@ -21,6 +21,17 @@ services:
       retries: 5
       timeout: 5s
 
+  migrate:
+    image: ghcr.io/k5sha/ticketo-backend:latest
+    container_name: ticketo-migrate
+    env_file: .env
+    command: make migrate-up
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+      
   minio:
     image: bitnami/minio:latest
     container_name: minio

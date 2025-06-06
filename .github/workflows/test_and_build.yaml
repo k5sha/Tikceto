@@ -182,5 +182,19 @@ jobs:
             echo "🚀 Starting services..."
             docker compose up -d
           
+                        echo "🚀 Starting database..."
+            docker compose up -d db
+            
+            echo "🔄 Waiting for database to be ready..."
+            while ! docker compose exec db pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}; do
+              sleep 2
+            done
+            
+            echo "🔃 Running migrations..."
+            docker compose run --rm migrate
+            
+            echo "🚀 Starting all services..."
+            docker compose up -d --remove-orphans
+            
             echo "✅ Deployment done!"
           EOF
