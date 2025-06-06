@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -92,8 +94,16 @@ func main() {
 
 	// Migration
 
+	dir, err := os.Getwd()
+	if err != nil {
+		logger.Fatalf("failed to get current working directory: %v", err)
+	}
+
+	migrationsPath := filepath.Join(dir, "cmd", "migrate", "migrations")
+	sourceURL := "file://" + migrationsPath
+
 	m, err := migrate.New(
-		"file://cmd/migrate/migrations",
+		sourceURL,
 		cfg.db.addr,
 	)
 	if err != nil {
