@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json .
+COPY package.json package-lock.json* ./
 
 RUN npm install
 
@@ -14,4 +14,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-CMD [ "serve", "-s", "dist" ]
+CMD ["serve", "-s", "dist", "--single"]

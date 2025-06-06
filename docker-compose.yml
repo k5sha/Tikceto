@@ -44,7 +44,7 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      - traefik-net
+      - traefik_default
       - app-network
     labels:
       - "traefik.enable=true"
@@ -97,7 +97,7 @@ services:
       minio:
         condition: service_healthy
     networks:
-      - traefik-net
+      - traefik_default
       - app-network
     volumes:
       - ./cmd/migrate/migrations:/app/cmd/migrate/migrations
@@ -126,7 +126,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - traefik-net
+      - traefik_default
       - app-network
     labels:
       - "traefik.enable=true"
@@ -163,9 +163,8 @@ volumes:
   ts-data:
 
 networks:
-  traefik-net:
+  traefik_default:
     external: true
-    name: traefik_default
   app-network:
     driver: bridge
     ipam:
