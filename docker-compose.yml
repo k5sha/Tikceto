@@ -10,7 +10,6 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./scripts:/docker-entrypoint-initdb.d
-      - ./config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     networks:
       - app-network
     healthcheck:
