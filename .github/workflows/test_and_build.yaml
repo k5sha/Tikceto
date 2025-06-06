@@ -179,10 +179,7 @@ jobs:
             git pull origin master
             docker compose pull
           
-            echo "🚀 Starting services..."
-            docker compose up -d
-          
-                        echo "🚀 Starting database..."
+            echo "🚀 Starting database..."
             docker compose up -d db
             
             echo "🔄 Waiting for database to be ready..."
@@ -195,6 +192,4 @@ jobs:
             
             echo "🚀 Starting all services..."
             docker compose up -d --remove-orphans
-            
-            echo "✅ Deployment done!"
           EOF

@@ -25,13 +25,15 @@ services:
     image: ghcr.io/k5sha/ticketo-backend:latest
     container_name: ticketo-migrate
     env_file: .env
-    command: make migrate-up
+    command: migrate -path=/app/cmd/migrate/migrations -database=${DB_ADDR} up
     depends_on:
       db:
         condition: service_healthy
     networks:
       - app-network
-      
+    volumes:
+      - ./cmd/migrate/migrations:/app/cmd/migrate/migrations
+
   minio:
     image: bitnami/minio:latest
     container_name: minio
