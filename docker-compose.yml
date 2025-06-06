@@ -89,8 +89,6 @@ services:
       - PAYMENT_PRIVATE_KEY
       - PAYMENT_FRONTEND_URL
       - PAYMENT_SERVER_URL
-    ports:
-      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -108,11 +106,6 @@ services:
       - "traefik.http.routers.ticketo-api.entrypoints=https"
       - "traefik.http.routers.ticketo-api.tls=true"
       - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
-      - "traefik.http.services.ticketo-api.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ticketo-api-http.rule=Host(`api.tikceto.k5sha.xyz`)"
-      - "traefik.http.routers.ticketo-api-http.entrypoints=http"
-      - "traefik.http.routers.ticketo-api-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   frontend:
     image: ghcr.io/k5sha/ticketo-frontend:latest
@@ -123,8 +116,6 @@ services:
       - VITE_APP_NAME
     depends_on:
       - backend
-    ports:
-      - "3000:3000"
     networks:
       - traefik_default
       - app-network
