@@ -50,14 +50,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.rule=Host(`minio.tikceto.k5sha.xyz`)"
       - "traefik.http.routers.minio.entrypoints=https"
-      - "traefik.http.services.minio.loadbalancer.server.port=9000"
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.routers.minio.tls.certresolver=letsEncrypt"
-      - "traefik.http.routers.minio-http.rule=Host(`minio.tikceto.k5sha.xyz`)"
-      - "traefik.http.routers.minio-http.entrypoints=http"
-      - "traefik.http.routers.minio-http.middlewares=https-redirect"
-      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
-
+      - "traefik.http.services.minio.loadbalancer.server.url=http://minio:9000"
   backend:
     image: ghcr.io/k5sha/ticketo-backend:latest
     container_name: ticketo-api
@@ -106,7 +101,7 @@ services:
       - "traefik.http.routers.ticketo-api.entrypoints=https"
       - "traefik.http.routers.ticketo-api.tls=true"
       - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
-
+      - "traefik.http.services.ticketo-api.loadbalancer.server.url=http://ticketo-api:8080"
   frontend:
     image: ghcr.io/k5sha/ticketo-frontend:latest
     container_name: ticketo-frontend
@@ -125,6 +120,7 @@ services:
       - "traefik.http.routers.ticketo-front.entrypoints=https"
       - "traefik.http.routers.ticketo-front.tls=true"
       - "traefik.http.routers.ticketo-front.tls.certresolver=letsEncrypt"
+      - "traefik.http.services.ticketo-front.loadbalancer.server.url=http://ticketo-frontend:80"
   tailscale:
     image: tailscale/tailscale:latest
     container_name: ts-ticketo
