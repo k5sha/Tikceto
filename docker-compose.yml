@@ -12,14 +12,16 @@ services:
       - ./scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+    network_mode: service:ts-ticketo
     networks:
       - app-network
-      - tailscale-net
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 10s
       retries: 5
       timeout: 5s
+    depends_on:
+     - ts-ticketo
 
   minio:
     image: bitnami/minio:latest
@@ -46,7 +48,6 @@ services:
       retries: 3
     networks:
       - traefik-net
-      - tailscale-net
       - app-network
     labels:
       - "traefik.enable=true"
@@ -138,16 +139,31 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.services.ticketo-frontend.loadbalancer.server.port=3000"
 
+  ts-ticketo:
+      image: tailscale/tailscale:latest
+      hostname: ts-ticketo
+      env_file: .env
+      environment:
+        - TS_AUTHKEY
+        - TS_EXTRA_ARGS=--advertise-tags=tag:container
+        - TS_STATE_DIR=/var/lib/tailscale
+        - TS_USERSPACE=false
+      volumes:
+        - ${PWD}/ts-ticketo/state:/var/lib/tailscale
+      devices:
+        - /dev/net/tun:/dev/net/tun
+      cap_add:
+        - net_admin
+      restart: unless-stopped
+
 volumes:
   db-data:
   minio_data:
+  ts-ticketo:
 
 networks:
   traefik-net:
     external: true
     name: traefik_default
-  tailscale-net:
-    external: true
-    name: tailscale-net
   app-network:
     driver: bridge
