@@ -9,7 +9,10 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
       - ./scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
     networks:
       - app-network
     healthcheck:
@@ -136,28 +139,25 @@ services:
 
   tailscale:
     image: tailscale/tailscale:latest
-    hostname: ts-ticketo
     container_name: ts-ticketo
+    hostname: ts-ticketo
     env_file: .env
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
-      - TS_HOSTNAME=ts-ticketo
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_EXTRA_ARGS=--advertise-exit-node
-      - TS_USERSPACE=false
+      - TS_EXTRA_ARGS=--advertise-exit-node --advertise-routes=172.20.0.0/24
     volumes:
-      - ./ts-ticketo/state:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
+      - ./ts-data:/var/lib/tailscale
+    network_mode: "host"
     cap_add:
-      - net_admin
       - NET_ADMIN
-    network_mode: host
+      - NET_RAW
     restart: unless-stopped
+
 volumes:
   db-data:
   minio_data:
-  ts-ticketo:
+  ts-data:
 
 networks:
   traefik-net:
@@ -165,3 +165,6 @@ networks:
     name: traefik_default
   app-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
