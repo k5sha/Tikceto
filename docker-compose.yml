@@ -12,7 +12,6 @@ services:
       - ./scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
-    network_mode: service:ts-ticketo
     networks:
       - app-network
     healthcheck:
@@ -154,6 +153,8 @@ services:
         - /dev/net/tun:/dev/net/tun
       cap_add:
         - net_admin
+      networks:
+        - app-network  
       restart: unless-stopped
 
 volumes:
