@@ -48,12 +48,12 @@ services:
       - app-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minio.rule=Host(`minio.k5sha.run.place`)"
+      - "traefik.http.routers.minio.rule=Host(`minio.tikceto.k5sha.xyz`)"
       - "traefik.http.routers.minio.entrypoints=https"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.routers.minio.tls.certresolver=letsEncrypt"
-      - "traefik.http.routers.minio-http.rule=Host(`minio.k5sha.run.place`)"
+      - "traefik.http.routers.minio-http.rule=Host(`minio.tikceto.k5sha.xyz`)"
       - "traefik.http.routers.minio-http.entrypoints=http"
       - "traefik.http.routers.minio-http.middlewares=https-redirect"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
@@ -104,12 +104,12 @@ services:
     restart: on-failure
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ticketo-api.rule=Host(`api.k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-api.rule=Host(`api.tikceto.k5sha.xyz`)"
       - "traefik.http.routers.ticketo-api.entrypoints=https"
       - "traefik.http.routers.ticketo-api.tls=true"
       - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
       - "traefik.http.services.ticketo-api.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ticketo-api-http.rule=Host(`api.k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-api-http.rule=Host(`api.tikceto.k5sha.xyz`)"
       - "traefik.http.routers.ticketo-api-http.entrypoints=http"
       - "traefik.http.routers.ticketo-api-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -128,11 +128,11 @@ services:
       - app-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ticketo-frontend.rule=Host(`k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-frontend.rule=Host(`tikceto.k5sha.xyz`)"
       - "traefik.http.routers.ticketo-frontend.entrypoints=https"
       - "traefik.http.routers.ticketo-frontend.tls=true"
       - "traefik.http.routers.ticketo-frontend.tls.certresolver=letsEncrypt"
-      - "traefik.http.routers.ticketo-frontend-http.rule=Host(`k5sha.run.place`)"
+      - "traefik.http.routers.ticketo-frontend-http.rule=Host(`tikceto.k5sha.xyz`)"
       - "traefik.http.routers.ticketo-frontend-http.entrypoints=http"
       - "traefik.http.routers.ticketo-frontend-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
