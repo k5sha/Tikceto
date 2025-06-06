@@ -1,4 +1,4 @@
-services:  
+services:
   db:
     image: postgres:16.3
     container_name: postgres-db
@@ -130,16 +130,10 @@ services:
       - app-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ticketo-frontend.rule=Host(`tikceto.k5sha.xyz`)"
-      - "traefik.http.routers.ticketo-frontend.entrypoints=https"
-      - "traefik.http.routers.ticketo-frontend.tls=true"
-      - "traefik.http.routers.ticketo-frontend.tls.certresolver=letsEncrypt"
-      - "traefik.http.routers.ticketo-frontend-http.rule=Host(`tikceto.k5sha.xyz`)"
-      - "traefik.http.routers.ticketo-frontend-http.entrypoints=http"
-      - "traefik.http.routers.ticketo-frontend-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.services.ticketo-frontend.loadbalancer.server.port=3000"
-
+      - "traefik.http.routers.ticketo-front.rule=Host(`tikceto.k5sha.xyz`)"
+      - "traefik.http.routers.ticketo-front.entrypoints=https"
+      - "traefik.http.routers.ticketo-front.tls=true"
+      - "traefik.http.routers.ticketo-front.tls.certresolver=letsEncrypt"
   tailscale:
     image: tailscale/tailscale:latest
     container_name: ts-ticketo
