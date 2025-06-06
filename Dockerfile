@@ -3,15 +3,6 @@ FROM golang:1.23.3 as builder
 WORKDIR /app
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o api cmd/api/*.go
-
-# Migration image
-FROM alpine:latest as migrator
-WORKDIR /app
-RUN apk add --no-cache postgresql-client
-COPY --from=builder /app/migrate ./migrate
-COPY cmd/migrate/migrations ./migrations
-ENTRYPOINT ["./migrate"]
-
 # The run stage
 FROM scratch
 WORKDIR /app

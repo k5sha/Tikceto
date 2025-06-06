@@ -3,6 +3,9 @@ package main
 import (
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/k5sha/Tikceto/internal/auth"
 	"github.com/k5sha/Tikceto/internal/db"
 	"github.com/k5sha/Tikceto/internal/env"
@@ -86,6 +89,20 @@ func main() {
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()
+
+	// Migration
+
+	m, err := migrate.New(
+		"file://cmd/migrate/migrations",
+		cfg.db.addr,
+	)
+	if err != nil {
+		logger.Fatalf("failed to create migrate instance: %v", err)
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		logger.Fatalf("failed to run up migrations: %v", err)
+	}
 
 	// Database
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
