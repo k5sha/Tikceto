@@ -11,9 +11,10 @@ services:
       - db-data:/var/lib/postgresql/data
       - ./scripts:/docker-entrypoint-initdb.d
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     networks:
       - app-network
+      - tailscale-net
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 10s
@@ -34,7 +35,7 @@ services:
       - MINIO_SCHEME=http
     ports:
       - "9000:9000"
-      - "127.0.0.1:9001:9001"
+      - "9001:9001"
     volumes:
       - minio_data:/data
     restart: on-failure
@@ -45,6 +46,7 @@ services:
       retries: 3
     networks:
       - traefik-net
+      - tailscale-net
       - app-network
     labels:
       - "traefik.enable=true"
@@ -144,5 +146,8 @@ networks:
   traefik-net:
     external: true
     name: traefik_default
+  tailscale-net:
+    external: true
+    name: tailscale-net
   app-network:
     driver: bridge
