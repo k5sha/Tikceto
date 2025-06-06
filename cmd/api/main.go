@@ -1,11 +1,11 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
+	// "os"
+	// "path/filepath"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
+	// "github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/k5sha/Tikceto/internal/auth"
@@ -94,25 +94,25 @@ func main() {
 
 	// Migration
 
-	dir, err := os.Getwd()
-	if err != nil {
-		logger.Fatalf("failed to get current working directory: %v", err)
-	}
+	// dir, err := os.Getwd()
+	// if err != nil {
+	// 	logger.Fatalf("failed to get current working directory: %v", err)
+	// }
 
-	migrationsPath := filepath.Join(dir, "cmd", "migrate", "migrations")
-	sourceURL := "file:/" + migrationsPath
+	// migrationsPath := filepath.Join(dir, "cmd", "migrate", "migrations")
+	// sourceURL := "file://" + migrationsPath
 
-	m, err := migrate.New(
-		sourceURL,
-		cfg.db.addr,
-	)
-	if err != nil {
-		logger.Fatalf("failed to create migrate instance: %v", err)
-	}
+	// m, err := migrate.New(
+	// 	sourceURL,
+	// 	cfg.db.addr,
+	// )
+	// if err != nil {
+	// 	logger.Fatalf("failed to create migrate instance: %v", err)
+	// }
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		logger.Fatalf("failed to run up migrations: %v", err)
-	}
+	// if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+	// 	logger.Fatalf("failed to run up migrations: %v", err)
+	// }
 
 	// Database
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
