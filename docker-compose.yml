@@ -100,7 +100,7 @@ services:
       - traefik-net
       - app-network
     volumes:
-      - ./cmd/migrate/migrations:/migrations
+      - ./cmd/migrate/migrations:/app/cmd/migrate/migrations
     restart: on-failure
     labels:
       - "traefik.enable=true"

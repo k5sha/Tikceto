@@ -100,7 +100,7 @@ func main() {
 	}
 
 	migrationsPath := filepath.Join(dir, "cmd", "migrate", "migrations")
-	sourceURL := "file://" + migrationsPath
+	sourceURL := "file:/" + migrationsPath
 
 	m, err := migrate.New(
 		sourceURL,
