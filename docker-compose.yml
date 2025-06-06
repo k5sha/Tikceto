@@ -123,6 +123,8 @@ services:
       - VITE_APP_NAME
     depends_on:
       - backend
+    ports:
+      - "3000:3000"
     networks:
       - traefik-net
       - app-network
