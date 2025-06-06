@@ -1,4 +1,4 @@
-services:
+services:  
   db:
     image: postgres:16.3
     container_name: postgres-db
@@ -10,6 +10,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./scripts:/docker-entrypoint-initdb.d
+      - ./config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     networks:
       - app-network
     healthcheck:
@@ -143,7 +144,7 @@ services:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_HOSTNAME=ts-ticketo
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_EXTRA_ARGS=--advertise-routes=172.20.0.0/16
+      - TS_EXTRA_ARGS=--advertise-exit-node
       - TS_USERSPACE=false
     volumes:
       - ./ts-ticketo/state:/var/lib/tailscale
@@ -152,7 +153,7 @@ services:
     cap_add:
       - net_admin
       - NET_ADMIN
-    network_mode: "service:db"
+    network_mode: host
     restart: unless-stopped
 volumes:
   db-data:
@@ -165,6 +166,3 @@ networks:
     name: traefik_default
   app-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
