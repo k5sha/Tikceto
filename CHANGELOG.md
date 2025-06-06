@@ -1,5 +1,57 @@
 # Changelog
 
+## [1.11.0](https://github.com/k5sha/Tikceto/compare/v1.10.0...v1.11.0) (2025-06-06)
+
+
+### Features
+
+* add auto migrate ([0c02c41](https://github.com/k5sha/Tikceto/commit/0c02c410db489dfc69b82f67a2c169d91fb2ce1c))
+* add go migrations ([9bb5165](https://github.com/k5sha/Tikceto/commit/9bb51652fd356155be3425553561ce23e606d604))
+* add tailscale ([053fc4b](https://github.com/k5sha/Tikceto/commit/053fc4bc48915abea3c08ce7ecba6a81556c64b8))
+* add tailscale ([ab3213f](https://github.com/k5sha/Tikceto/commit/ab3213f595be1ec8c8ef1e2b0472c3d21334636e))
+* change vps ([aacf62d](https://github.com/k5sha/Tikceto/commit/aacf62dda55031a1bb5e9218e30715c935856f1d))
+* new domain ([e0eb434](https://github.com/k5sha/Tikceto/commit/e0eb434ea8c2aca007a16a5f9157009809eecdec))
+* update docker compose ([c688aa5](https://github.com/k5sha/Tikceto/commit/c688aa5f2890e8dcc2433f7ee4d5f3d072e0fb50))
+* Update docker-compose.yml ([7604bb9](https://github.com/k5sha/Tikceto/commit/7604bb988a29fabe152dbbaba97b6383fcf4b682))
+* update Movie page ([9828f77](https://github.com/k5sha/Tikceto/commit/9828f77c0b678291ec2e82341909ffa5168d0bad))
+* update Ticket edit modal ([115cfe7](https://github.com/k5sha/Tikceto/commit/115cfe713e9283686f85ff4ee83c9b7e4bac7e26))
+* use Traefik ([2e02864](https://github.com/k5sha/Tikceto/commit/2e02864b3b7244ba6b59eb836616bc2de821ed63))
+
+
+### Bug Fixes
+
+* add go migrations ([ae21847](https://github.com/k5sha/Tikceto/commit/ae218479692700c0ad5a1c10ba68cb9d5672a986))
+* add go migrations ([8fe38bf](https://github.com/k5sha/Tikceto/commit/8fe38bfaec918df6259117151b586dbf58f48753))
+* add go migrations ([67c7dbd](https://github.com/k5sha/Tikceto/commit/67c7dbd7b409d0a4dc5f3340c1e5485fc12350ee))
+* add go migrations ([989eb54](https://github.com/k5sha/Tikceto/commit/989eb54de30ee4d7f8d03c92f1a03fffe090d9ef))
+* add go migrations ([32db128](https://github.com/k5sha/Tikceto/commit/32db1280034ef50cff07909c670586a9b7eb6f7f))
+* add go migrations ([a412278](https://github.com/k5sha/Tikceto/commit/a412278a987c8344759d8491fd07f5e63a45e58b))
+* add minio gui ([ac1c550](https://github.com/k5sha/Tikceto/commit/ac1c5503eb10656fe4e7a17e8d5a84c5b313f0e7))
+* add pg_hba.conf ([53ab1f0](https://github.com/k5sha/Tikceto/commit/53ab1f0531d34c2f071af0c08b8d525c07a2ed11))
+* add tls on ([6e0e128](https://github.com/k5sha/Tikceto/commit/6e0e128c2484434bcfb859e77a2c0a2888d181a6))
+* auto migrate ([1930cf0](https://github.com/k5sha/Tikceto/commit/1930cf060f486fbcb51234cbd593b324a99433fc))
+* auto migrate ([3574b82](https://github.com/k5sha/Tikceto/commit/3574b8235c2cbd869b70543b8f57f749c522dc67))
+* delete health check ([f145844](https://github.com/k5sha/Tikceto/commit/f145844e5bdd1afcf11dcf3f8b88e253f84076d8))
+* docker compose ([73f4fd5](https://github.com/k5sha/Tikceto/commit/73f4fd50eb2c2be9b8cdcb85718cdfd629fcdfc0))
+* docker-compose.yml ([9cb1055](https://github.com/k5sha/Tikceto/commit/9cb1055e95cb6866ce70078786fce1d04a811966))
+* docker-compose.yml ([085979d](https://github.com/k5sha/Tikceto/commit/085979d79d2323ab8dc3199b5f8b77f1ace76668))
+* docker-compose.yml ([a1a4980](https://github.com/k5sha/Tikceto/commit/a1a4980397c660e392765cf914f4a38b6a910df4))
+* docker-compose.yml ([f91f518](https://github.com/k5sha/Tikceto/commit/f91f51823effa84dc828fdd0836bc1a990c2edc2))
+* docker-compose.yml ([b660a0c](https://github.com/k5sha/Tikceto/commit/b660a0cbe07b05a73876750bb9803f2df6a2b2e5))
+* docker-compose.yml ([3c4cd42](https://github.com/k5sha/Tikceto/commit/3c4cd42dc8db91fe8ff3ba6c57cdae975929256d))
+* docker-compose.yml ([9822808](https://github.com/k5sha/Tikceto/commit/9822808dd9c3dc5e0de85970a4570b99b7da8704))
+* docker-compose.yml ([cdc5451](https://github.com/k5sha/Tikceto/commit/cdc5451295192de1c0629e8f48ff610d4466a0ea))
+* frontend Dockerfile ([686beb9](https://github.com/k5sha/Tikceto/commit/686beb97cba7c409bd66314b159561ffc5fb902c))
+* frontend Dockerfile ([b08bb76](https://github.com/k5sha/Tikceto/commit/b08bb764cc8a9d162998226303d58f9a4d782af8))
+* health check ([3afd103](https://github.com/k5sha/Tikceto/commit/3afd1033c24aa33c439f3c02b9bb0d497a52b8bf))
+* invalid path in workflow ([bf4194d](https://github.com/k5sha/Tikceto/commit/bf4194dfce6964144b39c0528951e85b1a7b2cfe))
+* minio client ([dd4bf7c](https://github.com/k5sha/Tikceto/commit/dd4bf7ccebe27c8c2be4efb3277ce4ff6133bd59))
+* minio gui ([77a1d24](https://github.com/k5sha/Tikceto/commit/77a1d244aafa0e5267561cfabee390b16d0ea5ad))
+* unworked frontend(add ports) ([cf99764](https://github.com/k5sha/Tikceto/commit/cf99764676e66820d5ef9c6f95f6983ce99beede))
+* unworked labels ([5cb6e60](https://github.com/k5sha/Tikceto/commit/5cb6e609c93a77164af81cec4683d20123d2943e))
+* unworker labels ([3209ab8](https://github.com/k5sha/Tikceto/commit/3209ab849ce816d35e95eb0087059880be055c37))
+* Update docker-compose.yml ([f0358c6](https://github.com/k5sha/Tikceto/commit/f0358c65e0f2152d3e64db1e2aad77e108f5d978))
+
 ## [1.10.0](https://github.com/k5sha/Tikceto/compare/v1.9.0...v1.10.0) (2025-05-31)
 
 
