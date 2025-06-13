@@ -26,3 +26,5 @@ bin/
 *.swo
 .vscode/
 certbot/
+ts-ticketo/
+ts-data/
