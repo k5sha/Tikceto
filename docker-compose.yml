@@ -121,22 +121,6 @@ services:
       - "traefik.http.routers.ticketo-front.tls=true"
       - "traefik.http.routers.ticketo-front.tls.certresolver=letsEncrypt"
       - "traefik.http.services.ticketo-front.loadbalancer.server.url=http://ticketo-frontend:80"
-  tailscale:
-    image: tailscale/tailscale:latest
-    container_name: ts-ticketo
-    hostname: ts-ticketo
-    env_file: .env
-    environment:
-      - TS_AUTHKEY=${TS_AUTHKEY}
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_EXTRA_ARGS=--advertise-exit-node --advertise-routes=172.20.0.0/24
-    volumes:
-      - ./ts-data:/var/lib/tailscale
-    network_mode: "host"
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    restart: unless-stopped
 
 volumes:
   db-data:
