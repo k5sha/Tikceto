@@ -165,8 +165,6 @@ jobs:
   
             echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> /home/k5sha/Tikceto/.env
             echo "VITE_APP_NAME=Ticketo" >> /home/k5sha/Tikceto/.env
-
-            echo "TS_AUTHKEY=${{ secrets.TS_AUTHKEY }}" >> /home/k5sha/Tikceto/.env
           EOF
 
       - name: Deploy to VPS
