@@ -111,7 +111,7 @@ func main() {
 	logger.Infof("Current working dir: %s", dir)
 
 	m, err := migrate.New(sourceURL, cfg.db.addr)
-	if err != nil {
+	if err != nil && migrate.ErrNoChange != err {
 		logger.Errorf("Failed to create migrate instance: %v", err)
 	}
 
