@@ -2,7 +2,6 @@ services:
   db:
     image: postgres:16.3
     container_name: postgres-db
-    env_file: .env
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -22,7 +21,6 @@ services:
   minio:
     image: bitnami/minio:2024
     container_name: minio
-    env_file: .env
     environment:
       - MINIO_ROOT_USER
       - MINIO_ROOT_PASSWORD
@@ -56,7 +54,6 @@ services:
   backend:
     image: ghcr.io/k5sha/ticketo-backend:latest
     container_name: ticketo-api
-    env_file: .env
     environment:
       - ENV
       - ADDR
@@ -102,25 +99,6 @@ services:
       - "traefik.http.routers.ticketo-api.tls=true"
       - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
       - "traefik.http.services.ticketo-api.loadbalancer.server.url=http://ticketo-api:8080"
-  frontend:
-    image: ghcr.io/k5sha/ticketo-frontend:latest
-    container_name: ticketo-frontend
-    env_file: .env
-    environment:
-      - VITE_API_URL
-      - VITE_APP_NAME
-    depends_on:
-      - backend
-    networks:
-      - traefik_default
-      - app-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ticketo-front.rule=Host(`tikceto.k5sha.xyz`)"
-      - "traefik.http.routers.ticketo-front.entrypoints=https"
-      - "traefik.http.routers.ticketo-front.tls=true"
-      - "traefik.http.routers.ticketo-front.tls.certresolver=letsEncrypt"
-      - "traefik.http.services.ticketo-front.loadbalancer.server.url=http://ticketo-frontend:80"
 
 volumes:
   db-data:
