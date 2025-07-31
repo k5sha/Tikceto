@@ -93,7 +93,7 @@ func main() {
 
 	// Migration
 
-	migrationsPath := "/app/cmd/migrate/migrations"
+	migrationsPath := "./cmd/migrate/migrations"
 	sourceURL := "file://" + migrationsPath
 
 	logger.Info("Starting DB migrations")
@@ -112,7 +112,7 @@ func main() {
 
 	err = m.Up()
 	if err != nil {
-		logger.Errorf("Migration failed: %v", err)
+		logger.Fatalf("Migration failed: %v", err)
 	}
 
 	if err == migrate.ErrNoChange {
