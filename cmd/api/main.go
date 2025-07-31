@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -95,16 +96,29 @@ func main() {
 	migrationsPath := "/app/cmd/migrate/migrations"
 	sourceURL := "file://" + migrationsPath
 
-	m, err := migrate.New(
-		sourceURL,
-		cfg.db.addr,
-	)
+	logger.Debug("Starting DB migrations")
+	logger.Debug("Using migrations path: %s", migrationsPath)
+
+	dir, err := os.Getwd()
 	if err != nil {
-		logger.Fatalf("failed to create migrate instance: %v", err)
+		logger.Fatalf("failed to get current working directory: %v", err)
+	}
+	logger.Infof("Current working dir: %s", dir)
+
+	m, err := migrate.New(sourceURL, cfg.db.addr)
+	if err != nil {
+		logger.Errorf("Failed to create migrate instance: %v", err)
 	}
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		logger.Fatalf("failed to run up migrations: %v", err)
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		logger.Errorf("Migration failed: %v", err)
+	}
+
+	if err == migrate.ErrNoChange {
+		logger.Error("No new migrations to run")
+	} else {
+		logger.Info("Migrations applied successfully")
 	}
 
 	// Database
