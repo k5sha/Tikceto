@@ -14,7 +14,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
       interval: 10s
       retries: 5
       timeout: 5s
@@ -96,15 +96,15 @@ services:
       - "traefik.http.routers.ticketo-api.entrypoints=https"
       - "traefik.http.routers.ticketo-api.tls=true"
       - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
-
+      - "traefik.http.services.ticketo-api.loadbalancer.server.url=http://ticketo-api:8080"
 volumes:
   db-data:
   minio_data:
   ts-data:
+
 
 networks:
   traefik_default:
     external: true
   app-network:
     driver: bridge
-  
