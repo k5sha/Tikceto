@@ -79,6 +79,10 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           DB_ADDR: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ secrets.POSTGRES_DB }}?sslmode=disable
+          PAYMENT_PUBLIC_KEY: ${{secrets.PAYMENT_PUBLIC_KEY}}
+          PAYMENT_PRIVATE_KEY: ${{secrets.PAYMENT_PRIVATE_KEY}}
+          PAYMENT_FRONTEND_URL: ${{secrets.PAYMENT_FRONTEND_URL}}
+          PAYMENT_SERVER_URL: ${{secrets.PAYMENT_SERVER_URL}}
         run: |
           docker --context remote compose -f docker-compose.yml pull
           docker --context remote compose -f docker-compose.yml up -d

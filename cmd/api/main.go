@@ -96,8 +96,8 @@ func main() {
 	migrationsPath := "/app/cmd/migrate/migrations"
 	sourceURL := "file://" + migrationsPath
 
-	logger.Debug("Starting DB migrations")
-	logger.Debug("Using migrations path: %s", migrationsPath)
+	logger.Info("Starting DB migrations")
+	logger.Infof("Using migrations path: %s", migrationsPath)
 
 	dir, err := os.Getwd()
 	if err != nil {
@@ -111,7 +111,7 @@ func main() {
 	}
 
 	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
+	if err != nil {
 		logger.Errorf("Migration failed: %v", err)
 	}
 
