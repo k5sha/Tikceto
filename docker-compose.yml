@@ -89,8 +89,6 @@ services:
     networks:
       - traefik_default
       - app-network
-    volumes:
-      - ./cmd/migrate/migrations:/app/cmd/migrate/migrations
     restart: on-failure
     labels:
       - "traefik.enable=true"

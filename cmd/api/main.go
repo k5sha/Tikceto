@@ -93,7 +93,12 @@ func main() {
 
 	// Migration
 
-	migrationsPath := "./cmd/migrate/migrations"
+	migrationsPath := "/app/cmd/migrate/migrations"
+
+	if _, err := os.Stat(migrationsPath); os.IsNotExist(err) {
+		logger.Fatalf("Migrations path does not exist: %s", migrationsPath)
+	}
+
 	sourceURL := "file://" + migrationsPath
 
 	logger.Info("Starting DB migrations")
