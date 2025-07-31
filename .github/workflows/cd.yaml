@@ -67,10 +67,8 @@ jobs:
           AUTH_TOKEN_HOST: ${{ secrets.AUTH_TOKEN_HOST }}
           MAIL_TOKEN_EXPIRATION: ${{ secrets.MAIL_TOKEN_EXPIRATION }}
           MAIL_FROM_EMAIL: ${{ secrets.MAIL_FROM_EMAIL }}
-          BREVO_USERNAME: ${{ secrets.BREVO_USERNAME }}
-          BREVO_PASSWORD: ${{ secrets.BREVO_PASSWORD }}
-          BREVO_HOST: ${{ secrets.BREVO_HOST }}
-          BREVO_PORT: ${{ secrets.BREVO_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.BREVO_PASSWORD }}
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
           MINIO_ENDPOINT_PUBLIC: ${{ secrets.MINIO_ENDPOINT_PUBLIC }}
