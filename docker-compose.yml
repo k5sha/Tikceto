@@ -22,10 +22,10 @@ services:
     image: bitnami/minio:2024
     container_name: minio
     environment:
-      - MINIO_ROOT_USER
-      - MINIO_ROOT_PASSWORD
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_USE_SSL=no
-      - MINIO_DEFAULT_BUCKETS
+      - MINIO_DEFAULT_BUCKETS=${S3_BUCKET_NAME}
       - MINIO_SERVER_URL=http://minio:9000
       - MINIO_SCHEME=http
       - MINIO_SKIP_CLIENT=yes
@@ -52,35 +52,31 @@ services:
       - "traefik.http.routers.minio.tls.certresolver=letsEncrypt"
       - "traefik.http.services.minio.loadbalancer.server.url=http://minio:9000"
   backend:
-    image: ghcr.io/k5sha/ticketo-backend:latest
+    image: ${IMAGE_REF}
     container_name: ticketo-api
     environment:
-      - ENV
-      - ADDR
-      - EXTERNAL_URL
-      - FRONTEND_URL
-      - DB_ADDR
-      - AUTH_BASIC_USERNAME
-      - AUTH_BASIC_PASSWORD
-      - AUTH_TOKEN_SECRET
-      - AUTH_TOKEN_EXPIRATION
-      - AUTH_TOKEN_HOST
-      - MAIL_TOKEN_EXPIRATION
-      - MAIL_FROM_EMAIL
-      - BREVO_USERNAME
-      - BREVO_PASSWORD
-      - BREVO_HOST
-      - BREVO_PORT
-      - S3_BUCKET_NAME
-      - MINIO_ENDPOINT
-      - MINIO_ENDPOINT_PUBLIC
-      - MINIO_ROOT_USER
-      - MINIO_ROOT_PASSWORD
-      - MINIO_SSL
-      - PAYMENT_PUBLIC_KEY
-      - PAYMENT_PRIVATE_KEY
-      - PAYMENT_FRONTEND_URL
-      - PAYMENT_SERVER_URL
+      - ENV=${ENV}
+      - ADDR=${ADDR}
+      - EXTERNAL_URL=${EXTERNAL_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - DB_ADDR=${DB_ADDR}
+      - AUTH_BASIC_USERNAME=${AUTH_BASIC_USERNAME}
+      - AUTH_BASIC_PASSWORD=${AUTH_BASIC_PASSWORD}
+      - AUTH_TOKEN_SECRET=${AUTH_TOKEN_SECRET}
+      - AUTH_TOKEN_EXPIRATION=${AUTH_TOKEN_EXPIRATION}
+      - AUTH_TOKEN_HOST=${AUTH_TOKEN_HOST}
+      - MAIL_TOKEN_EXPIRATION=${MAIL_TOKEN_EXPIRATION}
+      - MAIL_FROM_EMAIL=${MAIL_FROM_EMAIL}
+      - BREVO_USERNAME=${BREVO_USERNAME}
+      - BREVO_PASSWORD=${BREVO_PASSWORD}
+      - BREVO_HOST=${BREVO_HOST}
+      - BREVO_PORT=${BREVO_PORT}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ENDPOINT_PUBLIC=${MINIO_ENDPOINT_PUBLIC}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_SSL=${MINIO_SSL}
     depends_on:
       db:
         condition: service_healthy
