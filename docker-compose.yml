@@ -90,11 +90,10 @@ services:
     restart: on-failure
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ticketo-api.rule=Host(`api.tikceto.k5sha.xyz`)"
-      - "traefik.http.routers.ticketo-api.entrypoints=https"
-      - "traefik.http.routers.ticketo-api.tls=true"
-      - "traefik.http.routers.ticketo-api.tls.certresolver=letsEncrypt"
-      - "traefik.http.services.ticketo-api.loadbalancer.server.url=http://ticketo-api:8080"
+      - "traefik.http.routers.portfolio-web.rule=Host(`api.tikceto.k5sha.xyz`)"
+      - "traefik.http.routers.portfolio-web.entrypoints=https"
+      - "traefik.http.routers.portfolio-web.tls=true"
+      - "traefik.http.routers.portfolio-web.tls.certresolver=letsEncrypt"
 
 volumes:
   db-data:
