@@ -69,6 +69,8 @@ jobs:
           MAIL_FROM_EMAIL: ${{ secrets.MAIL_FROM_EMAIL }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
           MINIO_ENDPOINT_PUBLIC: ${{ secrets.MINIO_ENDPOINT_PUBLIC }}
