@@ -2,7 +2,7 @@
 
 <div align="center">
 
-  [![CI & Build](https://github.com/k5sha/Tikceto/actions/workflows/test_and_build.yaml/badge.svg)](https://github.com/k5sha/Tikceto/actions/workflows/test_and_build.yaml)
+  [![CI & Build](https://github.com/k5sha/Tikceto/actions/workflows/cd.yaml/badge.svg)](https://github.com/k5sha/Tikceto/actions/workflows/test_and_build.yaml)
     [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
     ![Go](https://img.shields.io/badge/backend-Go-informational?logo=go)
     ![React](https://img.shields.io/badge/frontend-React-blue?logo=react)
