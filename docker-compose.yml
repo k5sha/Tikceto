@@ -19,20 +19,17 @@ services:
       retries: 5
       timeout: 5s
   minio:
-    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
     container_name: minio
+    command: server /data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-      - MINIO_USE_SSL=no
+      - MINIO_SERVER_URL=http://minio:9000 
       - MINIO_DEFAULT_BUCKETS=${S3_BUCKET_NAME}
-      - MINIO_SERVER_URL=http://minio:9000
-      - MINIO_SCHEME=http
-      - MINIO_SKIP_CLIENT=yes
-      - MINIO_CONSOLE_PORT_NUMBER=9001
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
+      - "127.0.0.1:9000:9000" 
+      - "127.0.0.1:9001:9001" 
     volumes:
       - minio_data:/data
     restart: on-failure
@@ -41,6 +38,7 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+      start_period: 10s 
     networks:
       - traefik_default
       - app-network
