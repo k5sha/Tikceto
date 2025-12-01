@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.12.0](https://github.com/k5sha/Tikceto/compare/v1.11.0...v1.12.0) (2025-12-01)
+
+
+### Features
+
+* add payment secrets to Docker compose and improve migration logging ([ebda63b](https://github.com/k5sha/Tikceto/commit/ebda63b8bf2299fb4a44a3f451739acb9060e316))
+* enhance migration logging and error handling ([130cfb5](https://github.com/k5sha/Tikceto/commit/130cfb5b5777570c39c2541e4865904afe4b42d6))
+* move web part to other repo ([59ed119](https://github.com/k5sha/Tikceto/commit/59ed1190f93ce3c177ee38b0b39ca36f11879c99))
+* refactor CI/CD workflows and update docker-compose ([29c67bb](https://github.com/k5sha/Tikceto/commit/29c67bbac926747a7f39427b10aa44b9c1ec0424))
+* update README.md ([da91af4](https://github.com/k5sha/Tikceto/commit/da91af41e747507eccc4117702922aad5382f748))
+
+
+### Bug Fixes
+
+* add loadbalancer ([ef04653](https://github.com/k5sha/Tikceto/commit/ef046533f5d06d6aa62718d04ed738aaf38b83f2))
+* add more smtp options to env ([481f9e1](https://github.com/k5sha/Tikceto/commit/481f9e1680c634f491b38e110d9287109e8d871f))
+* correct migrations path and improve migration error logging ([58b0f6b](https://github.com/k5sha/Tikceto/commit/58b0f6b34e6bc6dd28b97bbe5a477b51c50fa101))
+* ErrNoChange ([441f56c](https://github.com/k5sha/Tikceto/commit/441f56ccfe2f206e45e16251164e59dedaa49c10))
+* migratioms path ([fb43503](https://github.com/k5sha/Tikceto/commit/fb43503382d0934504fb0ee75738ca4cfb8c1b05))
+* migrations path ([369a9b2](https://github.com/k5sha/Tikceto/commit/369a9b2193e5a53961c6cde42d80ef9a6e42f593))
+* no new migrations to run ([8141924](https://github.com/k5sha/Tikceto/commit/8141924fd13d70e7889d95f6fba36bf2fb538b8a))
+* remove tailscale from project ([4076e12](https://github.com/k5sha/Tikceto/commit/4076e1236ed61d4b6f272de59f1cb3a311b601a0))
+* remove tailscale from project ([3285cb4](https://github.com/k5sha/Tikceto/commit/3285cb4f44e52798758b9f51f1c1e1421c4285c0))
+* update Dockerfile and docker-compose ([bd62217](https://github.com/k5sha/Tikceto/commit/bd62217af1dbff8e82d69f595b1f76e1d89a36ac))
+* Update MinIO image and configuration settings ([eb5977d](https://github.com/k5sha/Tikceto/commit/eb5977d8680033f680799e176f622edd66bb351e))
+* Update MinIO image to specific release version ([30c7f66](https://github.com/k5sha/Tikceto/commit/30c7f66479a6760cc647b07b6d9c144c676e100d))
+* update SMTP password secret in CI/CD workflow ([16a96bb](https://github.com/k5sha/Tikceto/commit/16a96bb8e92b3fbb41ba8159772982d600bd053d))
+* update Traefik router configuration for ticketo-api service ([5d45878](https://github.com/k5sha/Tikceto/commit/5d45878c3e3b68d1b3ed35fbca226056200b724e))
+
 ## [1.11.0](https://github.com/k5sha/Tikceto/compare/v1.10.0...v1.11.0) (2025-06-06)
 
 
