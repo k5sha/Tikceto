@@ -10,10 +10,17 @@ FROM debian:bullseye-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN groupadd -r tikceto && useradd -r -g tikceto tikceto
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /app/api .
 
 COPY cmd/migrate/migrations ./cmd/migrate/migrations
+
+USER tikceto
 
 EXPOSE 8080
 
