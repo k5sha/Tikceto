@@ -1,102 +1,60 @@
-name: 🚀 Continuous Delivery
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+name: "🚀 Continuous Delivery (CD)"
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [master]
+  workflow_run:
+    workflows: ["🩺 Continuous Integration (CI)"]
+    types:
+      - completed
+    branches:
+      - master
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: read
-  packages: write
+env:
+  INFRA_REPO: "k5sha/k5sha-gitops"
+  MANIFEST_PATH: "manifests/tikceto"
+  REGISTRY: "ghcr.io"
 
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yaml
-
-  deploy:
-    name: 🚚 Deploy to VPS
+  update-manifest:
+    name: 🔄 Update Kubernetes Manifest
     runs-on: ubuntu-latest
-    needs: ci
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
     steps:
-      - name: 📥 Checkout repository
+      - name: 📥 Checkout Infra Repository
         uses: actions/checkout@v4
-        env:
-          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 🔑 Set up SSH access
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} > ~/.ssh/known_hosts
-          docker context create remote --docker host=ssh://${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}
-
-      - name: 🤖 Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,format=short,prefix=
+          repository: ${{ env.INFRA_REPO }}
+          token: ${{ secrets.INFRA_REPO_TOKEN }}
+          path: infra-repo
 
-      - name: ⚙️ Log in to the Container registry
-        uses: docker/login-action@v3.0.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 🚀 Docker compose on server
-        env:
-          IMAGE_REF: ${{ steps.meta.outputs.tags }}
-          ENV: production
-          ADDR: ${{ secrets.ADDR }}
-          EXTERNAL_URL: ${{ secrets.EXTERNAL_URL }}
-          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
-          AUTH_BASIC_USERNAME: ${{ secrets.AUTH_BASIC_USERNAME }}
-          AUTH_BASIC_PASSWORD: ${{ secrets.AUTH_BASIC_PASSWORD }}
-          AUTH_TOKEN_SECRET: ${{ secrets.AUTH_TOKEN_SECRET }}
-          AUTH_TOKEN_EXPIRATION: ${{ secrets.AUTH_TOKEN_EXPIRATION }}
-          AUTH_TOKEN_HOST: ${{ secrets.AUTH_TOKEN_HOST }}
-          MAIL_TOKEN_EXPIRATION: ${{ secrets.MAIL_TOKEN_EXPIRATION }}
-          MAIL_FROM_EMAIL: ${{ secrets.MAIL_FROM_EMAIL }}
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
-          MINIO_ENDPOINT_PUBLIC: ${{ secrets.MINIO_ENDPOINT_PUBLIC }}
-          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
-          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
-          MINIO_SSL: ${{ secrets.MINIO_SSL }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          DB_ADDR: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ secrets.POSTGRES_DB }}?sslmode=disable
-          PAYMENT_PUBLIC_KEY: ${{secrets.PAYMENT_PUBLIC_KEY}}
-          PAYMENT_PRIVATE_KEY: ${{secrets.PAYMENT_PRIVATE_KEY}}
-          PAYMENT_FRONTEND_URL: ${{secrets.PAYMENT_FRONTEND_URL}}
-          PAYMENT_SERVER_URL: ${{secrets.PAYMENT_SERVER_URL}}
+      - name: 🤖 Extract short SHA
+        id: vars
         run: |
-          docker --context remote compose -f docker-compose.yml pull
-          docker --context remote compose -f docker-compose.yml up -d
+          echo "sha_short=$(echo ${{ github.event.workflow_run.head_sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
 
-      - name: 🧹 Cleanup and summary
+      - name: 🔧 Update Image Tag in Deployment
         run: |
-          docker --context remote system prune -f --filter "until=72h"
-          rm -rf ~/.ssh
-          echo "### ✅ Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Item       | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|------------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🐳 Image    | \`${{ steps.meta.outputs.tags }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔀 Git SHA  | \`${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🕒 Time     | \`$(date -u)\` |" >> $GITHUB_STEP_SUMMARY
+          cd infra-repo/${{ env.MANIFEST_PATH }}
+          
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_FULL_PATH="${{ env.REGISTRY }}/${REPO_LOWER}"
+          NEW_TAG="${{ steps.vars.outputs.sha_short }}"
+          
+          echo "Updating image to: ${IMAGE_FULL_PATH}:${NEW_TAG}"
+          
+          sed -i "s|image: ${IMAGE_FULL_PATH}:.*|image: ${IMAGE_FULL_PATH}:${NEW_TAG}|g" deployment.yaml
+
+      - name: 🚀 Commit and Push to Infra Repo
+        run: |
+          cd infra-repo
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+          git add ${{ env.MANIFEST_PATH }}/deployment.yaml
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(cd): update image for ${{ github.event.repository.name }} to ${{ steps.vars.outputs.sha_short }}"
+            git push
+          fi
