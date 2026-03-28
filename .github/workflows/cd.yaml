@@ -51,7 +51,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
           
-          git add ${{ env.MANIFEST_PATH }}/deployment.yaml
+          git add ${{ env.MANIFEST_PATH }}/${{ env.MANIFEST_FILE }}
           
           if git diff --staged --quiet; then
             echo "No changes to commit"
