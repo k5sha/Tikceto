@@ -11,6 +11,7 @@ on:
 env:
   INFRA_REPO: "k5sha/k5sha-gitops"
   MANIFEST_PATH: "manifests/tikceto"
+  MANIFEST_FILE: "backend.yaml"
   REGISTRY: "ghcr.io"
 
 jobs:
@@ -42,7 +43,7 @@ jobs:
           
           echo "Updating image to: ${IMAGE_FULL_PATH}:${NEW_TAG}"
           
-          sed -i "s|image: ${IMAGE_FULL_PATH}:.*|image: ${IMAGE_FULL_PATH}:${NEW_TAG}|g" deployment.yaml
+          sed -i "s|image: ${IMAGE_FULL_PATH}:.*|image: ${IMAGE_FULL_PATH}:${NEW_TAG}|g" ${{ env.MANIFEST_FILE }}
 
       - name: 🚀 Commit and Push to Infra Repo
         run: |
