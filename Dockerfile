@@ -1,5 +1,6 @@
-# Build stage
 FROM golang:1.23.3 as builder
+
+RUN apk update && apk upgrade --no-cache
 
 WORKDIR /app
 COPY . .
