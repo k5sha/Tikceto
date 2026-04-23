@@ -1,6 +1,6 @@
 FROM golang:1.23.3 as builder
 
-RUN apk update && apk upgrade --no-cache
+RUN apt-get update && apt-get upgrade -y
 
 WORKDIR /app
 COPY . .

@@ -15,6 +15,11 @@ type PaginatedMoviesQuery struct {
 	Until  *string `json:"until"`
 }
 
+type PaginatedMoviesResponse struct {
+	Data  []Movie `json:"data"`
+	Total int     `json:"total"`
+}
+
 func (pq *PaginatedMoviesQuery) Parse(r *http.Request) (PaginatedMoviesQuery, error) {
 	qs := r.URL.Query()
 

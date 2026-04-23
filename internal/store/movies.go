@@ -86,28 +86,31 @@ func (s *MoviesStore) GetBySlug(ctx context.Context, slug string) (*Movie, error
 	return movie, nil
 }
 
-func (s *MoviesStore) GetMoviesList(ctx context.Context, fq PaginatedMoviesQuery) ([]Movie, error) {
+func (s *MoviesStore) GetMoviesList(ctx context.Context, fq PaginatedMoviesQuery) ([]Movie, int, error) {
 	query := `
-		SELECT id, slug, title, description, duration, poster_url, release_date, created_at
-		FROM movies
-		WHERE 
-			(title ILIKE '%' || $1 || '%' OR description ILIKE '%' || $1 || '%') AND
-			($2::date IS NULL OR release_date >= $2) AND
-			($3::date IS NULL OR release_date <= $3)
-		ORDER BY release_date ` + fq.Sort + `
-		LIMIT $4 OFFSET $5
-	`
+        SELECT id, slug, title, description, duration, poster_url, release_date, created_at, 
+               COUNT(*) OVER() AS total_count
+        FROM movies
+        WHERE 
+            (title ILIKE '%' || $1 || '%' OR description ILIKE '%' || $1 || '%') AND
+            ($2::date IS NULL OR release_date >= $2) AND
+            ($3::date IS NULL OR release_date <= $3)
+        ORDER BY release_date ` + fq.Sort + `
+        LIMIT $4 OFFSET $5
+    `
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
 	rows, err := s.db.QueryContext(ctx, query, fq.Search, fq.Since, fq.Until, fq.Limit, fq.Offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
 	var movies []Movie
+	totalCount := 0
+
 	for rows.Next() {
 		var movie Movie
 		err := rows.Scan(
@@ -119,14 +122,15 @@ func (s *MoviesStore) GetMoviesList(ctx context.Context, fq PaginatedMoviesQuery
 			&movie.PosterUrl,
 			&movie.ReleaseDate,
 			&movie.CreatedAt,
+			&totalCount,
 		)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		movies = append(movies, movie)
 	}
 
-	return movies, nil
+	return movies, totalCount, nil
 }
 
 func (s *MoviesStore) Create(ctx context.Context, movie *Movie) error {

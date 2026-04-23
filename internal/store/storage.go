@@ -34,7 +34,7 @@ type Storage struct {
 	Movies interface {
 		GetByID(context.Context, int64) (*Movie, error)
 		GetBySlug(context.Context, string) (*Movie, error)
-		GetMoviesList(context.Context, PaginatedMoviesQuery) ([]Movie, error)
+		GetMoviesList(context.Context, PaginatedMoviesQuery) ([]Movie, int, error)
 		Create(context.Context, *Movie) error
 		Delete(context.Context, int64) error
 		Update(context.Context, *Movie) error

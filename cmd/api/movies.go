@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/k5sha/Tikceto/internal/s3"
-	"github.com/k5sha/Tikceto/internal/store"
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/k5sha/Tikceto/internal/s3"
+	"github.com/k5sha/Tikceto/internal/store"
 )
 
 type movieKey string
@@ -165,7 +166,7 @@ func (app *application) getMovieHandler(w http.ResponseWriter, r *http.Request) 
 //	@Param			offset	query		int		false	"Offset"
 //	@Param			sort	query		string	false	"Sort order (asc|desc)"
 //	@Param			search	query		string	false	"Search by title or description"
-//	@Success		200		{object}	[]store.Movie
+//	@Success		200		{object}	store.PaginatedMoviesResponse
 //	@Failure		400		{object}	error
 //	@Failure		500		{object}	error
 //	@Router			/movies [get]
@@ -189,7 +190,7 @@ func (app *application) getMoviesHandler(w http.ResponseWriter, r *http.Request)
 
 	ctx := r.Context()
 
-	movies, err := app.store.Movies.GetMoviesList(ctx, pq)
+	movies, total, err := app.store.Movies.GetMoviesList(ctx, pq)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
@@ -205,7 +206,12 @@ func (app *application) getMoviesHandler(w http.ResponseWriter, r *http.Request)
 		movies[i].PosterUrl = url
 	}
 
-	if err := app.jsonResponse(w, http.StatusOK, movies); err != nil {
+	response := store.PaginatedMoviesResponse{
+		Data:  movies,
+		Total: total,
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, response); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
