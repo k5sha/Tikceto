@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"time"
 
@@ -18,7 +19,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const version = "0.0.1"
+const version = "0.1.2"
 
 //	@title			Tikceto
 //	@description	API for Tikceto
@@ -71,13 +72,12 @@ func main() {
 			},
 		},
 		s3: s3Config{
-			bucketName: env.GetString("S3_BUCKET_NAME", "tikceto"),
-			minio: minioConfig{
-				user:           env.GetString("MINIO_ROOT_USER", "admin"),
-				password:       env.GetString("MINIO_ROOT_PASSWORD", "adminpassword"),
-				endpoint:       env.GetString("MINIO_ENDPOINT", "minio:9000"),
-				endpointPublic: env.GetString("MINIO_ENDPOINT_PUBLIC", "localhost/minio"),
-				ssl:            env.GetBool("MINIO_SSL", false),
+			bucketName: env.GetString("R2_BUCKET_NAME", "tikceto"),
+			r2: r2Config{
+				accountID:       env.GetString("R2_ACCOUNT_ID", ""),
+				accessKeyID:     env.GetString("R2_ACCESS_KEY_ID", ""),
+				secretAccessKey: env.GetString("R2_SECRET_ACCESS_KEY", ""),
+				publicEndpoint:  env.GetString("R2_PUBLIC_ENDPOINT", ""),
 			},
 		},
 		payment: payConfig{
@@ -147,7 +147,14 @@ func main() {
 	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
 
 	// S3
-	s3, err := s3.NewMinioClient(cfg.s3.minio.endpoint, cfg.s3.minio.endpointPublic, cfg.s3.minio.user, cfg.s3.minio.password, cfg.s3.bucketName, cfg.s3.minio.ssl)
+	s3, err := s3.NewR2Client(
+		context.Background(),
+		cfg.s3.r2.accountID,
+		cfg.s3.r2.accessKeyID,
+		cfg.s3.r2.secretAccessKey,
+		cfg.s3.bucketName,
+		cfg.s3.r2.publicEndpoint,
+	)
 	if err != nil {
 		logger.Fatal(err)
 	}

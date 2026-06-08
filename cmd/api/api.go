@@ -90,15 +90,14 @@ type smtpConfig struct {
 
 type s3Config struct {
 	bucketName string
-	minio      minioConfig
+	r2         r2Config
 }
 
-type minioConfig struct {
-	user           string
-	password       string
-	ssl            bool
-	endpoint       string
-	endpointPublic string
+type r2Config struct {
+	accountID       string
+	accessKeyID     string
+	secretAccessKey string
+	publicEndpoint  string
 }
 
 func (app *application) mount() *chi.Mux {
