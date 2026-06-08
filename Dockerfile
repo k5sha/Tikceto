@@ -1,4 +1,4 @@
-FROM golang:1.23.3 as builder
+FROM golang:1.24 AS builder
 
 RUN apt-get update && apt-get upgrade -y
 
