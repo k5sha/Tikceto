@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const version = "0.1.2"
+const version = "0.1.3"
 
 //	@title			Tikceto
 //	@description	API for Tikceto
