@@ -1,7 +1,9 @@
-name: "🩺 Continuous Integration (CI)"
+name: "Continuous Integration (CI)"
 
 on:
   push:
+    branches: ["master"]
+  pull_request:
     branches: ["master"]
   workflow_dispatch:
 
@@ -11,36 +13,36 @@ env:
 
 jobs:
   pre-build-check:
-    name: 🧪 Run Tests
+    name: Run Tests & Checks
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: 🐳 Lint Dockerfile
+      - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
           failure-threshold: error
 
-      - name: 🛡️ Scan FS for Secrets and Configs
+      - name: Scan FS for Secrets and Configs
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           scan-ref: '.'
-          scanners: 'vuln,secret,config' 
+          scanners: 'vuln,secret,config'
           hide-progress: true
           format: 'table'
-          exit-code: '1' 
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
 
-      - name: 🛠️ Set up Go
-        uses: actions/setup-go@v2
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
           go-version: 1.23.3
 
-      - name: 💾 Cache Go Modules
-        uses: actions/cache@v3
+      - name: Cache Go Modules
+        uses: actions/cache@v4
         with:
           path: |
             ~/go/pkg/mod
@@ -49,44 +51,44 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: 🔎 Verify Dependencies
+      - name: Verify Dependencies
         run: go mod verify
 
-      - name: 🏗️ Build
+      - name: Build
         run: go build -v ./...
 
-      - name: 🕵️‍♂️ Run go vet
+      - name: Run go vet
         run: go vet ./...
 
-      - name: 📦 Install staticcheck
+      - name: Install staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: 🧹 Run staticcheck
+      - name: Run staticcheck
         run: staticcheck ./...
 
-      - name: 🧪 Run Tests
+      - name: Run Tests
         run: go test -race ./...
 
   build-and-push:
-    name: 🔧 Build & Push Image
-    needs: pre-build-check 
+    name: Build & Push Image
+    needs: pre-build-check
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Log in to the Container registry
+      - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🤖 Extract metadata
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -94,10 +96,10 @@ jobs:
           tags: |
             type=sha,format=short,prefix=
 
-      - name: ⚙️ Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🚀 Build and push
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
